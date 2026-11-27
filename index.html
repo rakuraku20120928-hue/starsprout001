@@ -195,7 +195,7 @@
             ⚔️ 立即開始冒險
           </button>
           <button onclick="enterGame('gacha')" class="pixel-btn" style="padding:14px 22px;border-radius:16px;background:linear-gradient(180deg,#fbbf24,#d97706);color:#1e1b4b;font-weight:900;font-size:14px;">
-            ✨ 免費領 15 抽招募
+            ✨ 上線免費100抽！
           </button>
         </div>
       </section>
@@ -319,7 +319,7 @@
           🪙 <span id="top-coins">500</span>
         </div>
         <div style="background:#111426;border:1px solid rgba(56,189,248,0.4);border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;color:var(--sky);">
-          🎫 <span id="top-tickets">15</span>
+          🎫 <span id="top-tickets">100</span>
         </div>
         <button id="btn-sound" onclick="toggleSound()" style="width:28px;height:28px;border-radius:50%;background:#262d52;border:1px solid #475569;color:#fff;font-size:12px;cursor:pointer;">🔊</button>
       </div>
@@ -1375,12 +1375,14 @@
      *************************************************************************/
     const ACCOUNTS_DB_KEY = 'star_sprout_accounts_db_v3';
     const CURRENT_USER_KEY = 'star_sprout_current_user_v3';
+    const SAVE_SCHEMA_VERSION = 3;
 
     function createDefaultState(username = '訪客冒險家') {
       return {
+        saveVersion: SAVE_SCHEMA_VERSION,
         username,
         coins: 500,
-        tickets: 15,
+        tickets: 100,
         owned: { 1: 1 },
         equippedId: 1,
         selectedMapId: 'meadow',
@@ -1391,6 +1393,23 @@
       };
     }
 
+    // 深度合併舊存檔與預設結構，確保未來更新遊戲新增欄位或修改版本時，玩家所有遊玩紀錄完整保留不遺失
+    function migrateAndMergeSaveState(username, rawSave) {
+      const base = createDefaultState(username);
+      if (!rawSave || typeof rawSave !== 'object') return base;
+      const merged = Object.assign({}, base, rawSave);
+      merged.username = username;
+      merged.saveVersion = SAVE_SCHEMA_VERSION;
+      merged.owned = Object.assign({}, base.owned, rawSave.owned || {});
+      merged.stats = Object.assign({}, base.stats, rawSave.stats || {});
+      merged.claimedQuests = Object.assign({}, base.claimedQuests, rawSave.claimedQuests || {});
+      merged.gachaHistory = Array.isArray(rawSave.gachaHistory) ? rawSave.gachaHistory : [];
+      if (typeof merged.coins !== 'number' || Number.isNaN(merged.coins)) merged.coins = base.coins;
+      if (typeof merged.tickets !== 'number' || Number.isNaN(merged.tickets)) merged.tickets = base.tickets;
+      if (!merged.equippedId || !merged.owned[merged.equippedId]) merged.equippedId = 1;
+      return merged;
+    }
+
     let accountsDB = {};
     let currentUsername = '訪客冒險家';
     let gameState = createDefaultState(currentUsername);
@@ -1399,14 +1418,20 @@
       try {
         const rawDB = localStorage.getItem(ACCOUNTS_DB_KEY);
         if (rawDB) accountsDB = JSON.parse(rawDB) || {};
+        // 自動將舊版存檔資料結構無損升級並補齊預設欄位
+        Object.keys(accountsDB).forEach(accName => {
+          if (accountsDB[accName] && accountsDB[accName].saveData) {
+            accountsDB[accName].saveData = migrateAndMergeSaveState(accName, accountsDB[accName].saveData);
+          }
+        });
         const savedUser = localStorage.getItem(CURRENT_USER_KEY);
         if (savedUser && accountsDB[savedUser]) {
           currentUsername = savedUser;
-          gameState = Object.assign(createDefaultState(savedUser), accountsDB[savedUser].saveData);
+          gameState = migrateAndMergeSaveState(savedUser, accountsDB[savedUser].saveData);
         } else {
           if (!accountsDB['訪客冒險家']) accountsDB['訪客冒險家'] = { password: '', saveData: createDefaultState('訪客冒險家') };
           currentUsername = '訪客冒險家';
-          gameState = Object.assign(createDefaultState('訪客冒險家'), accountsDB['訪客冒險家'].saveData);
+          gameState = migrateAndMergeSaveState('訪客冒險家', accountsDB['訪客冒險家'].saveData);
         }
       } catch (e) {}
     }
@@ -1518,7 +1543,7 @@
         try {
           const parsed = JSON.parse(ev.target.result);
           if (parsed && parsed.owned) {
-            gameState = Object.assign(createDefaultState(currentUsername), parsed);
+            gameState = migrateAndMergeSaveState(currentUsername, parsed);
             saveGame();
             switchTab(currentTab);
             openAccountModal();
@@ -1552,7 +1577,7 @@
         if (!accountsDB[user]) { fb.textContent = '❌ 找不到此帳號，請先註冊'; return; }
         if (accountsDB[user].password && accountsDB[user].password !== pass) { fb.textContent = '❌ 密碼錯誤'; return; }
         currentUsername = user;
-        gameState = Object.assign(createDefaultState(user), accountsDB[user].saveData);
+        gameState = migrateAndMergeSaveState(user, accountsDB[user].saveData);
         saveGame(); switchTab(currentTab); openAccountModal();
         fb.textContent = `✅ 歡迎回來，${user}！`;
       }
@@ -1561,7 +1586,7 @@
     function quickSwitchAccount(name) {
       if (!accountsDB[name]) return;
       currentUsername = name;
-      gameState = Object.assign(createDefaultState(name), accountsDB[name].saveData);
+      gameState = migrateAndMergeSaveState(name, accountsDB[name].saveData);
       saveGame(); switchTab(currentTab); openAccountModal();
       showToast(`已切換至帳號：${name}`);
     }
@@ -1585,7 +1610,7 @@
       try {
         const parsed = JSON.parse(decodeURIComponent(atob(input.trim())));
         if (parsed && parsed.owned) {
-          gameState = Object.assign(createDefaultState(currentUsername), parsed);
+          gameState = migrateAndMergeSaveState(currentUsername, parsed);
           saveGame(); switchTab(currentTab); openAccountModal();
           document.getElementById('save-feedback').textContent = '✅ 存檔代碼還原成功！';
         } else { document.getElementById('save-feedback').textContent = '❌ 無效的存檔代碼'; }
@@ -3231,6 +3256,11 @@
       screenEl.addEventListener('touchend', endJoy, { passive: true });
       screenEl.addEventListener('touchcancel', endJoy, { passive: true });
     })();
+
+    // 關閉或更新重整網頁前自動保存目前進度
+    window.addEventListener('beforeunload', () => {
+      try { saveGame(); } catch (e) {}
+    });
 
     // 啟動初始化
     window.addEventListener('DOMContentLoaded', () => {
