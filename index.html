@@ -2684,8 +2684,8 @@
         Battle.enemies.push({
           x: (Battle.zone === 'main' ? p.x : 0) + Math.cos(ang) * dist,
           y: (Battle.zone === 'main' ? p.y : 0) + Math.sin(ang) * dist,
-          hp: Math.round(28 * hpScale), maxHp: Math.round(28 * hpScale),
-          atk: Math.round(9 * Battle.map.rewardMult),
+          hp: Math.max(1, Math.round((28 * hpScale) / 3)), maxHp: Math.max(1, Math.round((28 * hpScale) / 3)),
+          atk: Math.max(1, Math.round((9 * Battle.map.rewardMult) / 3)),
           spd: 62 + Math.min(45, Battle.elapsed * 0.05),
           r: 14, isBoss: false
         });
