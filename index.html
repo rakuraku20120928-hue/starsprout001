@@ -1,1842 +1,1659 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>星芽紀元 StarSprout：500異獸對戰舞台終極整合版</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>星芽冒險團 STAR SPROUT ADVENTURE | 500異獸生存割草終極整合版 v3.0</title>
 <style>
   :root {
-    --bg: #070a11;
-    --panel: #0f1523;
-    --panel-2: #161f33;
-    --border: #273452;
-    --text: #e2e8f0;
-    --muted: #8b9bb8;
-    --accent: #38bdf8;
-    --gold: #f59e0b;
-    --mythic: #e11d48;
-    --epic: #9333ea;
-    --rare: #2563eb;
-    --common: #475569;
+    --bg-dark: #090d16;
+    --bg-card: #121a2d;
+    --bg-card-2: #19243e;
+    --border-gold: #f5c542;
+    --accent-green: #38e57c;
+    --accent-cyan: #38bdf8;
+    --accent-purple: #c084fc;
+    --accent-red: #f87171;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
   }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
   body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
     overflow-x: hidden;
-    padding-bottom: 68px;
+    line-height: 1.5;
   }
-  #dynamic-bg {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background: radial-gradient(circle at 20% 20%, #152038 0%, #070a11 75%);
-    transition: background 0.8s ease;
-  }
-  .star-dot {
-    position: absolute;
-    background: #cbd5e1;
-    opacity: 0.45;
-    animation: twinkle 3s infinite ease-in-out alternate;
-  }
-  @keyframes twinkle { from { opacity: 0.15; } to { opacity: 0.85; } }
+  .pixel-font { font-family: 'Courier New', monospace; letter-spacing: 1px; }
+  button { cursor: pointer; border: none; font-family: inherit; transition: transform 0.12s, filter 0.15s; }
+  button:active { transform: scale(0.96); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  canvas.pixel-art { image-rendering: pixelated; }
 
-  /* Header */
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    background: rgba(7, 10, 17, 0.95);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border);
-    padding: 8px 12px;
+  /* ================= 1. 官網門戶 (STAR SPROUT PORTAL) ================= */
+  #portal-view { display: block; }
+  .navbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(9, 13, 22, 0.94); backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(245, 197, 66, 0.25);
+    padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
   }
-  .top-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-logo { font-size: 28px; }
+  .brand-title h1 { font-size: 18px; color: var(--accent-green); font-weight: 900; }
+  .brand-title span { font-size: 10px; color: var(--border-gold); letter-spacing: 2px; display: block; }
+  .nav-links { display: flex; gap: 16px; align-items: center; }
+  .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; }
+  .nav-links a:hover { color: #fff; }
+  .btn-play-nav {
+    background: linear-gradient(135deg, #38e57c, #16a34a);
+    color: #052e16; font-weight: 900; padding: 8px 16px; border-radius: 8px;
+    box-shadow: 0 0 15px rgba(56, 229, 124, 0.4);
   }
-  .brand { font-weight: 900; font-size: 15px; color: #f8fafc; letter-spacing: 0.5px; }
-  .resources { display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px; }
-  .res-pill {
-    background: var(--panel-2);
-    border: 1px solid var(--border);
-    padding: 4px 8px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-weight: 700;
+  @media (max-width: 720px) { .nav-links a { display: none; } }
+
+  .hero {
+    text-align: center; padding: 56px 20px 46px;
+    background: radial-gradient(circle at 50% 20%, rgba(56, 229, 124, 0.14), transparent 60%),
+                radial-gradient(circle at 80% 60%, rgba(192, 132, 252, 0.12), transparent 50%);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .hero-badge {
+    display: inline-block; padding: 6px 14px; border-radius: 99px;
+    background: rgba(245, 197, 66, 0.15); border: 1px solid var(--border-gold);
+    color: var(--border-gold); font-size: 13px; font-weight: 700; margin-bottom: 18px;
+  }
+  .hero h2 { font-size: clamp(28px, 5vw, 44px); font-weight: 900; line-height: 1.25; margin-bottom: 16px; }
+  .hero h2 span { color: var(--border-gold); text-shadow: 0 0 20px rgba(245, 197, 66, 0.4); }
+  .hero p { max-width: 680px; margin: 0 auto 28px; color: var(--text-muted); font-size: 15px; }
+  .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn-hero-start {
+    background: linear-gradient(135deg, #f5c542, #d97706);
+    color: #1e1b08; font-size: 17px; font-weight: 900; padding: 14px 30px; border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(245, 197, 66, 0.4);
+  }
+  .btn-hero-gift {
+    background: rgba(192, 132, 252, 0.18); border: 1px solid var(--accent-purple);
+    color: #f3e8ff; font-size: 16px; font-weight: 800; padding: 14px 24px; border-radius: 12px;
   }
 
-  /* Navigation */
-  nav.main-nav {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding: 8px 12px;
-    background: rgba(15, 21, 35, 0.96);
-    border-bottom: 1px solid var(--border);
-    scrollbar-width: none;
-  }
-  nav.main-nav::-webkit-scrollbar { display: none; }
-  .nav-btn {
-    flex: 0 0 auto;
-    background: var(--panel-2);
-    color: var(--muted);
-    border: 1px solid var(--border);
-    padding: 7px 12px;
-    border-radius: 7px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-  .nav-btn.active { background: #1d4ed8; color: #fff; border-color: #60a5fa; }
+  .section { max-width: 1080px; margin: 0 auto; padding: 44px 20px; }
+  .sec-header { text-align: center; margin-bottom: 28px; }
+  .sec-en { font-size: 12px; color: var(--accent-cyan); letter-spacing: 3px; font-weight: 800; }
+  .sec-title { font-size: 26px; font-weight: 800; margin-top: 4px; }
 
-  main { max-width: 1100px; margin: 0 auto; padding: 12px; }
-  .tab-section { display: none; }
-  .tab-section.active { display: block; }
-
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
   .card {
-    background: rgba(15, 21, 35, 0.94);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    margin-bottom: 12px;
+    background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 18px; transition: 0.2s;
   }
-  .card-title {
-    font-size: 15px;
-    font-weight: 800;
-    margin: 0 0 10px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .card:hover { border-color: rgba(245, 197, 66, 0.45); }
+  .card-icon { font-size: 30px; margin-bottom: 8px; }
+  .card h3 { font-size: 16px; color: #fff; margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--text-muted); }
 
-  /* Buttons */
-  .btn {
-    background: var(--panel-2);
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: 8px 13px;
-    border-radius: 7px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.12s;
+  .filter-tabs { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn {
+    background: var(--bg-card); color: var(--text-muted); padding: 8px 16px;
+    border-radius: 8px; font-size: 13px; font-weight: 700; border: 1px solid rgba(255,255,255,0.1);
   }
-  .btn:active { transform: scale(0.96); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-primary { background: #1d4ed8; border-color: #3b82f6; color: #fff; }
-  .btn-gold { background: #b45309; border-color: #f59e0b; color: #fff; }
-  .btn-mythic { background: #be123c; border-color: #f43f5e; color: #fff; }
-  .btn-green { background: #047857; border-color: #10b981; color: #fff; }
-  .btn-sm { padding: 5px 9px; font-size: 12px; }
-  .btn-lg { padding: 12px 20px; font-size: 15px; border-radius: 9px; }
+  .tab-btn.active { background: var(--border-gold); color: #111; border-color: var(--border-gold); }
+  .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
+  .pet-card {
+    background: var(--bg-card); border-radius: 12px; padding: 12px; text-align: center;
+    border: 1px solid rgba(255,255,255,0.1); position: relative; cursor: pointer;
+  }
+  .pet-card canvas { width: 64px; height: 64px; margin: 6px auto; display: block; }
+  .rarity-badge {
+    position: absolute; top: 8px; right: 8px; font-size: 10px; padding: 2px 6px;
+    border-radius: 4px; font-weight: 800;
+  }
+  .r-mythic { background: rgba(245,197,66,0.22); color: #f5c542; border: 1px solid #f5c542; }
+  .r-epic { background: rgba(192,132,252,0.22); color: #c084fc; border: 1px solid #c084fc; }
+  .r-rare { background: rgba(56,189,248,0.22); color: #38bdf8; border: 1px solid #38bdf8; }
+  .r-uncommon { background: rgba(56,229,124,0.22); color: #38e57c; border: 1px solid #38e57c; }
+  .r-common { background: rgba(148,163,184,0.22); color: #cbd5e1; }
 
-  /* Expedition Map & Stage Selector */
-  .stage-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 10px;
-    margin-top: 10px;
+  .boss-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 14px; }
+  .boss-card {
+    background: linear-gradient(180deg, #171f36, #0f1524);
+    border: 1px solid rgba(248, 113, 113, 0.35); border-radius: 14px; padding: 14px;
+    display: flex; align-items: center; gap: 12px;
   }
-  .stage-node {
-    background: var(--panel-2);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .stage-node.boss-node { border-color: #f59e0b; background: linear-gradient(135deg, #271a0c, #161f33); }
+  .boss-card canvas { width: 64px; height: 64px; flex-shrink: 0; background: rgba(0,0,0,0.4); border-radius: 10px; }
+  .boss-time { font-size: 11px; color: #f87171; font-weight: 800; }
+  .boss-name { font-size: 15px; font-weight: 800; color: #fff; margin: 2px 0; }
+  .boss-desc { font-size: 12px; color: var(--text-muted); }
 
-  /* Quests / Missions List */
-  .quest-item {
-    background: var(--panel-2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .quest-item.completed { border-color: #10b981; }
+  .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .guide-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .guide-list li { background: var(--bg-card); padding: 12px 14px; border-radius: 10px; font-size: 13px; border-left: 3px solid var(--accent-green); }
+  .patch-item { background: var(--bg-card); padding: 14px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(56,189,248,0.25); }
+  .patch-tag { background: #ef4444; color: #fff; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 4px; margin-right: 6px; }
 
-  /* =========================================================================
-     FULL-SCREEN DEDICATED BATTLE STAGE OVERLAY (FIRST VERSION CORE)
-     ========================================================================= */
-  #battle-screen-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: #060911;
-    display: none;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow-y: auto;
+  /* ================= 2. 遊戲主程式視窗 (MOBILE PORTRAIT + DESKTOP) ================= */
+  #game-app {
+    display: none; position: fixed; inset: 0; background: #060911; z-index: 200;
+    justify-content: center; align-items: center;
   }
-  #battle-screen-overlay.open { display: flex; }
-
-  .battle-topbar {
-    background: rgba(15, 21, 35, 0.96);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .battle-visual-arena {
-    position: relative;
-    flex: 1;
-    min-height: 290px;
-    background: radial-gradient(circle at 50% 35%, #1e293b 0%, #090d16 80%);
-    border-bottom: 2px solid #334155;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  .mobile-frame {
+    width: 100%; max-width: 480px; height: 100%; background: #0d1322;
+    position: relative; display: flex; flex-direction: column;
+    border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);
     overflow: hidden;
   }
-  .arena-ground-grid {
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 45%;
-    background: linear-gradient(180deg, rgba(56,189,248,0.06) 0%, rgba(15,23,42,0.85) 100%);
-    border-top: 1px dashed rgba(148,163,184,0.25);
-    pointer-events: none;
+  .top-bar {
+    padding: 8px 12px; background: rgba(9, 13, 22, 0.96);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex; justify-content: space-between; align-items: center; font-size: 12px; gap: 6px;
   }
-  .enemy-stage-row {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-  .player-stage-row {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 12px;
-  }
-  .fighter-sprite-card {
-    background: rgba(15, 21, 35, 0.88);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 8px;
-    width: 145px;
-    text-align: center;
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.15s, border-color 0.15s;
-  }
-  .fighter-sprite-card.active-turn {
-    border-color: #38bdf8;
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.5);
-    transform: translateY(-4px);
-  }
-  .fighter-sprite-card.targeted {
-    border-color: #ef4444;
-    box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
-  }
-  .fighter-sprite-card.dead {
-    opacity: 0.32;
-    filter: grayscale(1);
-    pointer-events: none;
-  }
-  @keyframes hitShake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-8px); filter: brightness(1.8); }
-    50% { transform: translateX(8px); }
-    75% { transform: translateX(-5px); }
-  }
-  @keyframes lungeForward {
-    0% { transform: translateY(0); }
-    45% { transform: translateY(-18px) scale(1.08); }
-    100% { transform: translateY(0); }
-  }
-  .anim-hit { animation: hitShake 0.35s ease; }
-  .anim-attack { animation: lungeForward 0.32s ease; }
+  .res-group { display: flex; gap: 5px; flex-wrap: wrap; }
+  .res-pill { background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 99px; font-weight: 800; }
 
-  .dmg-popup {
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-weight: 900;
-    font-size: 18px;
-    color: #fbbf24;
-    text-shadow: 0 2px 6px #000;
-    pointer-events: none;
-    animation: floatUp 0.85s forwards ease-out;
-    z-index: 10;
+  .lobby-body { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+  .stage-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+  .stage-btn {
+    padding: 8px 2px; border-radius: 8px; background: var(--bg-card); color: var(--text-muted);
+    font-size: 11px; font-weight: 800; border: 1px solid rgba(255,255,255,0.1); text-align: center;
   }
-  @keyframes floatUp {
-    0% { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
-    100% { opacity: 0; transform: translate(-50%, -34px) scale(0.95); }
+  .stage-btn.active { border-color: var(--accent-green); color: #fff; background: rgba(56, 229, 124, 0.16); }
+
+  .active-pet-box {
+    background: linear-gradient(135deg, #162038, #0f1629);
+    border: 1px solid rgba(245, 197, 66, 0.45); border-radius: 14px; padding: 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .active-pet-box canvas { width: 72px; height: 72px; background: rgba(0,0,0,0.45); border-radius: 12px; flex-shrink: 0; }
+  .skill-tags { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 6px; }
+  .skill-tag { background: rgba(255,255,255,0.06); padding: 3px 7px; border-radius: 6px; font-size: 11px; color: #cbd5e1; }
+
+  /* 六大許願池卡片 */
+  .pool-card {
+    background: var(--bg-card); border-radius: 12px; padding: 12px;
+    border: 1px solid rgba(255,255,255,0.12); display: flex; flex-direction: column; gap: 8px;
+  }
+  .pool-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .pool-cover { width: 58px; height: 58px; background: rgba(0,0,0,0.45); border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); }
+
+  /* 任務與懸賞項目 */
+  .quest-card {
+    background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  }
+  .quest-card.ready { border-color: var(--accent-green); background: rgba(56, 229, 124, 0.08); }
+
+  /* 20種道具工坊 */
+  .item-row {
+    background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
   }
 
-  .bar-wrap { width: 100%; height: 6px; background: #060911; border-radius: 3px; overflow: hidden; margin-top: 4px; }
-  .hp-fill { height: 100%; background: #10b981; transition: width 0.25s; }
-  .hp-fill.enemy { background: #ef4444; }
-  .mp-fill { height: 100%; background: #3b82f6; transition: width 0.25s; }
+  .bottom-tabs {
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    background: #080c15; border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .b-tab { padding: 10px 2px; background: transparent; color: var(--text-muted); font-size: 11px; font-weight: 800; }
+  .b-tab.active { color: var(--border-gold); border-top: 2px solid var(--border-gold); background: rgba(245,197,66,0.08); }
 
-  .battle-control-deck {
-    background: #0b101d;
-    padding: 12px;
+  /* ================= 3. PokéSurvivor 2D 生存割草戰鬥畫布 ================= */
+  #battle-screen { display: none; position: absolute; inset: 0; background: #000; z-index: 30; }
+  #battle-canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+  .battle-hud-top {
+    position: absolute; top: 0; left: 0; right: 0; padding: 10px 12px; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0.82), transparent);
   }
-  .skill-buttons-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 8px;
-    margin: 8px 0;
+  .xp-bar-wrap { width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+  .xp-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #38bdf8, #38e57c); transition: width 0.15s; }
+  .hud-stats { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 900; text-shadow: 0 1px 3px #000; }
+  .boss-hp-wrap {
+    display: none; margin-top: 8px; background: rgba(15, 10, 15, 0.85); padding: 6px 10px;
+    border-radius: 8px; border: 1px solid #ef4444;
   }
-  .skill-cmd-btn {
-    background: #161f33;
-    border: 1px solid #3b82f6;
-    color: #f8fafc;
-    border-radius: 8px;
-    padding: 9px 10px;
-    text-align: left;
-    cursor: pointer;
-  }
-  .skill-cmd-btn:disabled { opacity: 0.4; border-color: #334155; cursor: not-allowed; }
-  .skill-cmd-btn.ult { border-color: #f43f5e; background: linear-gradient(135deg, #2d1122, #161f33); }
+  .boss-hp-bar { width: 100%; height: 8px; background: #3f1515; border-radius: 4px; overflow: hidden; margin-top: 4px; }
+  .boss-hp-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b); }
 
-  .battle-log {
-    height: 110px;
-    overflow-y: auto;
-    background: #05080f;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 8px;
-    font-size: 12px;
-    line-height: 1.5;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  .chest-toast {
+    position: absolute; top: 96px; left: 50%; transform: translateX(-50%);
+    background: rgba(245, 197, 66, 0.92); color: #111; font-weight: 900; font-size: 12px;
+    padding: 5px 14px; border-radius: 99px; display: none; z-index: 36; pointer-events: none;
   }
 
-  /* 6 Gacha Pools */
-  .pools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
-  .pool-card { border-radius: 10px; overflow: hidden; border: 2px solid var(--border); background: var(--panel); display: flex; flex-direction: column; justify-content: space-between; }
-  .pool-banner { height: 168px; padding: 12px; display: flex; align-items: center; justify-content: space-between; position: relative; }
-  .pool-banner-info { max-width: 56%; z-index: 2; }
-  .pool-badge { display: inline-block; font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 4px; background: rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.2); margin-bottom: 6px; }
-  .pool-name { font-size: 17px; font-weight: 900; margin: 0 0 4px 0; text-shadow: 0 2px 6px rgba(0,0,0,0.85); }
-  .pool-cover-art { width: 116px; height: 116px; border-radius: 10px; background: rgba(7, 10, 17, 0.72); border: 2px solid rgba(255,255,255,0.28); display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
-  .pool-cover-tap { position: absolute; bottom: 4px; font-size: 10px; background: rgba(0,0,0,0.8); padding: 1px 6px; border-radius: 4px; }
-  .pool-actions { padding: 9px 12px; background: #090d16; display: flex; align-items: center; justify-content: space-between; gap: 6px; border-top: 1px solid var(--border); }
+  /* 右手 4 招式切換與 AUTO 輪替 */
+  .right-skill-pad {
+    position: absolute; right: 12px; bottom: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 35;
+  }
+  .auto-btn {
+    padding: 6px 8px; border-radius: 8px; font-size: 11px; font-weight: 900;
+    background: rgba(15, 23, 42, 0.88); color: #94a3b8; border: 1px solid #475569;
+  }
+  .auto-btn.on { background: rgba(56, 229, 124, 0.25); color: #38e57c; border-color: #38e57c; box-shadow: 0 0 10px rgba(56,229,124,0.4); }
+  .skill-slot-btn {
+    width: 56px; height: 56px; border-radius: 12px; background: rgba(15, 23, 42, 0.88);
+    border: 2px solid rgba(255,255,255,0.22); color: #fff; font-size: 10px; font-weight: 800;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .skill-slot-btn.selected { border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.55); }
+  .skill-slot-btn.ex-ready { border-color: #f5c542; background: rgba(245, 197, 66, 0.24); box-shadow: 0 0 14px rgba(245,197,66,0.65); }
 
-  /* Codex & Items */
-  .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-  .filter-bar input, .filter-bar select { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); padding: 7px 10px; border-radius: 6px; font-size: 13px; }
-  .heroes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-  .hero-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; position: relative; cursor: pointer; }
-  .hero-card.locked { opacity: 0.45; filter: grayscale(0.75); }
-  .hero-card.rarity-MYTHIC { border-color: var(--mythic); }
-  .hero-card.rarity-EPIC { border-color: var(--epic); }
-  .hero-card.rarity-RARE { border-color: var(--rare); }
-  .rarity-tag { position: absolute; top: 6px; left: 6px; font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 4px; }
-  .elem-tag { position: absolute; top: 6px; right: 6px; font-size: 11px; }
-  .hero-sprite-wrap { width: 84px; height: 84px; margin: 12px auto 6px; display: flex; align-items: center; justify-content: center; }
-  .hero-name { font-size: 13px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .hero-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-  .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
-  .item-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
-
-  /* Modals */
-  .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82); z-index: 300; display: none; align-items: center; justify-content: center; padding: 14px; }
-  .modal-backdrop.open { display: flex; }
-  .modal-box { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; max-width: 520px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 16px; }
-  .skill-pill { background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 12px; }
-  .gacha-results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-top: 10px; }
-  textarea.coop-box { width: 100%; height: 74px; background: #060911; color: #93c5fd; border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-family: monospace; font-size: 11px; }
-  svg.pixel-art { shape-rendering: crispEdges; }
+  /* 升級三選一彈窗 */
+  .modal-overlay {
+    display: none; position: absolute; inset: 0; background: rgba(5, 8, 15, 0.88);
+    z-index: 50; justify-content: center; align-items: center; padding: 16px;
+  }
+  .modal-box {
+    width: 100%; background: #131b2e; border: 2px solid var(--border-gold);
+    border-radius: 16px; padding: 16px; text-align: center; max-height: 88%; overflow-y: auto;
+  }
+  .upgrade-card {
+    background: #1b2640; border: 1px solid rgba(255,255,255,0.16); border-radius: 12px;
+    padding: 12px; margin-top: 10px; text-align: left; cursor: pointer;
+  }
+  .upgrade-card:hover { border-color: var(--border-gold); background: #233152; }
+  .upgrade-card.ex-upgrade { border-color: #f5c542; background: linear-gradient(135deg, rgba(245,197,66,0.24), #1b2640); }
 </style>
 </head>
 <body>
-<div id="dynamic-bg"></div>
 
-<header>
-  <div class="top-row">
-    <div class="brand">⚔️ 星芽紀元 StarSprout (500異獸對戰終極版)</div>
-    <div class="resources">
-      <div class="res-pill">🪙 <span id="res-gold">5000</span></div>
-      <div class="res-pill">💎 <span id="res-gems">3200</span></div>
-      <div class="res-pill">🎫 招募券 <span id="res-tickets">20</span></div>
-      <div class="res-pill">📖 圖鑑 <span id="res-codex">0</span>/500</div>
-    </div>
-  </div>
-</header>
-
-<nav class="main-nav">
-  <button class="nav-btn active" onclick="switchTab('expedition')">🗺️ 遠征出擊</button>
-  <button class="nav-btn" onclick="switchTab('quests')">📋 任務懸賞</button>
-  <button class="nav-btn" onclick="switchTab('gacha')">🌠 六大許願池</button>
-  <button class="nav-btn" onclick="switchTab('codex')">📖 500異獸圖鑑</button>
-  <button class="nav-btn" onclick="switchTab('items')">🎒 道具工坊 (20種)</button>
-  <button class="nav-btn" onclick="switchTab('coop')">🤝 P2P雙人連線</button>
-  <button class="nav-btn" onclick="switchTab('settings')">⚙️ 場景與存檔</button>
-</nav>
-
-<main>
-  <!-- 1. EXPEDITION HUB (ENTER BATTLE MANUALLY) -->
-  <section id="tab-expedition" class="tab-section active">
-    <div class="card">
-      <div class="card-title">
-        <span>🏕️ 遠征營地 — 選擇目標並親自進入戰鬥舞台</span>
-        <span style="font-size:12px;color:#38bdf8;">出戰總戰力：<strong id="team-power">0</strong> ｜ 連勝：<strong id="win-streak" style="color:#f59e0b;">0</strong></span>
-      </div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">
-        當前出戰陣容（點擊異獸可查看技能，或至圖鑑更換編隊）：
-      </div>
-      <div id="camp-team-preview" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:8px;margin-bottom:12px;"></div>
-
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn btn-primary btn-lg" onclick="enterBattleStage(state.stage)">
-          ⚔️ 進入第 <span id="btn-stage-num">1</span> 關對戰舞台
-        </button>
-        <button class="btn btn-gold btn-lg" onclick="enterBossBattle()">
-          👑 挑戰區域首領戰
-        </button>
+<!-- ==================== 官網門戶 STAR SPROUT PORTAL ==================== -->
+<div id="portal-view">
+  <header class="navbar">
+    <div class="brand">
+      <div class="brand-logo">🌱</div>
+      <div class="brand-title">
+        <h1>星芽冒險團</h1>
+        <span>STAR SPROUT ADVENTURE</span>
       </div>
     </div>
+    <nav class="nav-links">
+      <a href="#features">核心特色</a>
+      <a href="#roster">星芽夥伴</a>
+      <a href="#bosses">首領圖鑑</a>
+      <a href="#guide">玩法與公告</a>
+      <button class="btn-play-nav" onclick="openGame('home')">⚔️ 立即遊玩</button>
+    </nav>
+  </header>
 
-    <div class="card">
-      <div class="card-title"><span>🗺️ 可挑戰星界區域（自由選擇關卡進入對戰）</span></div>
-      <div class="stage-cards-grid" id="stage-selector-grid"></div>
+  <section class="hero">
+    <div class="hero-badge">✨ 免費網頁像素生存 Roguelike 正式上線 ✨</div>
+    <h2>集結 500 隻原創像素夥伴<br><span>覺醒 EX 奧義，挑戰深遠之洞！</span></h2>
+    <p>免下載、免安裝，打開瀏覽器即刻開戰！操控可愛又強大的星芽精靈在五大元素秘境中生存，局內升級招式至 Lv.5 EX 覺醒版，迎戰 3 分鐘、6 分鐘、12 分鐘與 15 分鐘史詩級像素巨獸首領！</p>
+    <div class="hero-btns">
+      <button class="btn-hero-start" onclick="openGame('home')">⚔️ 立即開始冒險</button>
+      <button class="btn-hero-gift" onclick="claimStarterGift()">✨ 免費領 15 抽招募</button>
     </div>
   </section>
 
-  <!-- 2. MISSIONS & REWARDS SYSTEM (FIRST VERSION CORE) -->
-  <section id="tab-quests" class="tab-section">
-    <div class="card">
-      <div class="card-title">
-        <span>📋 星界冒險任務與懸賞獎勵</span>
-        <span style="font-size:12px;color:#10b981;">完成目標即可領取金幣、星鑽與招募券！</span>
+  <section id="features" class="section">
+    <div class="sec-header">
+      <div class="sec-en">GAME FEATURES</div>
+      <h2 class="sec-title">四大核心玩法亮點</h2>
+    </div>
+    <div class="grid-4">
+      <div class="card">
+        <div class="card-icon">🔥</div>
+        <h3>招式 Lv.5 EX 終極覺醒</h3>
+        <p>每隻角色擁有 4 種專屬招式，局內升級每級冷卻 -10%、傷害 +10%，升至 Lv.5 進化為「招式 EX 版」，解鎖全螢幕金色星爆與超巨幅範圍！</p>
       </div>
-      <div id="quests-list"></div>
+      <div class="card">
+        <div class="card-icon">🐾</div>
+        <h3>500 隻原創 Q 版像素夥伴</h3>
+        <p>涵蓋草、火、水、光、暗五大元素與五大稀有度，高達 1,050 種像素體型、頭飾、翅膀與表情組合，重複角色自動轉化養成金幣。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">👹</div>
+        <h3>8 種 48×48 高精細巨獸首領</h3>
+        <p>3 分鐘地圖守護小 Boss、6 分鐘與 12 分鐘時空之門異空間中 Boss、15 分鐘深遠之洞混沌巨眼，每隻皆有獨特彈幕與弱點機制。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h3>單手拇指搖桿＆本機雲端備份</h3>
+        <p>專為手機直向螢幕最佳化，支援左手虛擬搖桿、右手 4 招式切換與 AUTO 輪替，並支援多帳號管理、P2P 雙人連線與存檔碼匯出。</p>
+      </div>
     </div>
   </section>
 
-  <!-- 3. SIX GACHA POOLS WITH MYTHIC COVER ART -->
-  <section id="tab-gacha" class="tab-section">
-    <div class="card">
-      <div class="card-title">
-        <span>🌠 六大元素許願池（點擊封面像素立繪可預覽神話/史詩UP異獸）</span>
-        <span style="font-size:12px;color:#f59e0b;">神話保底：<span id="pity-count">0</span>/50 抽</span>
-      </div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">
-        全卡池收錄 500 隻外觀 100% 獨立的像素奇幻異獸（絕無重複造型）。單抽消耗 1 招募券或 160 星鑽；十連抽必出史詩以上！
-      </div>
-      <div class="pools-grid" id="pools-container"></div>
+  <section id="roster" class="section">
+    <div class="sec-header">
+      <div class="sec-en">STAR SPROUT ROSTER</div>
+      <h2 class="sec-title">星芽夥伴精選預覽</h2>
     </div>
+    <div class="filter-tabs">
+      <button class="tab-btn active" onclick="renderPortalRoster('popular', this)">人氣精選</button>
+      <button class="tab-btn" onclick="renderPortalRoster('mythic', this)">神話 (3%)</button>
+      <button class="tab-btn" onclick="renderPortalRoster('epic', this)">史詩 (7%)</button>
+      <button class="tab-btn" onclick="openGame('dex')">查看全 500 隻 →</button>
+    </div>
+    <div id="portal-roster-grid" class="roster-grid"></div>
   </section>
 
-  <!-- 4. 500 PIXEL CREATURES CODEX -->
-  <section id="tab-codex" class="tab-section">
-    <div class="card">
-      <div class="card-title">
-        <span>📖 500 異獸全圖鑑（每隻 4 項專屬技能，共 2,000 技能）</span>
-        <button class="btn btn-sm btn-primary" onclick="autoEquipBestTeam()">⚔️ 一鍵最強編隊</button>
+  <section id="bosses" class="section">
+    <div class="sec-header">
+      <div class="sec-en">BOSS ARCHIVES</div>
+      <h2 class="sec-title">首領情報檔案館（8 種 48×48 像素首領）</h2>
+    </div>
+    <div id="portal-boss-grid" class="boss-grid"></div>
+  </section>
+
+  <section id="guide" class="section">
+    <div class="two-col">
+      <div>
+        <div class="sec-en">HOW TO PLAY</div>
+        <h2 class="sec-title" style="margin-bottom:14px;">🎮 操作指南與通關秘訣</h2>
+        <ul class="guide-list">
+          <li><strong>移動操作：</strong>手機按住畫面左側拖曳虛擬搖桿；電腦使用 WASD 或方向鍵。</li>
+          <li><strong>招式 EX 進化：</strong>擊敗怪物吸收經驗寶石升級，優先將主力招式升至 Lv.5 EX 即可獲得質變範圍與傷害。</li>
+          <li><strong>開啟寶箱：</strong>靠近地圖發光寶箱停留 3 秒即可自動開啟，獲取金幣與招募券。</li>
+          <li><strong>首領挑戰：</strong>3 分鐘迎戰地圖守護者，6 分鐘與 12 分鐘踏入金色時空之門，15 分鐘決戰深遠之洞！</li>
+        </ul>
       </div>
-      <div class="filter-bar">
-        <input type="text" id="hero-search" placeholder="搜尋異獸名稱 / 編號..." oninput="renderHeroesGrid()" />
-        <select id="filter-elem" onchange="renderHeroesGrid()">
-          <option value="ALL">全部屬性</option>
-          <option value="FOREST">🌿 森之靈</option>
-          <option value="FIRE">🔥 炎之魂</option>
-          <option value="WATER">💧 水之潮</option>
-          <option value="LIGHT">☀️ 光之聖</option>
-          <option value="DARK">🌙 暗之影</option>
-          <option value="GENESIS">🌌 創世星</option>
-        </select>
-        <select id="filter-rarity" onchange="renderHeroesGrid()">
-          <option value="ALL">全部稀有度</option>
-          <option value="MYTHIC">🔴 神話 (Mythic)</option>
-          <option value="EPIC">🟣 史詩 (Epic)</option>
-          <option value="RARE">🔵 稀有 (Rare)</option>
-          <option value="COMMON">⚪ 普通 (Common)</option>
-        </select>
-        <select id="filter-owned" onchange="renderHeroesGrid()">
-          <option value="ALL">全部顯示 (500)</option>
-          <option value="OWNED">僅顯示已捕獲</option>
-          <option value="LOCKED">僅顯示未捕獲</option>
-        </select>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;color:var(--muted);">
-        <span id="codex-showing-text">顯示第 1 - 48 隻異獸</span>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-sm" onclick="changeCodexPage(-1)">◀ 上一頁</button>
-          <span id="codex-page-num" style="padding:4px 8px;">1</span>
-          <button class="btn btn-sm" onclick="changeCodexPage(1)">下一頁 ▶</button>
+      <div>
+        <div class="sec-en">PATCH NOTES</div>
+        <h2 class="sec-title" style="margin-bottom:14px;">📢 官方最新更新公告</h2>
+        <div class="patch-item">
+          <div style="margin-bottom:6px;"><span class="patch-tag">v3.0 FINAL</span><strong>完整整合 500 夥伴、任務懸賞與六大許願池！</strong></div>
+          <p style="font-size:13px; color:var(--text-muted);">結合官網門戶、PokéSurvivor 2D 生存割草、任務懸賞領獎、20 種工坊道具與 P2P 雙人羈絆。</p>
+        </div>
+        <div class="patch-item">
+          <div style="margin-bottom:6px;"><span class="patch-tag" style="background:#d97706;">v2.5 NEW</span><strong>招式 Lv.5 EX 覺醒系統實裝！</strong></div>
+          <p style="font-size:13px; color:var(--text-muted);">新增全招式 5 級獨立升級與 EX 華麗星爆特效，大幅強化滿級打擊爽快感。</p>
+        </div>
+        <div class="patch-item">
+          <div style="margin-bottom:6px;"><span class="patch-tag" style="background:#0284c7;">v2.0</span><strong>8 種 48×48 高精細像素首領登場</strong></div>
+          <p style="font-size:13px; color:var(--text-muted);">新增冰霜巨龍、黃金聖甲蟲王、時空執政官與深遠混沌之眼等獨特 Boss。</p>
         </div>
       </div>
-      <div class="heroes-grid" id="heroes-grid"></div>
     </div>
   </section>
-
-  <!-- 5. 20 ITEMS WORKSHOP -->
-  <section id="tab-items" class="tab-section">
-    <div class="card">
-      <div class="card-title">
-        <span>🎒 星界道具工坊（20種戰術道具與強化聖物）</span>
-        <span style="font-size:12px;color:#38bdf8;">持有道具可強化異獸或於戰鬥中使用</span>
-      </div>
-      <div class="items-grid" id="items-grid"></div>
-    </div>
-  </section>
-
-  <!-- 6. P2P COOP -->
-  <section id="tab-coop" class="tab-section">
-    <div class="card">
-      <div class="card-title"><span>🤝 WebRTC P2P 雙人免伺服器即時連線</span></div>
-      <p style="font-size:12px;color:var(--muted);margin-top:0;">
-        無需伺服器，透過交換連線代碼即可與好友建立點對點連線，獲得雙人羈絆加成（+25% 全屬性）並可互相支援！
-      </p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-        <button class="btn btn-primary btn-sm" onclick="createP2POffer()">1. 建立房主邀請碼 (Offer)</button>
-        <button class="btn btn-gold btn-sm" onclick="acceptP2POffer()">2. 貼上邀請碼並產生回覆 (Answer)</button>
-        <button class="btn btn-green btn-sm" onclick="finalizeP2PAnswer()">3. 房主貼上回覆碼完成連線</button>
-      </div>
-      <div style="font-size:12px;margin-bottom:4px;">📋 本機連線代碼（複製傳給好友）：</div>
-      <textarea id="p2p-local-sdp" class="coop-box" readonly placeholder="點擊上方按鈕產生代碼..."></textarea>
-      <div style="font-size:12px;margin:8px 0 4px;">📥 貼上好友傳來的代碼：</div>
-      <textarea id="p2p-remote-sdp" class="coop-box" placeholder="在此貼上好友的代碼..."></textarea>
-      <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-        <span style="font-size:13px;">連線狀態：<strong id="p2p-status" style="color:#f59e0b;">單人探索中</strong></span>
-        <button class="btn btn-sm btn-mythic" onclick="sendCoopCheer()">🔥 發送雙人合擊支援 (+500金幣)</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7. SETTINGS -->
-  <section id="tab-settings" class="tab-section">
-    <div class="card">
-      <div class="card-title"><span>🌌 動態天象與背景主題</span></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-sm" onclick="setBiomeTheme('auto')">🔄 隨關卡自動切換</button>
-        <button class="btn btn-sm" onclick="setBiomeTheme('forest')">🌿 翡翠星森</button>
-        <button class="btn btn-sm" onclick="setBiomeTheme('fire')">🌋 熔岩赤壁</button>
-        <button class="btn btn-sm" onclick="setBiomeTheme('water')">🌊 深海星淵</button>
-        <button class="btn btn-sm" onclick="setBiomeTheme('light')">☀️ 聖光雲殿</button>
-        <button class="btn btn-sm" onclick="setBiomeTheme('dark')">🌙 永夜幻境</button>
-        <button class="btn btn-sm" onclick="setBiomeTheme('genesis')">🌌 創世銀河</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><span>💾 本機存檔與備份管理</span></div>
-      <p style="font-size:12px;color:var(--muted);">
-        所有已捕獲異獸、任務進度、等級與關卡紀錄皆自動儲存於瀏覽器本機空間。
-      </p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-primary btn-sm" onclick="saveGame(true)">💾 立即手動存檔</button>
-        <button class="btn btn-gold btn-sm" onclick="exportSaveCode()">📤 匯出存檔代碼</button>
-        <button class="btn btn-sm" onclick="importSaveCode()">📥 匯入存檔代碼</button>
-      </div>
-    </div>
-  </section>
-</main>
-
-<!-- =========================================================================
-     DEDICATED FULL-SCREEN BATTLE ARENA OVERLAY (ENTER & EXIT MANUALLY)
-     ========================================================================= -->
-<div id="battle-screen-overlay">
-  <div class="battle-topbar">
-    <div>
-      <strong style="font-size:15px;color:#38bdf8;" id="arena-stage-title">⚔️ 第 1 關對戰舞台</strong>
-      <span style="font-size:12px;color:#fbbf24;margin-left:8px;" id="arena-turn-badge">第 1 回合</span>
-    </div>
-    <button class="btn btn-sm btn-mythic" onclick="retreatFromBattle()">🏃 撤退返回營地</button>
-  </div>
-
-  <!-- Visual Arena Stage -->
-  <div class="battle-visual-arena" id="battle-visual-arena">
-    <div class="arena-ground-grid"></div>
-    <!-- Top: Enemy Fighters -->
-    <div>
-      <div style="text-align:center;font-size:11px;color:#f87171;font-weight:800;margin-bottom:6px;">👾 敵方陣線（點擊異獸鎖定攻擊目標）</div>
-      <div class="enemy-stage-row" id="arena-enemy-row"></div>
-    </div>
-    <!-- Bottom: Player Fighters -->
-    <div>
-      <div style="text-align:center;font-size:11px;color:#60a5fa;font-weight:800;margin-bottom:6px;">🛡️ 我方出戰陣線（點擊切換行動單位）</div>
-      <div class="player-stage-row" id="arena-player-row"></div>
-    </div>
-  </div>
-
-  <!-- Bottom: Manual Command Deck & Combat Log -->
-  <div class="battle-control-deck">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-      <span style="font-size:13px;font-weight:800;color:#38bdf8;" id="active-actor-label">指令單位：載入中...</span>
-      <span style="font-size:12px;color:#f87171;" id="target-enemy-label">鎖定目標：載入中...</span>
-    </div>
-    <div class="skill-buttons-grid" id="skill-command-buttons"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-      <button class="btn btn-sm" onclick="playerDefendAction()">🛡️ 防禦蓄能（減傷50% / +30能量）</button>
-      <button class="btn btn-sm btn-green" onclick="useQuickPotionInBattle()">🧪 使用生命靈藥（剩餘 <span id="battle-potion-count">0</span> 瓶）</button>
-    </div>
-    <div class="battle-log" id="battle-log"></div>
-  </div>
 </div>
 
-<!-- HERO / POOL PREVIEW MODAL -->
-<div class="modal-backdrop" id="hero-modal" onclick="closeModal('hero-modal', event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <strong id="modal-hero-title" style="font-size:16px;">異獸詳情</strong>
-      <button class="btn btn-sm" onclick="document.getElementById('hero-modal').classList.remove('open')">✕ 關閉</button>
+<!-- ==================== 遊戲主程式 APP ==================== -->
+<div id="game-app">
+  <div class="mobile-frame">
+    <div class="top-bar">
+      <button onclick="closeGame()" style="background:rgba(255,255,255,0.12); color:#fff; padding:4px 9px; border-radius:6px; font-size:12px; font-weight:700;">← 官網</button>
+      <div class="res-group">
+        <span class="res-pill" style="color:#f5c542;">🪙 <span id="ui-gold">1200</span></span>
+        <span class="res-pill" style="color:#c084fc;">🎟️ <span id="ui-tickets">15</span></span>
+        <span class="res-pill" style="color:#38e57c;">🐾 <span id="ui-owned-cnt">5</span>/500</span>
+      </div>
     </div>
-    <div id="modal-hero-body"></div>
-  </div>
-</div>
 
-<!-- GACHA RESULT MODAL -->
-<div class="modal-backdrop" id="gacha-modal" onclick="closeModal('gacha-modal', event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <strong id="modal-gacha-title" style="font-size:16px;">🌠 許願召喚結果</strong>
-      <button class="btn btn-sm" onclick="document.getElementById('gacha-modal').classList.remove('open')">✕ 收下</button>
+    <!-- 1. 出戰大廳 (選擇五大元素秘境 + 進入 2D 生存戰) -->
+    <div id="lobby-home" class="lobby-body">
+      <div style="font-size:12px; color:var(--text-muted); font-weight:800;">選擇五大元素秘境（決定 03:00 專屬守護小 Boss）：</div>
+      <div class="stage-selector" id="stage-selector"></div>
+
+      <div class="active-pet-box">
+        <canvas id="active-pet-canvas" class="pixel-art" width="32" height="32"></canvas>
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+            <strong id="active-pet-name" style="font-size:15px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">#001 森芽精靈</strong>
+            <span id="active-pet-rarity" class="rarity-badge r-mythic" style="position:static; flex-shrink:0;">神話</span>
+          </div>
+          <div id="active-pet-meta" style="font-size:12px; color:#38e57c; margin-top:2px;">草系 · Lv.1 · 戰力倍率 ×1.6</div>
+          <div class="skill-tags" id="active-pet-skills"></div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px;">
+        <button onclick="upgradeActivePet()" style="flex:1; background:#1e293b; border:1px solid #f5c542; color:#f5c542; font-size:13px; font-weight:800; padding:11px 8px; border-radius:12px;">
+          ⬆️ 強化夥伴 (<span id="pet-up-cost">200</span>🪙)
+        </button>
+        <button onclick="startBattle()" style="flex:2; background:linear-gradient(135deg,#38e57c,#16a34a); color:#052e16; font-size:16px; font-weight:900; padding:12px; border-radius:12px; box-shadow:0 6px 20px rgba(56,229,124,0.35);">
+          ⚔️ 進入元素秘境生存戰
+        </button>
+      </div>
+
+      <div class="card" style="padding:12px;">
+        <div style="font-size:13px; font-weight:800; color:var(--border-gold); margin-bottom:6px;">⏱️ 48×48 高精細像素首領時間軸</div>
+        <div style="font-size:12px; color:var(--text-muted); line-height:1.65;">
+          • <strong>03:00</strong>：秘境專屬小 Boss（樹妖巨像 / 孢子菇王 / 熔岩炎魔 / 冰霜巨龍 / 聖甲蟲王）<br>
+          • <strong>06:00</strong>：時空之門中 Boss【時空虛空執政官】<br>
+          • <strong>12:00</strong>：時空之門中 Boss【星界雙子機甲獸】<br>
+          • <strong>15:00</strong>：深遠之洞最終 Boss【深遠混沌之眼·克蘇魯星獸】
+        </div>
+      </div>
     </div>
-    <div id="modal-gacha-body"></div>
-  </div>
-</div>
 
-<!-- BATTLE RESULT VICTORY / DEFEAT MODAL -->
-<div class="modal-backdrop" id="result-modal">
-  <div class="modal-box" style="text-align:center;">
-    <h2 id="result-modal-title" style="margin-top:0;">🎉 戰鬥勝利！</h2>
-    <div id="result-modal-body" style="font-size:14px;margin-bottom:14px;"></div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-      <button class="btn btn-primary" onclick="closeResultAndReturn()">🏕️ 返回遠征營地</button>
-      <button class="btn btn-gold" id="btn-next-stage-battle" onclick="closeResultAndNextStage()">⚔️ 繼續挑戰下一關</button>
+    <!-- 2. 任務懸賞獎勵系統 -->
+    <div id="lobby-quests" class="lobby-body" style="display:none;">
+      <div style="font-size:14px; font-weight:900; color:var(--border-gold);">📋 星界冒險團懸賞任務（完成即可領取獎勵）</div>
+      <div id="quests-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+
+    <!-- 3. 六大許願池招募 -->
+    <div id="lobby-gacha" class="lobby-body" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="font-size:14px; color:var(--border-gold);">✨ 六大元素許願召喚池</strong>
+        <span style="font-size:11px; color:var(--text-muted);">神話保底：<span id="pity-display">0</span>/50</span>
+      </div>
+      <div id="gacha-pools-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+      <div id="gacha-results" class="roster-grid"></div>
+    </div>
+
+    <!-- 4. 500 隻原創像素圖鑑 -->
+    <div id="lobby-dex" class="lobby-body" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+        <strong style="font-size:13px;">星芽圖鑑 (<span id="dex-count">5</span>/500)</strong>
+        <select id="dex-elem-filter" onchange="renderGameDex()" style="background:#1e293b; color:#fff; border:1px solid #475569; padding:4px 6px; border-radius:6px; font-size:11px;">
+          <option value="all">全部元素</option>
+          <option value="grass">草系</option>
+          <option value="fire">火系</option>
+          <option value="water">水系</option>
+          <option value="light">光系</option>
+          <option value="dark">暗系</option>
+        </select>
+        <select id="dex-filter" onchange="renderGameDex()" style="background:#1e293b; color:#fff; border:1px solid #475569; padding:4px 6px; border-radius:6px; font-size:11px;">
+          <option value="owned">已解鎖</option>
+          <option value="all">全部 500 隻</option>
+        </select>
+      </div>
+      <div id="game-dex-grid" class="roster-grid"></div>
+    </div>
+
+    <!-- 5. 20種道具工坊 -->
+    <div id="lobby-items" class="lobby-body" style="display:none;">
+      <div style="font-size:14px; font-weight:900; color:var(--accent-cyan);">🎒 星界秘寶與強化道具工坊（20種）</div>
+      <div id="items-workshop-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+
+    <!-- 6. 多帳號存檔與 P2P 雙人連線 -->
+    <div id="lobby-save" class="lobby-body" style="display:none;">
+      <div class="card">
+        <h3 style="margin-bottom:6px; font-size:15px;">👥 多帳號管理</h3>
+        <div style="display:flex; gap:6px; margin-bottom:8px;">
+          <button onclick="switchAccountSlot(1)" id="acc-btn-1" class="tab-btn active" style="flex:1;">帳號 1</button>
+          <button onclick="switchAccountSlot(2)" id="acc-btn-2" class="tab-btn" style="flex:1;">帳號 2</button>
+          <button onclick="switchAccountSlot(3)" id="acc-btn-3" class="tab-btn" style="flex:1;">帳號 3</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:6px; font-size:15px;">💾 存檔碼匯出／匯入備份</h3>
+        <textarea id="save-code-box" rows="3" placeholder="點擊匯出產生備份代碼，或貼上代碼還原..." style="width:100%; background:#080c15; color:#38e57c; border:1px solid #334155; border-radius:8px; padding:8px; font-size:11px;"></textarea>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <button onclick="exportSaveCode()" style="flex:1; padding:9px; background:#0284c7; color:#fff; border-radius:8px; font-weight:700; font-size:12px;">匯出存檔碼</button>
+          <button onclick="importSaveCode()" style="flex:1; padding:9px; background:#16a34a; color:#fff; border-radius:8px; font-weight:700; font-size:12px;">匯入還原</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:6px; font-size:15px;">🤝 WebRTC P2P 雙人免伺服器連線</h3>
+        <p style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">連線成功後局內全傷害 +20%，並可互贈戰備金幣。</p>
+        <div style="display:flex; gap:6px; margin-bottom:6px;">
+          <button onclick="p2pCreateOffer()" style="flex:1; padding:7px; background:#1d4ed8; color:#fff; border-radius:6px; font-size:11px; font-weight:700;">1.建立邀請</button>
+          <button onclick="p2pAcceptOffer()" style="flex:1; padding:7px; background:#b45309; color:#fff; border-radius:6px; font-size:11px; font-weight:700;">2.回覆邀請</button>
+          <button onclick="p2pFinishAnswer()" style="flex:1; padding:7px; background:#047857; color:#fff; border-radius:6px; font-size:11px; font-weight:700;">3.完成連線</button>
+        </div>
+        <textarea id="p2p-local" rows="2" readonly placeholder="本機連線代碼..." style="width:100%; background:#080c15; color:#93c5fd; border:1px solid #334155; border-radius:6px; padding:6px; font-size:10px;"></textarea>
+        <textarea id="p2p-remote" rows="2" placeholder="貼上好友代碼..." style="width:100%; background:#080c15; color:#fde047; border:1px solid #334155; border-radius:6px; padding:6px; font-size:10px; margin-top:4px;"></textarea>
+        <div style="font-size:12px; margin-top:6px;">狀態：<strong id="p2p-status" style="color:#f5c542;">單人冒險中</strong></div>
+      </div>
+    </div>
+
+    <div class="bottom-tabs">
+      <button class="b-tab active" onclick="switchLobbyTab('home', this)">⚔️ 出戰</button>
+      <button class="b-tab" onclick="switchLobbyTab('quests', this)">📋 任務</button>
+      <button class="b-tab" onclick="switchLobbyTab('gacha', this)">✨ 許願</button>
+      <button class="b-tab" onclick="switchLobbyTab('dex', this)">🐾 圖鑑</button>
+      <button class="b-tab" onclick="switchLobbyTab('items', this)">🎒 工坊</button>
+      <button class="b-tab" onclick="switchLobbyTab('save', this)">💾 存檔</button>
+    </div>
+
+    <!-- ==================== PokéSurvivor 2D 生存割草戰鬥畫面 ==================== -->
+    <div id="battle-screen">
+      <canvas id="battle-canvas"></canvas>
+      <div class="battle-hud-top">
+        <div class="xp-bar-wrap"><div id="hud-xp-fill" class="xp-bar-fill"></div></div>
+        <div class="hud-stats">
+          <span style="color:#38e57c;">Lv.<span id="hud-lv">1</span></span>
+          <span id="hud-timer" class="pixel-font" style="font-size:16px; color:#f5c542;">00:00</span>
+          <span style="color:#f87171;">HP <span id="hud-hp">100</span>%</span>
+          <button onclick="quitBattle()" style="pointer-events:auto; background:rgba(239,68,68,0.85); color:#fff; padding:3px 9px; border-radius:6px; font-size:11px; font-weight:800;">撤退</button>
+        </div>
+        <div id="boss-hp-wrap" class="boss-hp-wrap">
+          <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:#fca5a5;">
+            <span id="hud-boss-name">BOSS</span>
+            <span id="hud-boss-hp-txt">100%</span>
+          </div>
+          <div class="boss-hp-bar"><div id="hud-boss-fill" class="boss-hp-fill"></div></div>
+        </div>
+      </div>
+
+      <div id="chest-toast" class="chest-toast">🎁 開啟發光寶箱！獲得 250 金幣 + 1 招募券！</div>
+
+      <!-- 右手 4 招式切換與 AUTO 輪替 -->
+      <div class="right-skill-pad">
+        <button id="btn-auto-skill" class="auto-btn on" onclick="toggleAutoSkill()">AUTO ON</button>
+        <div id="skill-slots-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+      </div>
+
+      <!-- 局內升級三選一 Modal -->
+      <div id="levelup-modal" class="modal-overlay">
+        <div class="modal-box">
+          <div style="color:var(--border-gold); font-size:12px; font-weight:900;">LEVEL UP!</div>
+          <h3 style="font-size:17px; margin:4px 0;">選擇招式強化（Lv.5 覺醒 EX！）</h3>
+          <div id="upgrade-options"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-/* ============================================================================
-   1. 500 UNIQUE PIXEL MONSTERS / CREATURES & 2,000 SKILLS
-   ============================================================================ */
-const ELEMENTS = {
-  FOREST: { id: 'FOREST', name: '森之靈', icon: '🌿', color: '#22c55e' },
-  FIRE:   { id: 'FIRE',   name: '炎之魂', icon: '🔥', color: '#ef4444' },
-  WATER:  { id: 'WATER',  name: '水之潮', icon: '💧', color: '#06b6d4' },
-  LIGHT:  { id: 'LIGHT',  name: '光之聖', icon: '☀️', color: '#facc15' },
-  DARK:   { id: 'DARK',   name: '暗之影', icon: '🌙', color: '#a855f7' },
-  GENESIS:{ id: 'GENESIS',name: '創世星', icon: '🌌', color: '#f472b6' }
-};
-const ELEM_KEYS = Object.keys(ELEMENTS);
-
-const PREFIXES = [
-  '蒼牙','緋炎','霜甲','雷角','幽冥','翡翠','永恆','晨星',
-  '暮影','虛空','古龍','幻晶','天啟','琉璃','赤煉','碧鱗',
-  '銀翼','金瞳','風嘯','岩核','潮汐','電光','星塵','神諭',
-  '暗蝕','白骨','紫電','青嵐','熾翼','深淵','古樹','極光',
-  '隕鐵','時空','烈陽','寒霜','疾影','聖紋','星核','幻獸',
-  '雷帝','海皇','森羅','炎魔','光翼','冥府','創世','星芽'
+// ==================== 1. 500 隻原創 Q 版像素夥伴資料庫 (1,050 組合) ====================
+const ELEMENTS = [
+  { id: 'grass', name: '草', color: '#38e57c', bg: '#0c2418', accent: '#bbf7d0' },
+  { id: 'fire',  name: '火', color: '#f87171', bg: '#291010', accent: '#fed7aa' },
+  { id: 'water', name: '水', color: '#38bdf8', bg: '#0c1e33', accent: '#bae6fd' },
+  { id: 'light', name: '光', color: '#f5c542', bg: '#29210a', accent: '#fef08a' },
+  { id: 'dark',  name: '暗', color: '#c084fc', bg: '#1e1033', accent: '#e9d5ff' }
 ];
-const SPECIES_NAMES = ['戰狼','角龍','晶獸','魔偶','雷鷹','影豹','岩龜','蛇怪','獅鷲','星靈'];
-const SKILL_VERBS = ['裂空','星爆','裁決','庇護','疾風','咆哮','審判','瞬影','共鳴','覺醒','奔流','焚天','聖癒','破曉','終焉'];
-const SKILL_NOUNS = ['龍息炮','利爪擊','結界陣','隕星雨','脈衝波','晶刺盾','影分身','元素核','時空鎖','創世波'];
 
-function mulberry32(a) {
-  return function() {
-    var t = a += 0x6D2B79F5;
-    t = Math.imul(t ^ t >>> 15, t | 1);
-    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+const RARITIES = [
+  { key: 'mythic',   label: '神話', cls: 'r-mythic',   weight: 3,  mult: 1.65 },
+  { key: 'epic',     label: '史詩', cls: 'r-epic',     weight: 7,  mult: 1.38 },
+  { key: 'rare',     label: '稀有', cls: 'r-rare',     weight: 20, mult: 1.20 },
+  { key: 'uncommon', label: '精良', cls: 'r-uncommon', weight: 30, mult: 1.08 },
+  { key: 'common',   label: '普通', cls: 'r-common',   weight: 40, mult: 1.0 }
+];
+
+const PREFIXES = ['星芽','烈焰','蒼穹','霜華','影月','雷鳴','翡翠','赤霄','琉璃','幻夢','聖光','深淵','晨曦','疾風','岩晶','海潮','紫電','金烏','靈狐','龍裔'];
+const NOUNS = ['精靈','幼龍','狐仙','機甲','樹靈','星獸','魔導','劍士','史萊姆','貓靈','獨角獸','鳳凰','巨像','使徒','騎士','幻蝶','狼王','靈龜','夜梟','聖靈'];
+
+const SKILL_POOL = [
+  { name: '星辰飛彈', type: 'proj',   color: '#38bdf8', cd: 0.72, dmg: 26, desc: '追蹤鎖定最近敵人的高速星彈' },
+  { name: '新星環斬', type: 'nova',   color: '#f5c542', cd: 1.55, dmg: 40, desc: '以自身為中心釋放環形能量衝擊' },
+  { name: '穿透光槍', type: 'pierce', color: '#38e57c', cd: 1.05, dmg: 34, desc: '貫穿整排敵軍的元素光束槍' },
+  { name: '隕星爆裂', type: 'aoe',    color: '#f87171', cd: 1.95, dmg: 56, desc: '鎖定敵群落下高爆範圍隕星' },
+  { name: '螺旋星輪', type: 'orbit',  color: '#c084fc', cd: 1.35, dmg: 30, desc: '發射多向擴散的旋轉星輪彈幕' },
+  { name: '聖光審判', type: 'aoe',    color: '#fef08a', cd: 1.85, dmg: 50, desc: '召喚垂直聖光柱轟擊範圍目標' }
+];
+
+const PET_DB = [];
+for (let i = 1; i <= 500; i++) {
+  const el = ELEMENTS[(i - 1) % 5];
+  let rObj = RARITIES[4];
+  if (i % 33 === 1 || i <= 5) rObj = RARITIES[0];
+  else if (i % 14 === 2) rObj = RARITIES[1];
+  else if (i % 5 === 3) rObj = RARITIES[2];
+  else if (i % 3 === 0) rObj = RARITIES[3];
+
+  const pName = PREFIXES[(i * 7) % PREFIXES.length] + NOUNS[(i * 13 + Math.floor(i / 20)) % NOUNS.length];
+  const skills = [
+    SKILL_POOL[(i) % SKILL_POOL.length],
+    SKILL_POOL[(i + 1) % SKILL_POOL.length],
+    SKILL_POOL[(i + 2) % SKILL_POOL.length],
+    SKILL_POOL[(i + 4) % SKILL_POOL.length]
+  ];
+  PET_DB.push({
+    id: i,
+    code: '#' + String(i).padStart(3, '0'),
+    name: pName,
+    element: el,
+    rarity: rObj,
+    skills,
+    bodyType: i % 7,
+    headgear: (i * 3) % 10,
+    wings: (i * 5) % 5,
+    face: i % 3
+  });
+}
+
+function drawPetSprite(canvas, pet) {
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 32, 32);
+  const cMain = pet.element.color;
+  const cAcc = pet.element.accent;
+
+  if (pet.wings > 0) {
+    ctx.fillStyle = cAcc;
+    if (pet.wings === 1) { ctx.fillRect(3, 12, 5, 8); ctx.fillRect(24, 12, 5, 8); }
+    if (pet.wings === 2) { ctx.fillRect(2, 9, 6, 4); ctx.fillRect(24, 9, 6, 4); ctx.fillRect(4, 13, 4, 5); ctx.fillRect(24, 13, 4, 5); }
+    if (pet.wings === 3) { ctx.fillStyle = '#fff'; ctx.fillRect(3, 10, 5, 9); ctx.fillRect(24, 10, 5, 9); }
+    if (pet.wings === 4) { ctx.fillStyle = '#f5c542'; ctx.fillRect(2, 11, 6, 7); ctx.fillRect(24, 11, 6, 7); }
+  }
+
+  ctx.fillStyle = cMain;
+  const w = 14 + (pet.bodyType % 3) * 2;
+  const h = 13 + (pet.bodyType % 2) * 2;
+  const x = 16 - Math.floor(w / 2);
+  const y = 12;
+  ctx.fillRect(x, y, w, h);
+  ctx.fillRect(x + 2, y - 2, w - 4, 2);
+  ctx.fillStyle = cAcc;
+  ctx.fillRect(x + 4, y + 5, w - 8, h - 6);
+  ctx.fillStyle = cMain;
+  ctx.fillRect(x + 2, y + h, 3, 3);
+  ctx.fillRect(x + w - 5, y + h, 3, 3);
+
+  ctx.fillStyle = '#f5c542';
+  if (pet.headgear === 1) { ctx.fillRect(14, 5, 4, 5); ctx.fillRect(12, 7, 8, 2); }
+  else if (pet.headgear === 2) { ctx.fillRect(10, 7, 3, 3); ctx.fillRect(19, 7, 3, 3); }
+  else if (pet.headgear === 3) { ctx.fillRect(11, 6, 10, 3); ctx.fillRect(12, 4, 2, 2); ctx.fillRect(15, 4, 2, 2); ctx.fillRect(18, 4, 2, 2); }
+  else if (pet.headgear === 4) { ctx.fillStyle = '#fff'; ctx.fillRect(10, 5, 3, 5); ctx.fillRect(19, 5, 3, 5); }
+  else if (pet.headgear >= 5) { ctx.fillStyle = cAcc; ctx.fillRect(13, 6, 6, 3); }
+
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(11, 14, 2, 3);
+  ctx.fillRect(19, 14, 2, 3);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(11, 14, 1, 1);
+  ctx.fillRect(19, 14, 1, 1);
+}
+
+// ==================== 2. 8 種 48x48 高精細像素 Boss (getBossSprite) ====================
+const BOSS_LIST = [
+  { id: 'treant',  time: '03:00 (草地秘境小 Boss)', name: '遠古樹妖巨像', color: '#22c55e', core: '#a3e635', desc: '草地地圖守護者，釋放藤蔓地刺與森羅孢子彈幕。' },
+  { id: 'shroom',  time: '03:00 (蘑菇森林小 Boss)', name: '劇毒孢子菇王', color: '#a855f7', core: '#f472b6', desc: '蘑菇森林守護者，噴發擴散劇毒紫霧與追蹤孢子。' },
+  { id: 'ifrit',   time: '03:00 (熔岩火山小 Boss)', name: '黑曜熔岩炎魔', color: '#ef4444', core: '#fbbf24', desc: '熔岩火山守護者，揮舞火浪並發射扇形熔岩火球。' },
+  { id: 'frost',   time: '03:00 (冰晶雪原小 Boss)', name: '極光冰霜巨龍', color: '#38bdf8', core: '#e0f2fe', desc: '冰晶雪原守護者，吐息極寒冰錐與六角霜華彈幕。' },
+  { id: 'scarab',  time: '03:00 (黃金沙漠小 Boss)', name: '黃金聖甲蟲王', color: '#eab308', core: '#fef08a', desc: '黃金沙漠守護者，高速衝鋒並散射日輪金光彈。' },
+  { id: 'archon',  time: '06:00 時空之門中 Boss',   name: '時空虛空執政官', color: '#6366f1', core: '#38bdf8', desc: '交替發射 8 方向虛空環彈與空間折躍追蹤連彈。' },
+  { id: 'twins',   time: '12:00 時空之門中 Boss',   name: '星界雙子機甲獸', color: '#ec4899', core: '#f5c542', desc: '雙核心交替發射 8 方向環彈與追蹤連彈。' },
+  { id: 'cthulhu', time: '15:00 深遠之洞最終 Boss', name: '深遠混沌之眼·克蘇魯星獸', color: '#dc2626', core: '#fde047', desc: '帶呼吸光環與 10 方向螺旋星雲彈幕的最終首領！' }
+];
+
+function getBossSprite(bossObj) {
+  const c = document.createElement('canvas');
+  c.width = 48; c.height = 48;
+  c.className = 'pixel-art';
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = bossObj.color;
+  ctx.fillRect(10, 10, 28, 26);
+  ctx.fillRect(6, 16, 36, 16);
+  ctx.fillRect(14, 6, 20, 4);
+  ctx.fillRect(2, 12, 4, 14);
+  ctx.fillRect(42, 12, 4, 14);
+  ctx.fillRect(12, 36, 6, 8);
+  ctx.fillRect(30, 36, 6, 8);
+  ctx.fillStyle = bossObj.core;
+  ctx.fillRect(16, 16, 16, 10);
+  ctx.fillStyle = '#090d16';
+  ctx.fillRect(22, 17, 4, 8);
+  ctx.fillStyle = 'rgba(255,255,255,0.42)';
+  ctx.fillRect(12, 10, 24, 2);
+  return c;
+}
+
+// ==================== 3. 任務懸賞、六大許願池與 20 種道具工坊 ====================
+const QUESTS_DB = [
+  { id: 'q_kill_50',   title: '秘境清剿：累計擊敗 50 隻野生怪物', type: 'kills', target: 50,  gold: 600,  tickets: 2 },
+  { id: 'q_kill_300',  title: '割草達人：累計擊敗 300 隻野生怪物', type: 'kills', target: 300, gold: 1800, tickets: 5 },
+  { id: 'q_chest_1',   title: '尋寶獵人：開啟 1 個戰場發光寶箱', type: 'chests', target: 1,   gold: 500,  tickets: 2 },
+  { id: 'q_gacha_10',  title: '星界召喚：累計進行 10 次許願招募', type: 'pulls', target: 10,  gold: 1200, tickets: 3 },
+  { id: 'q_dex_15',    title: '圖鑑收藏家：解鎖 15 隻不同像素夥伴', type: 'owned', target: 15,  gold: 2000, tickets: 5 },
+  { id: 'q_boss_1',    title: '巨獸討伐：擊敗 1 隻 48×48 像素首領', type: 'bossKills', target: 1, gold: 3000, tickets: 8 }
+];
+
+const GACHA_POOLS = [
+  { id: 'pool_grass', name: '翡翠森芽許願池', elem: 'grass', coverId: 1,  desc: '草系夥伴出現率大幅提升！' },
+  { id: 'pool_fire',  name: '赤霄烈焰許願池', elem: 'fire',  coverId: 2,  desc: '火系夥伴出現率大幅提升！' },
+  { id: 'pool_water', name: '蒼穹海潮許願池', elem: 'water', coverId: 3,  desc: '水系夥伴出現率大幅提升！' },
+  { id: 'pool_light', name: '晨曦聖光許願池', elem: 'light', coverId: 4,  desc: '光系夥伴出現率大幅提升！' },
+  { id: 'pool_dark',  name: '深淵影月許願池', elem: 'dark',  coverId: 5,  desc: '暗系夥伴出現率大幅提升！' },
+  { id: 'pool_all',   name: '星界創世全明星池', elem: 'all', coverId: 34, desc: '全 500 隻夥伴集結，神話保底 50 抽！' }
+];
+
+const WORKSHOP_ITEMS = [
+  { id: 'it01', icon: '⚔️', name: '星紋磨刀石', cost: 300, desc: '永久全夥伴基礎傷害 +5%', apply: s => s.permDmgPct += 5 },
+  { id: 'it02', icon: '🛡️', name: '翡翠生命護符', cost: 300, desc: '永久全夥伴最大生命 +10', apply: s => s.permHp += 10 },
+  { id: 'it03', icon: '👟', name: '疾風精靈之靴', cost: 350, desc: '永久移動速度 +5%', apply: s => s.permSpdPct += 5 },
+  { id: 'it04', icon: '🧲', name: '星塵磁力核心', cost: 400, desc: '永久經驗寶石吸取範圍 +20px', apply: s => s.permMagnet += 20 },
+  { id: 'it05', icon: '🎟️', name: '星界招募禮券', cost: 500, desc: '立即獲得 2 張招募券', apply: s => s.tickets += 2 },
+  { id: 'it06', icon: '🔥', name: 'EX 覺醒催化劑', cost: 800, desc: '開局第一招直接提升 +1 級', apply: s => s.startSkillBonus += 1 },
+  { id: 'it07', icon: '💎', name: '幸運四葉草', cost: 450, desc: '寶箱金幣收益永久 +15%', apply: s => s.chestBonusPct += 15 },
+  { id: 'it08', icon: '🧪', name: '再生翡翠藥水', cost: 350, desc: '局內每秒自動回復 0.5 HP', apply: s => s.regenHp += 0.5 },
+  { id: 'it09', icon: '⚡', name: '雷鳴冷卻沙漏', cost: 600, desc: '全招式冷卻時間永久縮短 4%', apply: s => s.cdrPct += 4 },
+  { id: 'it10', icon: '🌟', name: '神話召喚羅盤', cost: 1200, desc: '神話保底計數直接 +10', apply: s => s.pity = Math.min(49, s.pity + 10) },
+  { id: 'it11', icon: '🏹', name: '穿透星光箭矢', cost: 550, desc: '所有投射物穿透數 +1', apply: s => s.bonusPierce += 1 },
+  { id: 'it12', icon: '👑', name: '冒險團榮耀徽章', cost: 1000, desc: '出戰夥伴直接升 +2 級', apply: s => { s.petLevels[s.selectedPetId] = (s.petLevels[s.selectedPetId]||1) + 2; } },
+  { id: 'it13', icon: '🔮', name: '隨機新夥伴蛋', cost: 900, desc: '立即解鎖 1 隻未擁有的夥伴', apply: s => unlockRandomNewPet(s) },
+  { id: 'it14', icon: '💰', name: '星界煉金袋', cost: 250, desc: '隨機獲得 300～800 金幣', apply: s => s.gold += 300 + Math.floor(Math.random()*501) },
+  { id: 'it15', icon: '🐉', name: '屠龍者聖印', cost: 750, desc: '對 48×48 首領傷害永久 +12%', apply: s => s.bossDmgPct += 12 },
+  { id: 'it16', icon: '❄️', name: '極光護盾晶核', cost: 500, desc: '受到怪物碰撞傷害減少 10%', apply: s => s.dmgReducePct += 10 },
+  { id: 'it17', icon: '📜', name: '古樹智慧卷軸', cost: 450, desc: '局內經驗值獲取 +10%', apply: s => s.xpBonusPct += 10 },
+  { id: 'it18', icon: '🌈', name: '元素共鳴水晶', cost: 650, desc: '全屬性傷害再 +6%', apply: s => s.permDmgPct += 6 },
+  { id: 'it19', icon: '🎁', name: '豪華遠征補給箱', cost: 1100, desc: '獲得 3 張招募券 + 600 金幣', apply: s => { s.tickets += 3; s.gold += 600; } },
+  { id: 'it20', icon: '🌌', name: '創世星核碎片', cost: 2200, desc: '直接解鎖 1 隻未擁有的【神話】夥伴！', apply: s => unlockRandomMythicPet(s) }
+];
+
+// ==================== 4. 多帳號存檔與 P2P 連線 ====================
+let currentAccount = 1;
+let saveData = createDefaultSave();
+
+function createDefaultSave() {
+  return {
+    gold: 1200,
+    tickets: 15,
+    pity: 0,
+    selectedPetId: 1,
+    selectedStage: 0,
+    owned: [1, 2, 3, 4, 5],
+    petLevels: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 },
+    giftClaimed: false,
+    stats: { kills: 0, chests: 0, pulls: 0, bossKills: 0 },
+    claimedQuests: {},
+    permDmgPct: 0, permHp: 0, permSpdPct: 0, permMagnet: 0,
+    startSkillBonus: 0, chestBonusPct: 0, regenHp: 0, cdrPct: 0,
+    bonusPierce: 0, bossDmgPct: 0, dmgReducePct: 0, xpBonusPct: 0
   };
 }
 
-const HEROES = [];
-const usedSignatures = new Set();
+function getStorageKey(slot) { return `starsprout_v3_acc_${slot}`; }
 
-(function build500Creatures() {
-  for (let id = 1; id <= 500; id++) {
-    const rng = mulberry32(id * 9973 + 2026);
-    const elemKey = ELEM_KEYS[(id - 1) % 6];
-    const elem = ELEMENTS[elemKey];
+function loadSave(slot = currentAccount) {
+  currentAccount = slot;
+  try {
+    const raw = localStorage.getItem(getStorageKey(slot));
+    saveData = raw ? { ...createDefaultSave(), ...JSON.parse(raw) } : createDefaultSave();
+  } catch (e) {
+    saveData = createDefaultSave();
+  }
+  [1, 2, 3].forEach(n => {
+    const btn = document.getElementById(`acc-btn-${n}`);
+    if (btn) btn.classList.toggle('active', n === slot);
+  });
+  updateAllLobbyUI();
+}
 
-    let rarity = 'COMMON';
-    if (id <= 30 || id % 17 === 0) rarity = 'MYTHIC';
-    else if (id <= 125 || id % 5 === 0) rarity = 'EPIC';
-    else if (id <= 300 || id % 2 === 0) rarity = 'RARE';
+function writeSave() {
+  try { localStorage.setItem(getStorageKey(currentAccount), JSON.stringify(saveData)); } catch (e) {}
+  updateAllLobbyUI();
+}
 
-    const pIdx = (id * 7 + Math.floor(rng() * 13)) % PREFIXES.length;
-    const sIdx = (id * 3 + Math.floor(rng() * 7)) % SPECIES_NAMES.length;
-    const titleTag = rarity === 'MYTHIC' ? '【神話】' : (rarity === 'EPIC' ? '【史詩】' : '');
-    const name = `${PREFIXES[pIdx]}${SPECIES_NAMES[sIdx]}·${String(id).padStart(3, '0')}`;
+function switchAccountSlot(slot) {
+  loadSave(slot);
+  alert(`已切換至【帳號 ${slot}】！`);
+}
 
-    let sig = '';
-    let traits = {};
-    let salt = 0;
-    do {
-      const r2 = mulberry32(id * 7919 + salt * 131);
-      traits = {
-        archetype: Math.floor(r2() * 8),
-        hornType: Math.floor(r2() * 7),
-        eyeShape: Math.floor(r2() * 6),
-        wingOrBack: Math.floor(r2() * 7),
-        tailType: Math.floor(r2() * 6),
-        pattern: Math.floor(r2() * 6),
-        hue1: (id * 53 + salt * 23) % 360,
-        hue2: (id * 97 + salt * 37 + 140) % 360,
-        hueEye: (id * 131 + salt * 41 + 60) % 360
+function unlockRandomNewPet(s) {
+  const locked = PET_DB.filter(p => !s.owned.includes(p.id));
+  if (locked.length) {
+    const pick = locked[Math.floor(Math.random() * locked.length)];
+    s.owned.push(pick.id);
+    s.petLevels[pick.id] = 1;
+    alert(`🔮 成功解鎖新夥伴：【${pick.code} ${pick.name}】！`);
+  } else {
+    s.gold += 800;
+  }
+}
+
+function unlockRandomMythicPet(s) {
+  const locked = PET_DB.filter(p => !s.owned.includes(p.id) && p.rarity.key === 'mythic');
+  if (locked.length) {
+    const pick = locked[Math.floor(Math.random() * locked.length)];
+    s.owned.push(pick.id);
+    s.petLevels[pick.id] = 1;
+    alert(`🌌 創世星核共鳴！解鎖神話夥伴【${pick.code} ${pick.name}】！`);
+  } else {
+    s.tickets += 10;
+  }
+}
+
+function claimStarterGift() {
+  if (!saveData.giftClaimed) {
+    saveData.tickets += 15;
+    saveData.giftClaimed = true;
+    writeSave();
+    alert('🎉 成功領取開服豪禮：招募券 ×15！已存入你的帳號。');
+  } else {
+    alert('✨ 你已經領取過開服 15 抽招募禮包囉！立即前往許願池抽卡吧！');
+  }
+  openGame('gacha');
+}
+
+// WebRTC P2P
+let p2pConn = null, p2pChan = null, p2pActive = false;
+function setupP2P() {
+  p2pConn = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+  p2pConn.onicecandidate = () => {
+    if (p2pConn.localDescription) {
+      document.getElementById('p2p-local').value = btoa(encodeURIComponent(JSON.stringify(p2pConn.localDescription)));
+    }
+  };
+  p2pConn.ondatachannel = e => bindP2PChannel(e.channel);
+}
+function bindP2PChannel(ch) {
+  p2pChan = ch;
+  p2pChan.onopen = () => {
+    p2pActive = true;
+    document.getElementById('p2p-status').textContent = '🟢 雙人連線已建立（全傷害 +20%）';
+    document.getElementById('p2p-status').style.color = '#38e57c';
+  };
+}
+async function p2pCreateOffer() {
+  setupP2P();
+  bindP2PChannel(p2pConn.createDataChannel('starsprout'));
+  const off = await p2pConn.createOffer();
+  await p2pConn.setLocalDescription(off);
+}
+async function p2pAcceptOffer() {
+  const txt = document.getElementById('p2p-remote').value.trim();
+  if (!txt) return;
+  setupP2P();
+  await p2pConn.setRemoteDescription(JSON.parse(decodeURIComponent(atob(txt))));
+  const ans = await p2pConn.createAnswer();
+  await p2pConn.setLocalDescription(ans);
+}
+async function p2pFinishAnswer() {
+  const txt = document.getElementById('p2p-remote').value.trim();
+  if (!txt || !p2pConn) return;
+  await p2pConn.setRemoteDescription(JSON.parse(decodeURIComponent(atob(txt))));
+}
+
+// ==================== 5. 官網與大廳介面渲染 ====================
+function renderPortalRoster(filter, btnEl) {
+  if (btnEl) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btnEl.classList.add('active');
+  }
+  const grid = document.getElementById('portal-roster-grid');
+  grid.innerHTML = '';
+  let list = PET_DB;
+  if (filter === 'mythic') list = PET_DB.filter(p => p.rarity.key === 'mythic');
+  else if (filter === 'epic') list = PET_DB.filter(p => p.rarity.key === 'epic');
+
+  list.slice(0, 12).forEach(pet => {
+    const card = document.createElement('div');
+    card.className = 'pet-card';
+    card.innerHTML = `
+      <span class="rarity-badge ${pet.rarity.cls}">${pet.rarity.label}</span>
+      <canvas class="pixel-art" width="32" height="32"></canvas>
+      <div style="font-size:11px; color:var(--text-muted);">${pet.code} · ${pet.element.name}系</div>
+      <div style="font-size:14px; font-weight:800; margin-top:2px;">${pet.name}</div>
+    `;
+    drawPetSprite(card.querySelector('canvas'), pet);
+    card.onclick = () => openGame('dex');
+    grid.appendChild(card);
+  });
+}
+
+function renderPortalBosses() {
+  const grid = document.getElementById('portal-boss-grid');
+  grid.innerHTML = '';
+  BOSS_LIST.forEach(b => {
+    const card = document.createElement('div');
+    card.className = 'boss-card';
+    const sprite = getBossSprite(b);
+    card.innerHTML = `
+      <div>
+        <div class="boss-time">⏱️ ${b.time}</div>
+        <div class="boss-name">${b.name}</div>
+        <div class="boss-desc">${b.desc}</div>
+      </div>
+    `;
+    card.prepend(sprite);
+    grid.appendChild(card);
+  });
+}
+
+function openGame(tab = 'home') {
+  document.getElementById('portal-view').style.display = 'none';
+  document.getElementById('game-app').style.display = 'flex';
+  updateAllLobbyUI();
+  const tabBtns = document.querySelectorAll('.b-tab');
+  const map = { home: 0, quests: 1, gacha: 2, dex: 3, items: 4, save: 5 };
+  switchLobbyTab(tab, tabBtns[map[tab] || 0]);
+}
+
+function closeGame() {
+  quitBattle();
+  document.getElementById('game-app').style.display = 'none';
+  document.getElementById('portal-view').style.display = 'block';
+}
+
+function switchLobbyTab(tab, btn) {
+  document.querySelectorAll('.b-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  ['home', 'quests', 'gacha', 'dex', 'items', 'save'].forEach(t => {
+    document.getElementById('lobby-' + t).style.display = (t === tab) ? 'flex' : 'none';
+  });
+  if (tab === 'dex') renderGameDex();
+}
+
+const STAGES = [
+  { name: '草地秘境', bg: '#132a1c', grid: '#1b3b27', bossIdx: 0 },
+  { name: '蘑菇森林', bg: '#1e162e', grid: '#2a1f40', bossIdx: 1 },
+  { name: '熔岩火山', bg: '#2b1212', grid: '#3d1919', bossIdx: 2 },
+  { name: '冰晶雪原', bg: '#102536', grid: '#17364f', bossIdx: 3 },
+  { name: '黃金沙漠', bg: '#2e2410', grid: '#423417', bossIdx: 4 }
+];
+
+function updateAllLobbyUI() {
+  document.getElementById('ui-gold').textContent = saveData.gold;
+  document.getElementById('ui-tickets').textContent = saveData.tickets;
+  document.getElementById('ui-owned-cnt').textContent = saveData.owned.length;
+  document.getElementById('dex-count').textContent = saveData.owned.length;
+  document.getElementById('pity-display').textContent = saveData.pity;
+
+  // 1. 關卡選擇
+  const stWrap = document.getElementById('stage-selector');
+  stWrap.innerHTML = '';
+  STAGES.forEach((st, idx) => {
+    const b = document.createElement('button');
+    b.className = 'stage-btn' + (saveData.selectedStage === idx ? ' active' : '');
+    b.textContent = st.name;
+    b.onclick = () => { saveData.selectedStage = idx; writeSave(); };
+    stWrap.appendChild(b);
+  });
+
+  // 2. 出戰夥伴資訊
+  const pet = PET_DB.find(p => p.id === saveData.selectedPetId) || PET_DB[0];
+  const petLv = saveData.petLevels[pet.id] || 1;
+  drawPetSprite(document.getElementById('active-pet-canvas'), pet);
+  document.getElementById('active-pet-name').textContent = `${pet.code} ${pet.name} (Lv.${petLv})`;
+  const rBadge = document.getElementById('active-pet-rarity');
+  rBadge.textContent = pet.rarity.label;
+  rBadge.className = 'rarity-badge ' + pet.rarity.cls;
+  document.getElementById('active-pet-meta').textContent = `${pet.element.name}元素 · 稀有度倍率 ×${pet.rarity.mult}`;
+  document.getElementById('pet-up-cost').textContent = petLv * 200;
+
+  const skWrap = document.getElementById('active-pet-skills');
+  skWrap.innerHTML = pet.skills.map((s, i) => `<div class="skill-tag">${i+1}. ${s.name}</div>`).join('');
+
+  // 3. 渲染任務懸賞
+  renderQuestsUI();
+  // 4. 渲染六大許願池
+  renderGachaPoolsUI();
+  // 5. 渲染 20 種工坊道具
+  renderWorkshopUI();
+}
+
+function upgradeActivePet() {
+  const id = saveData.selectedPetId;
+  const lv = saveData.petLevels[id] || 1;
+  const cost = lv * 200;
+  if (saveData.gold < cost) { alert('金幣不足！'); return; }
+  saveData.gold -= cost;
+  saveData.petLevels[id] = lv + 1;
+  writeSave();
+}
+
+function renderQuestsUI() {
+  const wrap = document.getElementById('quests-container');
+  wrap.innerHTML = '';
+  QUESTS_DB.forEach(q => {
+    const cur = q.type === 'owned' ? saveData.owned.length : (saveData.stats[q.type] || 0);
+    const done = cur >= q.target;
+    const claimed = !!saveData.claimedQuests[q.id];
+    const div = document.createElement('div');
+    div.className = 'quest-card' + (done && !claimed ? ' ready' : '');
+    div.innerHTML = `
+      <div>
+        <div style="font-size:13px; font-weight:800;">${q.title}</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+          進度：<strong style="color:${done ? '#38e57c' : '#38bdf8'};">${Math.min(cur, q.target)}/${q.target}</strong>
+          ｜ 獎勵：${q.gold}🪙 + ${q.tickets}🎟️
+        </div>
+      </div>
+      <button style="padding:6px 12px; border-radius:8px; font-size:12px; font-weight:800; background:${claimed ? '#334155' : (done ? '#16a34a' : '#1e293b')}; color:#fff;" ${(!done || claimed) ? 'disabled' : ''}>
+        ${claimed ? '✔ 已領取' : (done ? '🎁 領獎' : '進行中')}
+      </button>
+    `;
+    if (done && !claimed) {
+      div.querySelector('button').onclick = () => {
+        saveData.claimedQuests[q.id] = true;
+        saveData.gold += q.gold;
+        saveData.tickets += q.tickets;
+        writeSave();
+        alert(`🎁 領取懸賞獎勵：+${q.gold} 金幣、+${q.tickets} 招募券！`);
       };
-      sig = `${traits.archetype}-${traits.hornType}-${traits.eyeShape}-${traits.wingOrBack}-${traits.tailType}-${traits.pattern}-${traits.hue1}`;
-      salt++;
-    } while (usedSignatures.has(sig));
-    usedSignatures.add(sig);
+    }
+    wrap.appendChild(div);
+  });
+}
 
-    const mult = rarity === 'MYTHIC' ? 2.4 : rarity === 'EPIC' ? 1.75 : rarity === 'RARE' ? 1.3 : 1.0;
-    const baseAtk = Math.round((130 + (id % 45) * 4) * mult);
-    const baseHp  = Math.round((880 + (id % 60) * 18) * mult);
+function renderGachaPoolsUI() {
+  const wrap = document.getElementById('gacha-pools-list');
+  wrap.innerHTML = '';
+  GACHA_POOLS.forEach(pool => {
+    const coverPet = PET_DB[pool.coverId - 1];
+    const card = document.createElement('div');
+    card.className = 'pool-card';
+    card.innerHTML = `
+      <div class="pool-top">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <canvas class="pool-cover pixel-art" width="32" height="32"></canvas>
+          <div>
+            <div style="font-size:14px; font-weight:900; color:#fff;">${pool.name}</div>
+            <div style="font-size:11px; color:var(--border-gold);">封面UP：${coverPet.name}</div>
+            <div style="font-size:11px; color:var(--text-muted);">${pool.desc}</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button onclick="doGacha('${pool.elem}', 1)" style="flex:1; padding:8px; border-radius:8px; background:#1e293b; color:#fff; font-size:12px; font-weight:800; border:1px solid #475569;">單抽 (1🎟️)</button>
+        <button onclick="doGacha('${pool.elem}', 10)" style="flex:1; padding:8px; border-radius:8px; background:linear-gradient(135deg,#f5c542,#d97706); color:#111; font-size:12px; font-weight:900;">十連抽 (10🎟️)</button>
+      </div>
+    `;
+    drawPetSprite(card.querySelector('canvas'), coverPet);
+    wrap.appendChild(card);
+  });
+}
 
-    const skills = [];
-    for (let s = 0; s < 4; s++) {
-      const sv = SKILL_VERBS[(id * 3 + s * 5) % SKILL_VERBS.length];
-      const sn = SKILL_NOUNS[(id * 7 + s * 3) % SKILL_NOUNS.length];
-      const mpCost = [0, 20, 35, 60][s];
-      const powerPct = Math.round((105 + s * 45 + (id % 25)) * (rarity === 'MYTHIC' ? 1.25 : 1));
-      skills.push({
-        name: `${sv}${sn}`,
-        mpCost,
-        power: powerPct,
-        isUlt: s === 3,
-        desc: s === 3
-          ? `消耗 60 能量，對敵方全體造成 ${powerPct}% ${elem.name}毀滅打擊！`
-          : `消耗 ${mpCost} 能量，對鎖定目標造成 ${powerPct}% ${elem.name}傷害。`
+function doGacha(elemFilter, times) {
+  if (saveData.tickets < times) {
+    if (saveData.gold >= times * 100) saveData.gold -= times * 100;
+    else { alert('招募券與金幣不足！（開啟戰場發光寶箱或完成懸賞任務可獲得招募券）'); return; }
+  } else {
+    saveData.tickets -= times;
+  }
+
+  saveData.stats.pulls += times;
+  const resWrap = document.getElementById('gacha-results');
+  resWrap.innerHTML = '';
+
+  for (let i = 0; i < times; i++) {
+    saveData.pity += 1;
+    const roll = Math.random() * 100;
+    let rKey = 'common';
+    if (saveData.pity >= 50 || roll < 3) { rKey = 'mythic'; saveData.pity = 0; }
+    else if (roll < 10) rKey = 'epic';
+    else if (roll < 30) rKey = 'rare';
+    else if (roll < 60) rKey = 'uncommon';
+
+    let pool = PET_DB.filter(p => p.rarity.key === rKey);
+    if (elemFilter !== 'all' && Math.random() < 0.65) {
+      const ep = pool.filter(p => p.element.id === elemFilter);
+      if (ep.length) pool = ep;
+    }
+    const pet = pool[Math.floor(Math.random() * pool.length)];
+    const isDup = saveData.owned.includes(pet.id);
+    if (isDup) {
+      saveData.gold += 150;
+    } else {
+      saveData.owned.push(pet.id);
+      saveData.petLevels[pet.id] = 1;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'pet-card';
+    card.innerHTML = `
+      <span class="rarity-badge ${pet.rarity.cls}">${pet.rarity.label}</span>
+      <canvas class="pixel-art" width="32" height="32"></canvas>
+      <div style="font-size:12px; font-weight:800;">${pet.name}</div>
+      <div style="font-size:10px; color:${isDup ? '#f5c542' : '#38e57c'};">${isDup ? '重複轉化 +150🪙' : 'NEW 解鎖！'}</div>
+    `;
+    drawPetSprite(card.querySelector('canvas'), pet);
+    resWrap.appendChild(card);
+  }
+  writeSave();
+}
+
+function renderGameDex() {
+  const mode = document.getElementById('dex-filter').value;
+  const elemF = document.getElementById('dex-elem-filter').value;
+  const grid = document.getElementById('game-dex-grid');
+  grid.innerHTML = '';
+
+  let list = (mode === 'owned') ? PET_DB.filter(p => saveData.owned.includes(p.id)) : PET_DB;
+  if (elemF !== 'all') list = list.filter(p => p.element.id === elemF);
+
+  list.slice(0, 150).forEach(pet => {
+    const unlocked = saveData.owned.includes(pet.id);
+    const selected = saveData.selectedPetId === pet.id;
+    const card = document.createElement('div');
+    card.className = 'pet-card';
+    card.style.opacity = unlocked ? '1' : '0.38';
+    if (selected) card.style.borderColor = '#38e57c';
+    card.innerHTML = `
+      <span class="rarity-badge ${pet.rarity.cls}">${pet.rarity.label}</span>
+      <canvas class="pixel-art" width="32" height="32"></canvas>
+      <div style="font-size:10px; color:var(--text-muted);">${pet.code} · ${pet.element.name}</div>
+      <div style="font-size:12px; font-weight:800;">${pet.name}</div>
+      <div style="font-size:10px; color:#38e57c; margin-top:3px;">${selected ? '✔ 出戰中' : (unlocked ? '點擊出戰' : '未解鎖')}</div>
+    `;
+    drawPetSprite(card.querySelector('canvas'), pet);
+    if (unlocked) {
+      card.onclick = () => { saveData.selectedPetId = pet.id; writeSave(); renderGameDex(); };
+    }
+    grid.appendChild(card);
+  });
+}
+
+function renderWorkshopUI() {
+  const wrap = document.getElementById('items-workshop-list');
+  wrap.innerHTML = '';
+  WORKSHOP_ITEMS.forEach(it => {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div>
+        <div style="font-size:13px; font-weight:800;">${it.icon} ${it.name}</div>
+        <div style="font-size:11px; color:var(--text-muted);">${it.desc}</div>
+      </div>
+      <button style="padding:6px 10px; border-radius:8px; background:#b45309; color:#fff; font-size:11px; font-weight:800; flex-shrink:0;">
+        ${it.cost}🪙 購買
+      </button>
+    `;
+    row.querySelector('button').onclick = () => {
+      if (saveData.gold < it.cost) { alert('金幣不足！'); return; }
+      saveData.gold -= it.cost;
+      it.apply(saveData);
+      writeSave();
+    };
+    wrap.appendChild(row);
+  });
+}
+
+function exportSaveCode() {
+  document.getElementById('save-code-box').value = btoa(encodeURIComponent(JSON.stringify(saveData)));
+  alert('✅ 存檔碼已產生！請複製保存。');
+}
+function importSaveCode() {
+  try {
+    const raw = document.getElementById('save-code-box').value.trim();
+    const parsed = JSON.parse(decodeURIComponent(atob(raw)));
+    if (parsed && Array.isArray(parsed.owned)) {
+      saveData = { ...createDefaultSave(), ...parsed };
+      writeSave();
+      alert('✅ 存檔還原成功！');
+    }
+  } catch (e) { alert('❌ 存檔碼格式錯誤！'); }
+}
+
+// ==================== 6. PokéSurvivor 2D 生存割草引擎 ====================
+let battleActive = false;
+let animFrameId = null;
+let battleState = null;
+const keys = {};
+let joy = { active: false, startX: 0, startY: 0, dx: 0, dy: 0 };
+
+window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+function toggleAutoSkill() {
+  if (!battleState) return;
+  battleState.autoSkill = !battleState.autoSkill;
+  const btn = document.getElementById('btn-auto-skill');
+  btn.textContent = battleState.autoSkill ? 'AUTO ON' : 'AUTO OFF';
+  btn.classList.toggle('on', battleState.autoSkill);
+}
+
+function startBattle() {
+  const pet = PET_DB.find(p => p.id === saveData.selectedPetId) || PET_DB[0];
+  const petLv = saveData.petLevels[pet.id] || 1;
+  const stage = STAGES[saveData.selectedStage];
+  const petCanvas = document.createElement('canvas');
+  petCanvas.width = 32; petCanvas.height = 32;
+  drawPetSprite(petCanvas, pet);
+
+  const maxHp = 100 + saveData.permHp + (petLv - 1) * 8;
+  const startLv = Math.min(5, 1 + saveData.startSkillBonus);
+
+  battleState = {
+    pet, petLv, stage, petCanvas,
+    time: 0, lastTs: performance.now(), paused: false,
+    autoSkill: true, activeSlot: 0,
+    player: {
+      x: 0, y: 0, hp: maxHp, maxHp,
+      speed: 155 * (1 + saveData.permSpdPct / 100),
+      lv: 1, xp: 0, nextXp: 24
+    },
+    skills: pet.skills.map((s, idx) => ({ ...s, lv: idx === 0 ? startLv : 0, timer: 0 })),
+    enemies: [], bullets: [], enemyBullets: [], gems: [], chests: [], particles: [],
+    boss: null,
+    spawned3m: false, spawned6m: false, spawned12m: false, spawned15m: false,
+    spawnTimer: 0, chestTimer: 14
+  };
+
+  document.getElementById('battle-screen').style.display = 'block';
+  document.getElementById('boss-hp-wrap').style.display = 'none';
+  renderSkillPad();
+  setupTouchControls();
+  battleActive = true;
+  animFrameId = requestAnimationFrame(battleLoop);
+}
+
+function quitBattle() {
+  battleActive = false;
+  if (animFrameId) cancelAnimationFrame(animFrameId);
+  document.getElementById('battle-screen').style.display = 'none';
+  document.getElementById('levelup-modal').style.display = 'none';
+  writeSave();
+}
+
+function setupTouchControls() {
+  const cvs = document.getElementById('battle-canvas');
+  cvs.ontouchstart = e => {
+    const t = e.touches[0];
+    joy.active = true; joy.startX = t.clientX; joy.startY = t.clientY; joy.dx = 0; joy.dy = 0;
+  };
+  cvs.ontouchmove = e => {
+    if (!joy.active) return;
+    const t = e.touches[0];
+    const vx = t.clientX - joy.startX, vy = t.clientY - joy.startY;
+    const dist = Math.hypot(vx, vy);
+    if (dist > 4) { joy.dx = vx / dist; joy.dy = vy / dist; }
+  };
+  cvs.ontouchend = () => { joy.active = false; joy.dx = 0; joy.dy = 0; };
+}
+
+function renderSkillPad() {
+  const wrap = document.getElementById('skill-slots-container');
+  wrap.innerHTML = '';
+  battleState.skills.forEach((sk, idx) => {
+    const btn = document.createElement('button');
+    const isEx = sk.lv >= 5;
+    btn.className = 'skill-slot-btn' + (battleState.activeSlot === idx ? ' selected' : '') + (isEx ? ' ex-ready' : '');
+    btn.innerHTML = `
+      <span style="color:${isEx ? '#f5c542' : '#38bdf8'};">${sk.lv === 0 ? '未習得' : (isEx ? 'Lv.5 EX' : 'Lv.' + sk.lv)}</span>
+      <span style="font-size:9px; margin-top:2px;">${sk.name.slice(0, 4)}</span>
+    `;
+    btn.onclick = () => {
+      if (sk.lv > 0) { battleState.activeSlot = idx; renderSkillPad(); }
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+function spawnBoss(bossIdx, hpBase) {
+  const bData = BOSS_LIST[bossIdx];
+  const p = battleState.player;
+  const angle = Math.random() * Math.PI * 2;
+  battleState.boss = {
+    data: bData,
+    sprite: getBossSprite(bData),
+    x: p.x + Math.cos(angle) * 210,
+    y: p.y + Math.sin(angle) * 210,
+    hp: hpBase, maxHp: hpBase,
+    atkTimer: 1.4, phase: 0
+  };
+  document.getElementById('boss-hp-wrap').style.display = 'block';
+  document.getElementById('hud-boss-name').textContent = `👹 ${bData.name}`;
+}
+
+function triggerLevelUp() {
+  battleState.paused = true;
+  const modal = document.getElementById('levelup-modal');
+  const opts = document.getElementById('upgrade-options');
+  opts.innerHTML = '';
+
+  const candidates = battleState.skills.filter(s => s.lv < 5);
+  if (candidates.length === 0) {
+    battleState.player.hp = Math.min(battleState.player.maxHp, battleState.player.hp + 30);
+    saveData.gold += 100;
+    battleState.paused = false;
+    return;
+  }
+
+  candidates.slice(0, 3).forEach(sk => {
+    const nextLv = sk.lv + 1;
+    const willEx = nextLv === 5;
+    const div = document.createElement('div');
+    div.className = 'upgrade-card' + (willEx ? ' ex-upgrade' : '');
+    div.innerHTML = `
+      <div style="display:flex; justify-content:space-between; font-weight:800; font-size:14px;">
+        <span style="color:${willEx ? '#f5c542' : '#fff'};">${sk.name}</span>
+        <span style="color:#38e57c;">${sk.lv === 0 ? '習得 Lv.1' : (willEx ? '🔥 覺醒 Lv.5 EX！' : `Lv.${sk.lv} → Lv.${nextLv}`)}</span>
+      </div>
+      <div style="font-size:12px; color:#cbd5e1; margin-top:4px;">
+        ${willEx ? '解鎖全螢幕金色星爆奧義與超巨幅範圍！' : '冷卻 -10%、傷害 +10%（滿 5 級進化 EX 版）'}
+      </div>
+    `;
+    div.onclick = () => {
+      sk.lv = nextLv;
+      modal.style.display = 'none';
+      battleState.paused = false;
+      battleState.lastTs = performance.now();
+      renderSkillPad();
+    };
+    opts.appendChild(div);
+  });
+  modal.style.display = 'flex';
+}
+
+function fireSkill(sk) {
+  const st = battleState;
+  const p = st.player;
+  const isEx = sk.lv >= 5;
+  const coopMult = p2pActive ? 1.2 : 1.0;
+  const lvMult = 1 + (st.petLv - 1) * 0.08 + saveData.permDmgPct / 100;
+  const mult = st.pet.rarity.mult * lvMult * coopMult * (1 + (sk.lv - 1) * 0.1) * (isEx ? 1.85 : 1);
+  const dmg = sk.dmg * mult;
+  const extraPierce = saveData.bonusPierce;
+
+  let target = st.boss;
+  let minD = target ? Math.hypot(target.x - p.x, target.y - p.y) : Infinity;
+  st.enemies.forEach(e => {
+    const d = Math.hypot(e.x - p.x, e.y - p.y);
+    if (d < minD) { minD = d; target = e; }
+  });
+  const baseAng = target ? Math.atan2(target.y - p.y, target.x - p.x) : 0;
+
+  // Lv.5 EX 覺醒：全螢幕金色星爆！
+  if (isEx) {
+    st.particles.push({ x: p.x, y: p.y, r: 12, maxR: 280, color: '#f5c542', life: 0.45 });
+    for (let i = 0; i < 12; i++) {
+      const a = (Math.PI * 2 / 12) * i + st.time;
+      st.bullets.push({ x: p.x, y: p.y, vx: Math.cos(a)*350, vy: Math.sin(a)*350, dmg: dmg*0.72, r: 9, color: '#f5c542', life: 1.25, pierce: 5 + extraPierce });
+    }
+  }
+
+  if (sk.type === 'proj' || sk.type === 'pierce') {
+    const count = isEx ? 3 : 1;
+    for (let i = 0; i < count; i++) {
+      const a = baseAng + (i - (count - 1)/2) * 0.18;
+      st.bullets.push({
+        x: p.x, y: p.y, vx: Math.cos(a)*330, vy: Math.sin(a)*330,
+        dmg, r: isEx ? 8 : 5, color: isEx ? '#f5c542' : sk.color,
+        life: 1.4, pierce: (sk.type === 'pierce' ? 4 : 1) + extraPierce
+      });
+    }
+  } else if (sk.type === 'nova' || sk.type === 'orbit') {
+    const count = isEx ? 10 : 6;
+    for (let i = 0; i < count; i++) {
+      const a = (Math.PI * 2 / count) * i + st.time * 2;
+      st.bullets.push({
+        x: p.x, y: p.y, vx: Math.cos(a)*245, vy: Math.sin(a)*245,
+        dmg, r: isEx ? 8 : 5, color: isEx ? '#f5c542' : sk.color, life: 1.15, pierce: 2 + extraPierce
+      });
+    }
+  } else {
+    const tx = target ? target.x : p.x + Math.cos(baseAng)*100;
+    const ty = target ? target.y : p.y + Math.sin(baseAng)*100;
+    const rad = isEx ? 120 : 68;
+    st.particles.push({ x: tx, y: ty, r: 8, maxR: rad, color: isEx ? '#f5c542' : sk.color, life: 0.35 });
+    st.enemies.forEach(e => { if (Math.hypot(e.x - tx, e.y - ty) <= rad) e.hp -= dmg; });
+    if (st.boss && Math.hypot(st.boss.x - tx, st.boss.y - ty) <= rad + 24) {
+      st.boss.hp -= dmg * (1 + saveData.bossDmgPct / 100);
+    }
+  }
+}
+
+function battleLoop(ts) {
+  if (!battleActive) return;
+  const st = battleState;
+  const dt = Math.min(0.05, (ts - st.lastTs) / 1000);
+  st.lastTs = ts;
+
+  const cvs = document.getElementById('battle-canvas');
+  if (cvs.width !== cvs.clientWidth || cvs.height !== cvs.clientHeight) {
+    cvs.width = cvs.clientWidth; cvs.height = cvs.clientHeight;
+  }
+  const ctx = cvs.getContext('2d');
+
+  if (!st.paused) {
+    st.time += dt;
+    const p = st.player;
+    if (saveData.regenHp > 0) p.hp = Math.min(p.maxHp, p.hp + saveData.regenHp * dt);
+
+    // 移動輸入
+    let mx = joy.dx, my = joy.dy;
+    if (keys['w'] || keys['arrowup']) my -= 1;
+    if (keys['s'] || keys['arrowdown']) my += 1;
+    if (keys['a'] || keys['arrowleft']) mx -= 1;
+    if (keys['d'] || keys['arrowright']) mx += 1;
+    const mLen = Math.hypot(mx, my);
+    if (mLen > 0) {
+      p.x += (mx / mLen) * p.speed * dt;
+      p.y += (my / mLen) * p.speed * dt;
+    }
+
+    // 招式施放
+    const cdrFactor = Math.max(0.4, 1 - saveData.cdrPct / 100);
+    st.skills.forEach((sk, idx) => {
+      if (sk.lv <= 0) return;
+      if (!st.autoSkill && idx !== st.activeSlot) return;
+      const cd = sk.cd * Math.pow(0.9, sk.lv - 1) * cdrFactor;
+      sk.timer -= dt;
+      if (sk.timer <= 0) {
+        sk.timer = cd;
+        fireSkill(sk);
+      }
+    });
+
+    // 8 種 48x48 首領時間軸 (03:00 / 06:00 / 12:00 / 15:00)
+    if (st.time >= 180 && !st.spawned3m) { st.spawned3m = true; spawnBoss(st.stage.bossIdx, 2000); }
+    if (st.time >= 360 && !st.spawned6m) { st.spawned6m = true; spawnBoss(5, 4200); }
+    if (st.time >= 720 && !st.spawned12m){ st.spawned12m = true; spawnBoss(6, 7500); }
+    if (st.time >= 900 && !st.spawned15m){ st.spawned15m = true; spawnBoss(7, 15000); }
+
+    // 怪物生成
+    st.spawnTimer -= dt;
+    if (st.spawnTimer <= 0 && st.enemies.length < 80) {
+      st.spawnTimer = Math.max(0.24, 0.88 - st.time / 600);
+      const a = Math.random() * Math.PI * 2;
+      const hp = 26 + st.time * 0.65;
+      st.enemies.push({
+        x: p.x + Math.cos(a) * 280, y: p.y + Math.sin(a) * 280,
+        hp, maxHp: hp, speed: 58 + Math.min(42, st.time * 0.05),
+        color: ['#a3e635','#f472b6','#fb923c','#60a5fa'][Math.floor(Math.random()*4)]
       });
     }
 
-    HEROES.push({ id, name, titleTag, elem: elemKey, rarity, baseAtk, baseHp, traits, skills });
-  }
-})();
-
-/* ============================================================================
-   2. CRISP 16x16 PIXEL ART MONSTER GENERATOR (NON-HUMAN, SHARP & COOL)
-   ============================================================================ */
-function renderHeroSVG(hero, size = 84) {
-  const t = hero.traits;
-  const cMain = `hsl(${t.hue1}, 72%, 46%)`;
-  const cDark = `hsl(${t.hue1}, 75%, 24%)`;
-  const cLight = `hsl(${t.hue1}, 80%, 64%)`;
-  const cAccent = `hsl(${t.hue2}, 85%, 54%)`;
-  const cEye = `hsl(${t.hueEye}, 95%, 58%)`;
-
-  const grid = Array.from({ length: 16 }, () => Array(16).fill(null));
-  const setPx = (x, y, col) => { if (x >= 0 && x < 16 && y >= 0 && y < 16) grid[y][x] = col; };
-  const fillRect = (x0, y0, w, h, col) => {
-    for (let y = y0; y < y0 + h; y++)
-      for (let x = x0; x < x0 + w; x++) setPx(x, y, col);
-  };
-
-  if (t.wingOrBack === 1) {
-    fillRect(1, 4, 3, 5, cDark); fillRect(12, 4, 3, 5, cDark);
-    setPx(0, 3, cAccent); setPx(15, 3, cAccent); setPx(2, 5, cAccent); setPx(13, 5, cAccent);
-  } else if (t.wingOrBack === 2) {
-    setPx(4, 2, cAccent); setPx(11, 2, cAccent); setPx(3, 4, cLight); setPx(12, 4, cLight);
-  } else if (t.wingOrBack === 3) {
-    fillRect(1, 5, 3, 3, '#64748b'); fillRect(12, 5, 3, 3, '#64748b');
-    setPx(1, 5, cEye); setPx(14, 5, cEye);
-  } else if (t.wingOrBack === 4) {
-    setPx(1, 2, cAccent); setPx(2, 3, cAccent); setPx(14, 2, cAccent); setPx(13, 3, cAccent);
-  } else if (t.wingOrBack === 5) {
-    fillRect(1, 5, 3, 4, cLight); fillRect(12, 5, 3, 4, cLight);
-  } else if (t.wingOrBack === 6) {
-    fillRect(1, 3, 2, 2, cAccent); fillRect(13, 3, 2, 2, cAccent);
-  }
-
-  switch (t.archetype) {
-    case 0:
-      fillRect(5, 3, 6, 5, cMain); fillRect(4, 8, 8, 5, cMain);
-      fillRect(6, 9, 4, 4, cLight); fillRect(4, 13, 2, 2, cDark); fillRect(10, 13, 2, 2, cDark);
-      break;
-    case 1:
-      fillRect(4, 4, 8, 5, cMain); fillRect(3, 9, 10, 4, cDark);
-      fillRect(5, 8, 6, 2, cLight); fillRect(3, 13, 2, 2, cMain); fillRect(11, 13, 2, 2, cMain);
-      break;
-    case 2:
-      fillRect(4, 3, 8, 4, '#334155'); fillRect(3, 7, 10, 6, cMain);
-      fillRect(6, 8, 4, 3, cAccent); fillRect(4, 13, 3, 2, '#1e293b'); fillRect(9, 13, 3, 2, '#1e293b');
-      break;
-    case 3:
-      fillRect(6, 2, 4, 11, cMain); fillRect(4, 5, 8, 6, cLight);
-      fillRect(5, 6, 6, 4, cDark); setPx(7, 14, cAccent); setPx(8, 14, cAccent);
-      break;
-    case 4:
-      fillRect(5, 3, 6, 4, cMain); fillRect(6, 7, 5, 3, cDark);
-      fillRect(4, 10, 7, 3, cMain); fillRect(3, 13, 9, 2, cLight);
-      break;
-    case 5:
-      fillRect(5, 3, 6, 5, cLight); fillRect(4, 8, 8, 4, cMain);
-      fillRect(7, 6, 2, 2, '#f59e0b'); fillRect(4, 12, 2, 3, '#f59e0b'); fillRect(10, 12, 2, 3, '#f59e0b');
-      break;
-    case 6:
-      fillRect(4, 3, 8, 7, cDark); fillRect(5, 4, 6, 5, '#0f172a');
-      setPx(4, 11, cMain); setPx(7, 12, cMain); setPx(10, 11, cMain); setPx(12, 10, cMain);
-      break;
-    case 7:
-      fillRect(3, 4, 10, 8, cDark); fillRect(4, 5, 8, 6, cMain);
-      fillRect(7, 4, 2, 8, cAccent); fillRect(2, 11, 2, 3, cDark); fillRect(12, 11, 2, 3, cDark);
-      break;
-  }
-
-  if (t.hornType === 1) { setPx(4, 2, cAccent); setPx(3, 1, cAccent); setPx(11, 2, cAccent); setPx(12, 1, cAccent); }
-  else if (t.hornType === 2) { fillRect(7, 1, 2, 2, cAccent); }
-  else if (t.hornType === 3) { setPx(5, 2, '#f59e0b'); setPx(7, 1, '#f59e0b'); setPx(10, 2, '#f59e0b'); }
-  else if (t.hornType === 4) { setPx(3, 3, cLight); setPx(2, 2, cLight); setPx(12, 3, cLight); setPx(13, 2, cLight); }
-  else if (t.hornType === 5) { setPx(4, 1, cLight); setPx(5, 2, cLight); setPx(11, 1, cLight); setPx(10, 2, cLight); }
-  else if (t.hornType === 6) { fillRect(6, 2, 4, 1, cEye); }
-
-  if (t.pattern === 1) { setPx(6, 9, cAccent); setPx(9, 9, cAccent); }
-  else if (t.pattern === 2) { fillRect(6, 10, 4, 1, cAccent); }
-  else if (t.pattern === 3) { setPx(5, 8, cLight); setPx(10, 8, cLight); }
-  else if (t.pattern === 4) { setPx(7, 9, cEye); setPx(8, 9, cEye); }
-
-  if (t.eyeShape === 0) { setPx(5, 5, cEye); setPx(6, 6, cEye); setPx(10, 5, cEye); setPx(9, 6, cEye); }
-  else if (t.eyeShape === 1) { fillRect(5, 5, 6, 1, cEye); }
-  else if (t.eyeShape === 2) { fillRect(5, 5, 2, 2, cEye); fillRect(9, 5, 2, 2, cEye); }
-  else if (t.eyeShape === 3) { fillRect(7, 5, 2, 2, cEye); }
-  else if (t.eyeShape === 4) { setPx(5, 5, cEye); setPx(10, 5, cEye); setPx(4, 6, cAccent); setPx(11, 6, cAccent); }
-  else { setPx(5, 5, '#fff'); setPx(5, 6, cEye); setPx(10, 5, '#fff'); setPx(10, 6, cEye); }
-
-  if (t.tailType === 1) { setPx(13, 11, cMain); setPx(14, 10, cAccent); }
-  else if (t.tailType === 2) { setPx(2, 11, cMain); setPx(1, 9, cAccent); }
-  else if (t.tailType === 3) { fillRect(13, 12, 2, 2, cAccent); }
-
-  let rects = '';
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
-      if (grid[y][x]) rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${grid[y][x]}"/>`;
+    // 發光寶箱 (靠近停留 3 秒自動開啟)
+    st.chestTimer -= dt;
+    if (st.chestTimer <= 0 && st.chests.length < 2) {
+      st.chestTimer = 24;
+      const a = Math.random() * Math.PI * 2;
+      st.chests.push({ x: p.x + Math.cos(a)*160, y: p.y + Math.sin(a)*160, progress: 0 });
     }
-  }
-  return `<svg class="pixel-art" width="${size}" height="${size}" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="16" height="16" rx="2" fill="${cDark}" fill-opacity="0.28"/>${rects}</svg>`;
-}
-
-/* ============================================================================
-   3. SIX GACHA POOLS & TWENTY ITEMS
-   ============================================================================ */
-const GACHA_POOLS = [
-  { id: 'POOL_FOREST', name: '翡翠古樹異獸池', elem: 'FOREST', badge: '🌿 森之靈 UP 池', featuredIds: [1, 7, 13], bannerBg: 'linear-gradient(135deg, #064e3b 0%, #14532d 55%, #070a11 100%)', borderColor: '#22c55e' },
-  { id: 'POOL_FIRE',   name: '赤紅熔岩魔龍池', elem: 'FIRE',   badge: '🔥 炎之魂 UP 池', featuredIds: [2, 8, 14], bannerBg: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 55%, #070a11 100%)', borderColor: '#ef4444' },
-  { id: 'POOL_WATER',  name: '深海星淵海皇池', elem: 'WATER',  badge: '💧 水之潮 UP 池', featuredIds: [3, 9, 15], bannerBg: 'linear-gradient(135deg, #164e63 0%, #075985 55%, #070a11 100%)', borderColor: '#06b6d4' },
-  { id: 'POOL_LIGHT',  name: '天界聖紋獅鷲池', elem: 'LIGHT',  badge: '☀️ 光之聖 UP 池', featuredIds: [4, 10, 16], bannerBg: 'linear-gradient(135deg, #713f12 0%, #92400e 55%, #070a11 100%)', borderColor: '#facc15' },
-  { id: 'POOL_DARK',   name: '永夜虛空魔物池', elem: 'DARK',   badge: '🌙 暗之影 UP 池', featuredIds: [5, 11, 17], bannerBg: 'linear-gradient(135deg, #3b0764 0%, #581c87 55%, #070a11 100%)', borderColor: '#a855f7' },
-  { id: 'POOL_GENESIS',name: '創世星核神話降臨', elem: 'GENESIS',badge: '🌌 全屬性神話雙倍 UP', featuredIds: [6, 12, 18], bannerBg: 'linear-gradient(135deg, #831843 0%, #3730a3 55%, #070a11 100%)', borderColor: '#f472b6' }
-];
-
-const ITEMS_DB = [
-  { id: 'item_01', icon: '🧪', name: '星芽生命靈藥', costGold: 300, desc: '於戰鬥舞台中回復單體異獸 60% 生命值與 30 能量。' },
-  { id: 'item_02', icon: '🎫', name: '星界許願招募券', costGold: 800, desc: '使用後獲得 1 張許願招募券，可用於六大許願池。' },
-  { id: 'item_03', icon: '⚔️', name: '破曉龍紋利爪石', costGold: 600, desc: '永久提升全隊攻擊力等級 +1。' },
-  { id: 'item_04', icon: '🛡️', name: '古樹鱗甲護符', costGold: 600, desc: '永久提升全隊防禦與生命等級 +1。' },
-  { id: 'item_05', icon: '💎', name: '高純度星鑽原石', costGold: 1200, desc: '立即提煉出 320 顆星鑽（可進行 2 次許願）。' },
-  { id: 'item_06', icon: '🔥', name: '炎魔爆裂結晶', costGold: 500, desc: '立即獲得 1,200 枚金幣戰備資金。' },
-  { id: 'item_07', icon: '🌿', name: '翡翠狩獵號角', costGold: 750, desc: '立即獲得 1,500 金幣與 150 星鑽的遠征補給。' },
-  { id: 'item_08', icon: '💧', name: '潮汐時光沙漏', costGold: 900, desc: '直接解鎖並推進 1 個最高遠征關卡！' },
-  { id: 'item_09', icon: '☀️', name: '聖光進化晶石', costGold: 1500, desc: '為目前出戰陣容的所有異獸增加 +2 星級進化！' },
-  { id: 'item_10', icon: '🌙', name: '暗影命運骰子', costGold: 1000, desc: '許願神話保底計數直接 +10！' },
-  { id: 'item_11', icon: '👑', name: '霸主榮耀王冠', costGold: 2000, desc: '永久提升戰鬥勝利金幣獎勵 +20%。' },
-  { id: 'item_12', icon: '🔮', name: '異獸召喚水晶球', costGold: 2500, desc: '立即隨機捕獲 1 隻尚未擁有的稀有或史詩異獸！' },
-  { id: 'item_13', icon: '⚡', name: '雷神超載核心', costGold: 700, desc: '為目前出戰陣容所有異獸提升 +2 等級！' },
-  { id: 'item_14', icon: '🐉', name: '古龍逆鱗護符', costGold: 1100, desc: '連勝計數 +3，提升戰鬥結算獎勵。' },
-  { id: 'item_15', icon: '💰', name: '星界寶藏密匣', costGold: 450, desc: '隨機開出 600～2,200 枚金幣。' },
-  { id: 'item_16', icon: '🧭', name: '星海羅盤', costGold: 850, desc: '切換戰場星界天象並獲得 150 顆星鑽。' },
-  { id: 'item_17', icon: '🏹', name: '穿甲魔導弩箭', costGold: 650, desc: '直接獲得 2 張許願招募券！' },
-  { id: 'item_18', icon: '📜', name: '失落技能石板', costGold: 1300, desc: '全隊技能傷害倍率永久 +5%。' },
-  { id: 'item_19', icon: '🌌', name: '創世星核碎片', costGold: 3500, desc: '立即召喚 1 隻尚未擁有的【神話】級異獸加入圖鑑！' },
-  { id: 'item_20', icon: '🎁', name: '遠征軍豪華補給箱', costGold: 1800, desc: '同時獲得 3 張招募券 + 500 星鑽 + 2,500 金幣。' }
-];
-
-/* ============================================================================
-   4. QUESTS / MISSIONS SYSTEM (FIRST VERSION CORE)
-   ============================================================================ */
-const QUEST_TEMPLATES = [
-  { id: 'q_battle_1', title: '初試鋒芒：親自進入戰鬥並獲勝 1 次', type: 'wins', target: 1, rewardGold: 800, rewardGems: 160, rewardTickets: 1 },
-  { id: 'q_battle_3', title: '星界獵人：累計獲得 3 場對戰勝利', type: 'wins', target: 3, rewardGold: 1500, rewardGems: 320, rewardTickets: 2 },
-  { id: 'q_battle_10', title: '百戰霸主：累計獲得 10 場對戰勝利', type: 'wins', target: 10, rewardGold: 4000, rewardGems: 800, rewardTickets: 5 },
-  { id: 'q_gacha_1', title: '星辰呼喚：於許願池進行 1 次召喚', type: 'pulls', target: 1, rewardGold: 600, rewardGems: 160, rewardTickets: 1 },
-  { id: 'q_gacha_10', title: '十連祈願：累計進行 10 次許願召喚', type: 'pulls', target: 10, rewardGold: 2500, rewardGems: 500, rewardTickets: 3 },
-  { id: 'q_codex_10', title: '異獸圖鑑師：捕獲解鎖 10 隻不同異獸', type: 'codex', target: 10, rewardGold: 2000, rewardGems: 480, rewardTickets: 2 },
-  { id: 'q_codex_30', title: '萬獸之王：捕獲解鎖 30 隻不同異獸', type: 'codex', target: 30, rewardGold: 5000, rewardGems: 1200, rewardTickets: 5 },
-  { id: 'q_stage_5', title: '突破首領：推進至第 5 關並擊敗區域首領', type: 'stage', target: 5, rewardGold: 3000, rewardGems: 640, rewardTickets: 3 },
-  { id: 'q_upgrade_3', title: '千錘百鍊：強化升級異獸 3 次', type: 'upgrades', target: 3, rewardGold: 1200, rewardGems: 240, rewardTickets: 1 }
-];
-
-/* ============================================================================
-   5. GAME STATE & PERSISTENCE
-   ============================================================================ */
-let state = {
-  gold: 5000,
-  gems: 3200,
-  tickets: 20,
-  stage: 1,
-  winStreak: 0,
-  pity: 0,
-  atkLv: 1,
-  defLv: 1,
-  goldBonusPct: 0,
-  skillBonusPct: 0,
-  biomeTheme: 'auto',
-  stats: { wins: 0, pulls: 0, upgrades: 0 },
-  claimedQuests: {},
-  owned: {
-    1: { level: 1, stars: 1 },
-    2: { level: 1, stars: 1 },
-    3: { level: 1, stars: 1 },
-    4: { level: 1, stars: 1 }
-  },
-  team: [1, 2, 3, 4],
-  inventory: { item_01: 4, item_02: 2, item_05: 1 }
-};
-
-let combat = {
-  inBattle: false,
-  battleStage: 1,
-  playerUnits: [],
-  enemyUnits: [],
-  activeActorIdx: 0,
-  selectedEnemyIdx: 0,
-  turnNumber: 1,
-  actedThisTurn: new Set(),
-  busy: false
-};
-
-let codexPage = 1;
-const PAGE_SIZE = 48;
-let p2pConnected = false;
-
-function loadGame() {
-  try {
-    const raw = localStorage.getItem('starsprout_stage_battle_v1') || localStorage.getItem('starsprout_pixel_manual_v1');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      state = { ...state, ...parsed };
-      if (!state.stats) state.stats = { wins: 0, pulls: 0, upgrades: 0 };
-      if (!state.claimedQuests) state.claimedQuests = {};
-      if (!state.owned || Object.keys(state.owned).length === 0) {
-        state.owned = { 1: { level: 1, stars: 1 }, 2: { level: 1, stars: 1 } };
+    st.chests = st.chests.filter(ch => {
+      if (Math.hypot(ch.x - p.x, ch.y - p.y) < 38) {
+        ch.progress += dt;
+        if (ch.progress >= 3.0) {
+          const bonusGold = Math.round(250 * (1 + saveData.chestBonusPct / 100));
+          saveData.gold += bonusGold;
+          saveData.tickets += 1;
+          saveData.stats.chests += 1;
+          st.particles.push({ x: ch.x, y: ch.y, r: 5, maxR: 65, color: '#f5c542', life: 0.4 });
+          const toast = document.getElementById('chest-toast');
+          toast.textContent = `🎁 開啟發光寶箱！獲得 ${bonusGold} 金幣 + 1 招募券！`;
+          toast.style.display = 'block';
+          setTimeout(() => toast.style.display = 'none', 2200);
+          return false;
+        }
       }
-      if (!state.team || state.team.length === 0) {
-        state.team = Object.keys(state.owned).slice(0, 4).map(Number);
+      return true;
+    });
+
+    // 子彈更新
+    const bossBonus = 1 + saveData.bossDmgPct / 100;
+    st.bullets = st.bullets.filter(b => {
+      b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt;
+      st.enemies.forEach(e => {
+        if (b.pierce > 0 && Math.hypot(e.x - b.x, e.y - b.y) < b.r + 12) {
+          e.hp -= b.dmg; b.pierce--;
+        }
+      });
+      if (st.boss && b.pierce > 0 && Math.hypot(st.boss.x - b.x, st.boss.y - b.y) < b.r + 24) {
+        st.boss.hp -= b.dmg * bossBonus; b.pierce--;
+      }
+      return b.life > 0 && b.pierce > 0;
+    });
+
+    // 怪物更新
+    const dmgTakenMult = Math.max(0.3, 1 - saveData.dmgReducePct / 100);
+    st.enemies = st.enemies.filter(e => {
+      if (e.hp <= 0) {
+        saveData.stats.kills += 1;
+        st.gems.push({ x: e.x, y: e.y, val: 8 * (1 + saveData.xpBonusPct / 100) });
+        return false;
+      }
+      const a = Math.atan2(p.y - e.y, p.x - e.x);
+      e.x += Math.cos(a) * e.speed * dt;
+      e.y += Math.sin(a) * e.speed * dt;
+      if (Math.hypot(p.x - e.x, p.y - e.y) < 18) p.hp -= 12 * dmgTakenMult * dt;
+      return true;
+    });
+
+    // Boss AI 與專屬彈幕
+    if (st.boss) {
+      const b = st.boss;
+      const a = Math.atan2(p.y - b.y, p.x - b.x);
+      b.x += Math.cos(a) * 44 * dt;
+      b.y += Math.sin(a) * 44 * dt;
+      b.atkTimer -= dt;
+      if (b.atkTimer <= 0) {
+        b.atkTimer = 1.9; b.phase++;
+        if (b.data.id === 'cthulhu') {
+          // 10 方向螺旋星雲彈幕
+          for (let i = 0; i < 10; i++) {
+            const ba = (Math.PI * 2 / 10) * i + b.phase * 0.42;
+            st.enemyBullets.push({ x: b.x, y: b.y, vx: Math.cos(ba)*155, vy: Math.sin(ba)*155, life: 3.8 });
+          }
+        } else if (b.data.id === 'archon' || b.data.id === 'twins') {
+          // 交替發射 8 方向環彈與追蹤連彈
+          if (b.phase % 2 === 1) {
+            for (let i = 0; i < 8; i++) {
+              const ba = (Math.PI * 2 / 8) * i + b.phase * 0.25;
+              st.enemyBullets.push({ x: b.x, y: b.y, vx: Math.cos(ba)*145, vy: Math.sin(ba)*145, life: 3.5 });
+            }
+          } else {
+            for (let k = -1; k <= 1; k++) {
+              const ba = a + k * 0.22;
+              st.enemyBullets.push({ x: b.x, y: b.y, vx: Math.cos(ba)*185, vy: Math.sin(ba)*185, life: 3.2 });
+            }
+          }
+        } else {
+          // 3 分鐘小 Boss 6 方向彈幕
+          for (let i = 0; i < 6; i++) {
+            const ba = (Math.PI * 2 / 6) * i + b.phase * 0.3;
+            st.enemyBullets.push({ x: b.x, y: b.y, vx: Math.cos(ba)*135, vy: Math.sin(ba)*135, life: 3.4 });
+          }
+        }
+      }
+      document.getElementById('hud-boss-fill').style.width = Math.max(0, (b.hp / b.maxHp)*100) + '%';
+      document.getElementById('hud-boss-hp-txt').textContent = Math.max(0, Math.ceil((b.hp / b.maxHp)*100)) + '%';
+      if (b.hp <= 0) {
+        saveData.gold += 600;
+        saveData.tickets += 3;
+        saveData.stats.bossKills += 1;
+        for (let i = 0; i < 14; i++) {
+          st.gems.push({ x: b.x + (Math.random()-0.5)*50, y: b.y + (Math.random()-0.5)*50, val: 16 });
+        }
+        st.boss = null;
+        document.getElementById('boss-hp-wrap').style.display = 'none';
       }
     }
-  } catch (e) { console.warn(e); }
-}
 
-function saveGame(showToast = false) {
-  localStorage.setItem('starsprout_stage_battle_v1', JSON.stringify(state));
-  if (showToast) alert('✅ 遊戲進度已儲存至本機！');
-}
-
-function getHeroPower(heroId) {
-  const h = HEROES[heroId - 1];
-  const own = state.owned[heroId] || { level: 1, stars: 1 };
-  const starMult = 1 + (own.stars - 1) * 0.25;
-  const lvMult = 1 + (own.level - 1) * 0.08;
-  const coopMult = p2pConnected ? 1.25 : 1.0;
-  const atk = Math.round(h.baseAtk * starMult * lvMult * (1 + (state.atkLv - 1) * 0.1) * coopMult);
-  const hp  = Math.round(h.baseHp * starMult * lvMult * (1 + (state.defLv - 1) * 0.1) * coopMult);
-  return { atk, hp, total: atk * 3 + hp };
-}
-
-function getTeamTotalPower() {
-  return state.team.reduce((sum, id) => sum + getHeroPower(id).total, 0);
-}
-
-/* ============================================================================
-   6. EXPEDITION HUB & DEDICATED FULL-SCREEN BATTLE ENGINE
-   ============================================================================ */
-function renderExpeditionHub() {
-  document.getElementById('btn-stage-num').textContent = state.stage;
-  const preview = document.getElementById('camp-team-preview');
-  preview.innerHTML = state.team.map(id => {
-    const h = HEROES[id - 1];
-    const pwr = getHeroPower(id);
-    const own = state.owned[id] || { level: 1, stars: 1 };
-    return `
-      <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="openHeroModal(${h.id})">
-        ${renderHeroSVG(h, 52)}
-        <div style="min-width:0;">
-          <div style="font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.name}</div>
-          <div style="font-size:11px;color:#38bdf8;">Lv.${own.level} ★${own.stars}</div>
-          <div style="font-size:10px;color:var(--muted);">ATK ${pwr.atk} / HP ${pwr.hp}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  // Render available stages to enter manually
-  const grid = document.getElementById('stage-selector-grid');
-  const startStg = Math.max(1, state.stage - 2);
-  const cards = [];
-  for (let stg = startStg; stg <= state.stage + 3; stg++) {
-    const locked = stg > state.stage;
-    const isBoss = stg % 5 === 0;
-    const previewMonster = HEROES[(stg * 11) % 500];
-    cards.push(`
-      <div class="stage-node ${isBoss ? 'boss-node' : ''}" style="${locked ? 'opacity:0.45;' : ''}">
-        <div style="display:flex;align-items:center;gap:10px;">
-          ${renderHeroSVG(previewMonster, 56)}
-          <div>
-            <div style="font-weight:900;font-size:14px;color:${isBoss ? '#fbbf24' : '#f8fafc'};">
-              ${isBoss ? `👑 第 ${stg} 關：區域首領戰` : `⚔️ 第 ${stg} 關：星界巡邏`}
-            </div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">
-              守關異獸：${previewMonster.name.split('·')[0]}
-            </div>
-            <div style="font-size:11px;color:#4ade80;margin-top:2px;">
-              勝利獎勵：+${220 + stg * 55}🪙 / +${isBoss ? 160 : 30}💎
-            </div>
-          </div>
-        </div>
-        <button class="btn btn-sm ${isBoss ? 'btn-gold' : 'btn-primary'}" ${locked ? 'disabled' : ''} onclick="enterBattleStage(${stg})">
-          ${locked ? '🔒 需先通關前置關卡' : '⚔️ 進入對戰舞台'}
-        </button>
-      </div>
-    `);
-  }
-  grid.innerHTML = cards.join('');
-}
-
-function enterBossBattle() {
-  const bossStg = Math.ceil(state.stage / 5) * 5;
-  if (bossStg > state.stage) {
-    state.stage = bossStg;
-  }
-  enterBattleStage(state.stage);
-}
-
-function enterBattleStage(stageNum) {
-  combat.inBattle = true;
-  combat.battleStage = stageNum;
-  combat.busy = false;
-  combat.playerUnits = state.team.map(id => {
-    const h = HEROES[id - 1];
-    const pwr = getHeroPower(id);
-    return {
-      heroId: id,
-      hero: h,
-      maxHp: pwr.hp,
-      hp: pwr.hp,
-      atk: pwr.atk,
-      mp: 40,
-      maxMp: 100,
-      defending: false
-    };
-  });
-
-  const isBoss = stageNum % 5 === 0;
-  const count = isBoss ? 1 : Math.min(3, 1 + Math.floor(stageNum / 2));
-  combat.enemyUnits = [];
-  for (let i = 0; i < count; i++) {
-    const sample = HEROES[(stageNum * 11 + i * 29) % 500];
-    const scale = Math.pow(1.13, stageNum - 1) * (isBoss ? 2.4 : 1.0);
-    const maxHp = Math.round(560 * scale);
-    combat.enemyUnits.push({
-      uid: i,
-      name: isBoss ? `👑 霸主·${sample.name}` : `野性·${sample.name.split('·')[0]}`,
-      hero: sample,
-      maxHp,
-      hp: maxHp,
-      atk: Math.round(65 * scale)
+    // 敵方彈幕
+    st.enemyBullets = st.enemyBullets.filter(eb => {
+      eb.x += eb.vx * dt; eb.y += eb.vy * dt; eb.life -= dt;
+      if (Math.hypot(eb.x - p.x, eb.y - p.y) < 14) { p.hp -= 10 * dmgTakenMult; return false; }
+      return eb.life > 0;
     });
-  }
 
-  combat.activeActorIdx = 0;
-  combat.selectedEnemyIdx = 0;
-  combat.turnNumber = 1;
-  combat.actedThisTurn.clear();
-
-  document.getElementById('arena-stage-title').textContent = `⚔️ 第 ${stageNum} 關對戰舞台${isBoss ? '【首領戰】' : ''}`;
-  document.getElementById('battle-log').innerHTML = '';
-  addLog(`⚔️ 進入第 ${stageNum} 關戰場！請選擇技能親自指揮我方異獸作戰。`, '#38bdf8');
-  renderBattleStage();
-  document.getElementById('battle-screen-overlay').classList.add('open');
-}
-
-function retreatFromBattle() {
-  combat.inBattle = false;
-  document.getElementById('battle-screen-overlay').classList.remove('open');
-  renderExpeditionHub();
-}
-
-function addLog(msg, color = '#cbd5e1') {
-  const box = document.getElementById('battle-log');
-  if (!box) return;
-  const line = document.createElement('div');
-  line.style.color = color;
-  line.innerHTML = `[回合 ${combat.turnNumber}] ${msg}`;
-  box.prepend(line);
-}
-
-function triggerVisualEffect(domId, animClass, dmgText = null) {
-  const el = document.getElementById(domId);
-  if (!el) return;
-  el.classList.remove('anim-hit', 'anim-attack');
-  void el.offsetWidth;
-  el.classList.add(animClass);
-  if (dmgText !== null) {
-    const pop = document.createElement('div');
-    pop.className = 'dmg-popup';
-    pop.textContent = dmgText;
-    el.appendChild(pop);
-    setTimeout(() => pop.remove(), 850);
-  }
-}
-
-function selectPlayerActor(idx) {
-  if (combat.busy) return;
-  const u = combat.playerUnits[idx];
-  if (!u || u.hp <= 0) return;
-  combat.activeActorIdx = idx;
-  renderBattleStage();
-}
-
-function selectTargetEnemy(idx) {
-  if (combat.busy) return;
-  const e = combat.enemyUnits[idx];
-  if (!e || e.hp <= 0) return;
-  combat.selectedEnemyIdx = idx;
-  renderBattleStage();
-}
-
-function executePlayerSkill(skillIdx) {
-  if (combat.busy) return;
-  const actorIdx = combat.activeActorIdx;
-  const actor = combat.playerUnits[actorIdx];
-  if (!actor || actor.hp <= 0 || combat.actedThisTurn.has(actorIdx)) return;
-
-  const skill = actor.hero.skills[skillIdx];
-  if (actor.mp < skill.mpCost) return;
-
-  actor.mp -= skill.mpCost;
-  actor.defending = false;
-  if (skill.mpCost === 0) actor.mp = Math.min(actor.maxMp, actor.mp + 20);
-
-  triggerVisualEffect(`p-card-${actorIdx}`, 'anim-attack');
-
-  const mult = (skill.power / 100) * (1 + state.skillBonusPct / 100);
-  if (skill.isUlt) {
-    combat.enemyUnits.forEach((en, eIdx) => {
-      if (en.hp <= 0) return;
-      const dmg = Math.round(actor.atk * mult * (0.92 + Math.random() * 0.16));
-      en.hp = Math.max(0, en.hp - dmg);
-      triggerVisualEffect(`e-card-${eIdx}`, 'anim-hit', `-${dmg}`);
-      addLog(`💥 <strong>${actor.hero.name}</strong> 釋放奧義【${skill.name}】對 ${en.name} 造成 <strong style="color:#f43f5e;">${dmg}</strong> 傷害！`);
+    // 吸取經驗寶石
+    const magnetRad = 95 + saveData.permMagnet;
+    st.gems = st.gems.filter(g => {
+      const d = Math.hypot(g.x - p.x, g.y - p.y);
+      if (d < magnetRad) {
+        g.x += ((p.x - g.x) / d) * 270 * dt;
+        g.y += ((p.y - g.y) / d) * 270 * dt;
+      }
+      if (d < 16) {
+        p.xp += g.val;
+        if (p.xp >= p.nextXp) {
+          p.xp -= p.nextXp; p.lv++; p.nextXp = Math.floor(p.nextXp * 1.28);
+          triggerLevelUp();
+        }
+        return false;
+      }
+      return true;
     });
-  } else {
-    let targetIdx = combat.selectedEnemyIdx;
-    if (!combat.enemyUnits[targetIdx] || combat.enemyUnits[targetIdx].hp <= 0) {
-      targetIdx = combat.enemyUnits.findIndex(e => e.hp > 0);
-    }
-    const target = combat.enemyUnits[targetIdx];
-    if (target) {
-      const dmg = Math.round(actor.atk * mult * (0.92 + Math.random() * 0.16));
-      target.hp = Math.max(0, target.hp - dmg);
-      triggerVisualEffect(`e-card-${targetIdx}`, 'anim-hit', `-${dmg}`);
-      addLog(`⚔️ <strong>${actor.hero.name}</strong> 使用【${skill.name}】攻擊 ${target.name}，造成 <strong style="color:#38bdf8;">${dmg}</strong> 傷害！`);
-    }
-  }
 
-  combat.actedThisTurn.add(actorIdx);
-  renderBattleStage();
-  setTimeout(() => advanceCombatTurn(), 380);
-}
+    // HUD 更新
+    const mm = String(Math.floor(st.time / 60)).padStart(2, '0');
+    const ss = String(Math.floor(st.time % 60)).padStart(2, '0');
+    document.getElementById('hud-timer').textContent = `${mm}:${ss}`;
+    document.getElementById('hud-lv').textContent = p.lv;
+    document.getElementById('hud-hp').textContent = Math.max(0, Math.ceil((p.hp / p.maxHp) * 100));
+    document.getElementById('hud-xp-fill').style.width = `${(p.xp / p.nextXp) * 100}%`;
 
-function playerDefendAction() {
-  if (combat.busy) return;
-  const actorIdx = combat.activeActorIdx;
-  const actor = combat.playerUnits[actorIdx];
-  if (!actor || actor.hp <= 0 || combat.actedThisTurn.has(actorIdx)) return;
-  actor.defending = true;
-  actor.mp = Math.min(actor.maxMp, actor.mp + 30);
-  triggerVisualEffect(`p-card-${actorIdx}`, 'anim-attack', '+30 MP');
-  addLog(`🛡️ <strong>${actor.hero.name}</strong> 進入防禦姿態並回復 30 點能量！`, '#60a5fa');
-  combat.actedThisTurn.add(actorIdx);
-  renderBattleStage();
-  setTimeout(() => advanceCombatTurn(), 300);
-}
-
-function useQuickPotionInBattle() {
-  if (combat.busy) return;
-  if ((state.inventory.item_01 || 0) <= 0) {
-    alert('背包中沒有【星芽生命靈藥】了！');
-    return;
-  }
-  const actorIdx = combat.activeActorIdx;
-  const actor = combat.playerUnits[actorIdx];
-  if (!actor || actor.hp <= 0) return;
-  state.inventory.item_01 -= 1;
-  const heal = Math.round(actor.maxHp * 0.6);
-  actor.hp = Math.min(actor.maxHp, actor.hp + heal);
-  actor.mp = Math.min(actor.maxMp, actor.mp + 30);
-  triggerVisualEffect(`p-card-${actorIdx}`, 'anim-attack', `+${heal} HP`);
-  addLog(`🧪 對 <strong>${actor.hero.name}</strong> 使用生命靈藥，回復 ${heal} 生命與 30 能量！`, '#10b981');
-  renderBattleStage();
-  renderItemsWorkshop();
-  saveGame();
-}
-
-function advanceCombatTurn() {
-  // Check Victory
-  if (combat.enemyUnits.every(e => e.hp <= 0)) {
-    const stg = combat.battleStage;
-    const isBoss = stg % 5 === 0;
-    const rewardGold = Math.round((220 + stg * 55) * (1 + state.winStreak * 0.05) * (1 + state.goldBonusPct / 100));
-    const rewardGems = isBoss ? 160 : 35;
-    const gotTicket = isBoss ? 1 : 0;
-
-    state.gold += rewardGold;
-    state.gems += rewardGems;
-    state.tickets += gotTicket;
-    state.winStreak += 1;
-    state.stats.wins += 1;
-    if (stg === state.stage) state.stage += 1;
-
-    updateTopUI();
-    renderQuestsList();
-    saveGame();
-
-    document.getElementById('result-modal-title').textContent = `🎉 第 ${stg} 關戰鬥勝利！`;
-    document.getElementById('result-modal-body').innerHTML = `
-      <p>成功擊潰所有守關異獸！（目前連勝：${state.winStreak}）</p>
-      <div style="background:var(--panel-2);padding:10px;border-radius:8px;border:1px solid var(--border);font-weight:800;color:#fbbf24;">
-        戰利品：+${rewardGold} 🪙 金幣 ｜ +${rewardGems} 💎 星鑽 ${gotTicket ? '｜ +1 🎫 招募券' : ''}
-      </div>
-    `;
-    document.getElementById('result-modal').classList.add('open');
-    return;
-  }
-
-  if (!combat.enemyUnits[combat.selectedEnemyIdx] || combat.enemyUnits[combat.selectedEnemyIdx].hp <= 0) {
-    combat.selectedEnemyIdx = combat.enemyUnits.findIndex(e => e.hp > 0);
-  }
-
-  const nextIdx = combat.playerUnits.findIndex((u, idx) => u.hp > 0 && !combat.actedThisTurn.has(idx));
-  if (nextIdx !== -1) {
-    combat.activeActorIdx = nextIdx;
-    renderBattleStage();
-    return;
-  }
-
-  // Enemy Turn Phase
-  combat.busy = true;
-  addLog(`🔻 敵方回合反擊！`, '#f87171');
-  combat.enemyUnits.forEach((en, eIdx) => {
-    if (en.hp <= 0) return;
-    const aliveIndices = combat.playerUnits.map((u, i) => u.hp > 0 ? i : -1).filter(i => i !== -1);
-    if (aliveIndices.length === 0) return;
-    const targetPIdx = aliveIndices[Math.floor(Math.random() * aliveIndices.length)];
-    const victim = combat.playerUnits[targetPIdx];
-    const rawDmg = Math.round(en.atk * (0.9 + Math.random() * 0.2));
-    const finalDmg = victim.defending ? Math.round(rawDmg * 0.5) : rawDmg;
-    victim.hp = Math.max(0, victim.hp - finalDmg);
-    triggerVisualEffect(`e-card-${eIdx}`, 'anim-attack');
-    triggerVisualEffect(`p-card-${targetPIdx}`, 'anim-hit', `-${finalDmg}`);
-    addLog(`👾 ${en.name} 攻擊 <strong>${victim.hero.name}</strong>，造成 <strong style="color:#f87171;">${finalDmg}</strong> 傷害！`);
-  });
-
-  renderBattleStage();
-
-  setTimeout(() => {
-    combat.busy = false;
-    if (combat.playerUnits.every(u => u.hp <= 0)) {
-      state.winStreak = 0;
-      updateTopUI();
-      saveGame();
-      document.getElementById('result-modal-title').textContent = `💀 戰鬥敗北`;
-      document.getElementById('result-modal-body').innerHTML = `
-        <p>我方出戰異獸已全數力竭，請返回營地強化異獸或調整陣容後再戰！</p>
-      `;
-      document.getElementById('result-modal').classList.add('open');
+    if (p.hp <= 0) {
+      alert(`冒險結束！生存時間：${mm}:${ss}，獲得戰利品與任務進度已自動保存！`);
+      quitBattle();
       return;
     }
-
-    combat.turnNumber += 1;
-    combat.actedThisTurn.clear();
-    combat.playerUnits.forEach(u => { if (u.hp > 0) u.mp = Math.min(u.maxMp, u.mp + 10); });
-    combat.activeActorIdx = combat.playerUnits.findIndex(u => u.hp > 0);
-    renderBattleStage();
-  }, 550);
-}
-
-function closeResultAndReturn() {
-  document.getElementById('result-modal').classList.remove('open');
-  retreatFromBattle();
-}
-
-function closeResultAndNextStage() {
-  document.getElementById('result-modal').classList.remove('open');
-  enterBattleStage(state.stage);
-}
-
-function renderBattleStage() {
-  document.getElementById('arena-turn-badge').textContent = `第 ${combat.turnNumber} 回合`;
-  document.getElementById('battle-potion-count').textContent = state.inventory.item_01 || 0;
-
-  const eRow = document.getElementById('arena-enemy-row');
-  eRow.innerHTML = combat.enemyUnits.map((e, idx) => {
-    const hpPct = Math.max(0, Math.round((e.hp / e.maxHp) * 100));
-    const isTarget = idx === combat.selectedEnemyIdx && e.hp > 0;
-    return `
-      <div id="e-card-${idx}" class="fighter-sprite-card ${isTarget ? 'targeted' : ''} ${e.hp <= 0 ? 'dead' : ''}" onclick="selectTargetEnemy(${idx})">
-        <div style="font-size:10px;color:#f87171;font-weight:800;height:14px;">${isTarget ? '🎯 鎖定目標' : ''}</div>
-        ${renderHeroSVG(e.hero, 66)}
-        <div style="font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px;">${e.name}</div>
-        <div style="font-size:10px;color:var(--muted);">HP ${e.hp}/${e.maxHp}</div>
-        <div class="bar-wrap"><div class="hp-fill enemy" style="width:${hpPct}%;"></div></div>
-      </div>
-    `;
-  }).join('');
-
-  const pRow = document.getElementById('arena-player-row');
-  pRow.innerHTML = combat.playerUnits.map((u, idx) => {
-    const hpPct = Math.max(0, Math.round((u.hp / u.maxHp) * 100));
-    const mpPct = Math.max(0, Math.round((u.mp / u.maxMp) * 100));
-    const isAct = idx === combat.activeActorIdx && u.hp > 0;
-    const done = combat.actedThisTurn.has(idx);
-    return `
-      <div id="p-card-${idx}" class="fighter-sprite-card ${isAct ? 'active-turn' : ''} ${u.hp <= 0 ? 'dead' : ''}" onclick="selectPlayerActor(${idx})">
-        <div style="font-size:10px;color:${done ? '#64748b' : '#38bdf8'};font-weight:800;height:14px;">${u.hp <= 0 ? '陣亡' : done ? '✔ 已行動' : isAct ? '▶ 行動中' : '待命'}</div>
-        ${renderHeroSVG(u.hero, 66)}
-        <div style="font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px;">${u.hero.name}</div>
-        <div style="font-size:10px;color:var(--muted);">HP ${u.hp}/${u.maxHp}</div>
-        <div class="bar-wrap"><div class="hp-fill" style="width:${hpPct}%;"></div></div>
-        <div class="bar-wrap" style="height:4px;"><div class="mp-fill" style="width:${mpPct}%;"></div></div>
-      </div>
-    `;
-  }).join('');
-
-  const actor = combat.playerUnits[combat.activeActorIdx];
-  const target = combat.enemyUnits[combat.selectedEnemyIdx];
-  document.getElementById('active-actor-label').textContent = actor ? `行動單位：${actor.hero.name} (能量 ${actor.mp}/100)` : '無';
-  document.getElementById('target-enemy-label').textContent = target ? `攻擊目標：${target.name}` : '無';
-
-  const cmdGrid = document.getElementById('skill-command-buttons');
-  if (actor && actor.hp > 0) {
-    const alreadyActed = combat.actedThisTurn.has(combat.activeActorIdx) || combat.busy;
-    cmdGrid.innerHTML = actor.hero.skills.map((sk, sIdx) => {
-      const disabled = alreadyActed || actor.mp < sk.mpCost;
-      return `
-        <button class="skill-cmd-btn ${sk.isUlt ? 'ult' : ''}" onclick="executePlayerSkill(${sIdx})" ${disabled ? 'disabled' : ''}>
-          <div style="font-size:12px;font-weight:800;color:${sk.isUlt ? '#fb7185' : '#38bdf8'};">${sk.name}</div>
-          <div style="font-size:10px;color:#cbd5e1;margin-top:2px;">威力 ${sk.power}% ｜ 耗能 ${sk.mpCost}</div>
-        </button>
-      `;
-    }).join('');
-  } else {
-    cmdGrid.innerHTML = '';
-  }
-}
-
-/* ============================================================================
-   7. QUESTS & REWARDS RENDERER
-   ============================================================================ */
-function getQuestProgress(q) {
-  if (q.type === 'wins') return state.stats.wins || 0;
-  if (q.type === 'pulls') return state.stats.pulls || 0;
-  if (q.type === 'codex') return Object.keys(state.owned).length;
-  if (q.type === 'stage') return state.stage;
-  if (q.type === 'upgrades') return state.stats.upgrades || 0;
-  return 0;
-}
-
-function renderQuestsList() {
-  const container = document.getElementById('quests-list');
-  container.innerHTML = QUEST_TEMPLATES.map(q => {
-    const cur = getQuestProgress(q);
-    const done = cur >= q.target;
-    const claimed = !!state.claimedQuests[q.id];
-    return `
-      <div class="quest-item ${done && !claimed ? 'completed' : ''}">
-        <div>
-          <div style="font-weight:800;font-size:14px;">${q.title}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:3px;">
-            進度：<strong style="color:${done ? '#4ade80' : '#38bdf8'};">${Math.min(cur, q.target)} / ${q.target}</strong>
-            ｜ 獎勵：${q.rewardGold}🪙 + ${q.rewardGems}💎 + ${q.rewardTickets}🎫
-          </div>
-        </div>
-        <div>
-          ${claimed
-            ? `<button class="btn btn-sm" disabled>✔ 已領取</button>`
-            : done
-              ? `<button class="btn btn-sm btn-green" onclick="claimQuestReward('${q.id}')">🎁 領取獎勵</button>`
-              : `<button class="btn btn-sm" disabled>進行中</button>`
-          }
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function claimQuestReward(qId) {
-  const q = QUEST_TEMPLATES.find(x => x.id === qId);
-  if (!q || state.claimedQuests[qId]) return;
-  if (getQuestProgress(q) < q.target) return;
-
-  state.claimedQuests[qId] = true;
-  state.gold += q.rewardGold;
-  state.gems += q.rewardGems;
-  state.tickets += q.rewardTickets;
-  updateTopUI();
-  renderQuestsList();
-  saveGame();
-  alert(`🎁 任務完成！獲得 ${q.rewardGold} 金幣、${q.rewardGems} 星鑽、${q.rewardTickets} 張招募券！`);
-}
-
-/* ============================================================================
-   8. SIX GACHA POOLS, 500 CODEX, 20 ITEMS, P2P & SETTINGS
-   ============================================================================ */
-function renderGachaPools() {
-  const container = document.getElementById('pools-container');
-  container.innerHTML = GACHA_POOLS.map(pool => {
-    const coverHero = HEROES[pool.featuredIds[0] - 1];
-    const subHeroes = pool.featuredIds.slice(1).map(id => HEROES[id - 1]);
-    return `
-      <div class="pool-card" style="border-color:${pool.borderColor};">
-        <div class="pool-banner" style="background:${pool.bannerBg};">
-          <div class="pool-banner-info">
-            <span class="pool-badge">${pool.badge}</span>
-            <h3 class="pool-name">${pool.name}</h3>
-            <div style="font-size:12px;color:#fde047;font-weight:700;">★ 神話UP：${coverHero.name}</div>
-            <div style="font-size:11px;color:#e2e8f0;margin-top:4px;">史詩UP：${subHeroes.map(h => h.name.split('·')[0]).join('、')}</div>
-          </div>
-          <div class="pool-cover-art" onclick="openHeroModal(${coverHero.id})">
-            ${renderHeroSVG(coverHero, 96)}
-            <span class="pool-cover-tap">🔍 預覽異獸</span>
-          </div>
-        </div>
-        <div class="pool-actions">
-          <button class="btn btn-sm" onclick="openPoolPreview('${pool.id}')">📋 卡池詳情</button>
-          <div style="display:flex;gap:6px;">
-            <button class="btn btn-sm btn-primary" onclick="pullGacha('${pool.id}', 1)">單抽 (1券/160💎)</button>
-            <button class="btn btn-sm btn-gold" onclick="pullGacha('${pool.id}', 10)">十連抽</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function openPoolPreview(poolId) {
-  const pool = GACHA_POOLS.find(p => p.id === poolId);
-  const featured = pool.featuredIds.map(id => HEROES[id - 1]);
-  document.getElementById('modal-hero-title').textContent = `${pool.name} — 精選 UP 異獸預覽`;
-  document.getElementById('modal-hero-body').innerHTML = `
-    <p style="font-size:12px;color:var(--muted);margin-top:0;">本卡池提升 <strong>${ELEMENTS[pool.elem].name}</strong> 屬性異獸出現機率，每 50 抽必得【神話】級異獸！</p>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      ${featured.map(h => `
-        <div style="display:flex;align-items:center;gap:12px;background:var(--panel-2);padding:10px;border-radius:8px;border:1px solid var(--border);cursor:pointer;" onclick="openHeroModal(${h.id})">
-          ${renderHeroSVG(h, 72)}
-          <div>
-            <div style="font-weight:800;font-size:14px;color:${h.rarity === 'MYTHIC' ? '#fb7185' : '#c084fc'};">${h.titleTag} ${h.name}</div>
-            <div style="font-size:12px;color:var(--muted);">基礎攻擊 ${h.baseAtk} ｜ 生命 ${h.baseHp}</div>
-            <div style="font-size:11px;color:#38bdf8;margin-top:4px;">終極技：${h.skills[3].name}（${h.skills[3].power}%傷害）</div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-  document.getElementById('hero-modal').classList.add('open');
-}
-
-function pullGacha(poolId, count) {
-  const gemCost = count * 160;
-  if (state.tickets >= count) state.tickets -= count;
-  else if (state.gems >= gemCost) state.gems -= gemCost;
-  else { alert(`資源不足！需要 ${count} 張招募券 或 ${gemCost} 顆星鑽。`); return; }
-
-  state.stats.pulls += count;
-  const pool = GACHA_POOLS.find(p => p.id === poolId);
-  const results = [];
-
-  for (let i = 0; i < count; i++) {
-    state.pity += 1;
-    let rarity = 'COMMON';
-    const roll = Math.random();
-    if (state.pity >= 50 || roll < (pool.elem === 'GENESIS' ? 0.06 : 0.04)) {
-      rarity = 'MYTHIC';
-      state.pity = 0;
-    } else if ((count === 10 && i === 9) || roll < 0.22) rarity = 'EPIC';
-    else if (roll < 0.58) rarity = 'RARE';
-
-    let candidates = HEROES.filter(h => h.rarity === rarity);
-    if (Math.random() < 0.55) {
-      const elemCands = candidates.filter(h => h.elem === pool.elem);
-      if (elemCands.length > 0) candidates = elemCands;
-    }
-    const chosen = candidates[Math.floor(Math.random() * candidates.length)];
-    const isNew = !state.owned[chosen.id];
-    if (isNew) state.owned[chosen.id] = { level: 1, stars: 1 };
-    else { state.owned[chosen.id].stars += 1; state.owned[chosen.id].level += 2; }
-    results.push({ hero: chosen, isNew });
   }
 
-  updateTopUI();
-  renderHeroesGrid();
-  renderQuestsList();
-  saveGame();
+  // ==================== 畫面渲染 ====================
+  const W = cvs.width, H = cvs.height;
+  const camX = st.player.x - W / 2, camY = st.player.y - H / 2;
+  ctx.fillStyle = st.stage.bg;
+  ctx.fillRect(0, 0, W, H);
 
-  document.getElementById('modal-gacha-title').textContent = `🌠 ${pool.name} — ${count === 10 ? '十連召喚' : '單次召喚'}結果`;
-  document.getElementById('modal-gacha-body').innerHTML = `
-    <div class="gacha-results-grid">
-      ${results.map(r => `
-        <div class="hero-card rarity-${r.hero.rarity}" onclick="openHeroModal(${r.hero.id})">
-          <span class="rarity-tag" style="background:${r.hero.rarity==='MYTHIC'?'#e11d48':r.hero.rarity==='EPIC'?'#9333ea':r.hero.rarity==='RARE'?'#2563eb':'#475569'};color:#fff;">
-            ${r.isNew ? 'NEW!' : '★+1'}
-          </span>
-          <div class="hero-sprite-wrap" style="width:68px;height:68px;">${renderHeroSVG(r.hero, 68)}</div>
-          <div class="hero-name" style="font-size:11px;">${r.hero.name}</div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-  document.getElementById('gacha-modal').classList.add('open');
-}
+  ctx.strokeStyle = st.stage.grid;
+  ctx.lineWidth = 1;
+  const gs = 48;
+  const offX = -camX % gs, offY = -camY % gs;
+  for (let x = offX; x < W; x += gs) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = offY; y < H; y += gs) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
-function renderHeroesGrid() {
-  const kw = (document.getElementById('hero-search')?.value || '').trim().toLowerCase();
-  const elemF = document.getElementById('filter-elem')?.value || 'ALL';
-  const rarF = document.getElementById('filter-rarity')?.value || 'ALL';
-  const ownF = document.getElementById('filter-owned')?.value || 'ALL';
-
-  const filtered = HEROES.filter(h => {
-    if (elemF !== 'ALL' && h.elem !== elemF) return false;
-    if (rarF !== 'ALL' && h.rarity !== rarF) return false;
-    const isOwned = !!state.owned[h.id];
-    if (ownF === 'OWNED' && !isOwned) return false;
-    if (ownF === 'LOCKED' && isOwned) return false;
-    if (kw && !h.name.toLowerCase().includes(kw) && !String(h.id).includes(kw)) return false;
-    return true;
+  // 發光寶箱與 3 秒開啟圓環
+  st.chests.forEach(ch => {
+    const sx = ch.x - camX, sy = ch.y - camY;
+    ctx.fillStyle = '#f5c542';
+    ctx.fillRect(sx - 12, sy - 10, 24, 20);
+    ctx.strokeStyle = '#38e57c'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(sx, sy, 22, -Math.PI/2, -Math.PI/2 + (ch.progress / 3) * Math.PI * 2); ctx.stroke();
   });
 
-  const maxPage = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  if (codexPage > maxPage) codexPage = maxPage;
-  const start = (codexPage - 1) * PAGE_SIZE;
-  const slice = filtered.slice(start, start + PAGE_SIZE);
+  // 經驗寶石
+  st.gems.forEach(g => {
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(g.x - camX - 3, g.y - camY - 3, 6, 6);
+  });
 
-  document.getElementById('codex-showing-text').textContent = `符合條件共 ${filtered.length} 隻異獸（顯示第 ${filtered.length ? start + 1 : 0} - ${start + slice.length} 隻）`;
-  document.getElementById('codex-page-num').textContent = `${codexPage} / ${maxPage}`;
+  // 小怪
+  st.enemies.forEach(e => {
+    const sx = e.x - camX, sy = e.y - camY;
+    ctx.fillStyle = e.color;
+    ctx.fillRect(sx - 9, sy - 9, 18, 18);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(sx - 4, sy - 3, 2, 3); ctx.fillRect(sx + 2, sy - 3, 2, 3);
+  });
 
-  const grid = document.getElementById('heroes-grid');
-  grid.innerHTML = slice.map(h => {
-    const own = state.owned[h.id];
-    const inTeam = state.team.includes(h.id);
-    const rarColor = h.rarity === 'MYTHIC' ? '#e11d48' : h.rarity === 'EPIC' ? '#9333ea' : h.rarity === 'RARE' ? '#2563eb' : '#475569';
-    return `
-      <div class="hero-card rarity-${h.rarity} ${own ? '' : 'locked'}" onclick="openHeroModal(${h.id})">
-        <span class="rarity-tag" style="background:${rarColor};color:#fff;">${h.rarity}</span>
-        <span class="elem-tag">${ELEMENTS[h.elem].icon}</span>
-        <div class="hero-sprite-wrap">${renderHeroSVG(h, 80)}</div>
-        <div class="hero-name">${h.name}</div>
-        <div class="hero-sub">${own ? `Lv.${own.level} ★${own.stars} ${inTeam ? '【出戰中】' : ''}` : '未捕獲（點擊預覽）'}</div>
-      </div>
-    `;
-  }).join('');
-}
-
-function changeCodexPage(delta) { codexPage = Math.max(1, codexPage + delta); renderHeroesGrid(); }
-
-function openHeroModal(heroId) {
-  const h = HEROES[heroId - 1];
-  const own = state.owned[heroId];
-  const inTeam = state.team.includes(heroId);
-  const pwr = getHeroPower(heroId);
-
-  document.getElementById('modal-hero-title').textContent = `#${String(h.id).padStart(3,'0')} ${h.name}`;
-  document.getElementById('modal-hero-body').innerHTML = `
-    <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px;">
-      ${renderHeroSVG(h, 104)}
-      <div>
-        <div style="font-size:13px;font-weight:800;color:${ELEMENTS[h.elem].color};">${ELEMENTS[h.elem].icon} ${ELEMENTS[h.elem].name} ｜ ${h.rarity}</div>
-        <div style="font-size:13px;margin:4px 0;">狀態：${own ? `<strong style="color:#4ade80;">已捕獲 (Lv.${own.level} / ★${own.stars})</strong>` : '<span style="color:#94a3b8;">尚未捕獲</span>'}</div>
-        <div style="font-size:12px;color:var(--muted);">攻擊：${pwr.atk} ｜ 生命：${pwr.hp} ｜ 戰力：${pwr.total}</div>
-        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
-          ${own ? `
-            <button class="btn btn-sm ${inTeam ? 'btn-mythic' : 'btn-primary'}" onclick="toggleTeamMember(${h.id})">
-              ${inTeam ? '➖ 移出出戰隊伍' : '➕ 加入出戰隊伍'}
-            </button>
-            <button class="btn btn-sm btn-gold" onclick="upgradeHero(${h.id})">⬆️ 強化升級 (${own.level * 150}🪙)</button>
-          ` : `<button class="btn btn-sm btn-green" onclick="switchTab('gacha');document.getElementById('hero-modal').classList.remove('open');">🌠 前往許願池召喚</button>`}
-        </div>
-      </div>
-    </div>
-    <div style="font-size:13px;font-weight:800;margin-bottom:6px;">✨ 專屬四維技能指令（共 2,000 技能庫）</div>
-    ${h.skills.map(sk => `
-      <div class="skill-pill">
-        <div style="display:flex;justify-content:space-between;font-weight:800;color:#38bdf8;">
-          <span>${sk.name}</span>
-          <span>耗能 ${sk.mpCost}</span>
-        </div>
-        <div style="color:#cbd5e1;margin-top:3px;">${sk.desc}</div>
-      </div>
-    `).join('')}
-  `;
-  document.getElementById('hero-modal').classList.add('open');
-}
-
-function toggleTeamMember(heroId) {
-  const idx = state.team.indexOf(heroId);
-  if (idx >= 0) {
-    if (state.team.length <= 1) { alert('至少需要保留 1 隻出戰異獸！'); return; }
-    state.team.splice(idx, 1);
-  } else {
-    if (state.team.length >= 4) state.team.shift();
-    state.team.push(heroId);
-  }
-  updateTopUI();
-  renderExpeditionHub();
-  renderHeroesGrid();
-  openHeroModal(heroId);
-  saveGame();
-}
-
-function upgradeHero(heroId) {
-  const own = state.owned[heroId];
-  const cost = own.level * 150;
-  if (state.gold < cost) { alert('金幣不足！'); return; }
-  state.gold -= cost;
-  own.level += 1;
-  state.stats.upgrades += 1;
-  updateTopUI();
-  renderExpeditionHub();
-  renderQuestsList();
-  openHeroModal(heroId);
-  saveGame();
-}
-
-function autoEquipBestTeam() {
-  const ownedIds = Object.keys(state.owned).map(Number);
-  ownedIds.sort((a, b) => getHeroPower(b).total - getHeroPower(a).total);
-  state.team = ownedIds.slice(0, 4);
-  updateTopUI();
-  renderExpeditionHub();
-  renderHeroesGrid();
-  saveGame();
-  alert('⚔️ 已自動將戰力最高的 4 隻異獸編入出戰陣容！');
-}
-
-function renderItemsWorkshop() {
-  const grid = document.getElementById('items-grid');
-  grid.innerHTML = ITEMS_DB.map(it => {
-    const qty = state.inventory[it.id] || 0;
-    return `
-      <div class="item-card">
-        <div>
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <strong style="font-size:14px;">${it.icon} ${it.name}</strong>
-            <span style="font-size:11px;background:#1e293b;padding:2px 7px;border-radius:4px;">持有：${qty}</span>
-          </div>
-          <p style="font-size:12px;color:var(--muted);margin:6px 0 0;">${it.desc}</p>
-        </div>
-        <div style="display:flex;gap:6px;margin-top:6px;">
-          <button class="btn btn-sm btn-gold" style="flex:1;" onclick="buyItem('${it.id}')">購買 (${it.costGold}🪙)</button>
-          <button class="btn btn-sm btn-primary" style="flex:1;" onclick="useItem('${it.id}')" ${qty <= 0 ? 'disabled' : ''}>使用</button>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function buyItem(itemId) {
-  const it = ITEMS_DB.find(x => x.id === itemId);
-  if (state.gold < it.costGold) { alert('金幣不足！'); return; }
-  state.gold -= it.costGold;
-  state.inventory[itemId] = (state.inventory[itemId] || 0) + 1;
-  updateTopUI();
-  renderItemsWorkshop();
-  saveGame();
-}
-
-function useItem(itemId) {
-  if ((state.inventory[itemId] || 0) <= 0) return;
-  state.inventory[itemId] -= 1;
-
-  switch (itemId) {
-    case 'item_01': state.gold += 300; alert('🧪 已補充戰備物資（戰鬥舞台內可直接點擊使用靈藥）！'); break;
-    case 'item_02': state.tickets += 1; alert('🎫 獲得 1 張許願招募券！'); break;
-    case 'item_03': state.atkLv += 1; alert('⚔️ 全隊永久攻擊等級 +1！'); break;
-    case 'item_04': state.defLv += 1; alert('🛡️ 全隊永久防禦與生命等級 +1！'); break;
-    case 'item_05': state.gems += 320; alert('💎 提煉出 320 顆星鑽！'); break;
-    case 'item_06': state.gold += 1200; alert('🔥 獲得 1,200 枚金幣！'); break;
-    case 'item_07': state.gold += 1500; state.gems += 150; alert('🌿 獲得 1,500 金幣與 150 星鑽！'); break;
-    case 'item_08': state.stage += 1; alert(`💧 已推進至第 ${state.stage} 關！`); break;
-    case 'item_09': state.team.forEach(id => { if (state.owned[id]) state.owned[id].stars += 2; }); alert('☀️ 出戰異獸全體 +2 星級！'); break;
-    case 'item_10': state.pity = Math.min(49, state.pity + 10); alert('🌙 許願神話保底計數 +10！'); break;
-    case 'item_11': state.goldBonusPct += 20; alert('👑 戰鬥勝利金幣獎勵永久 +20%！'); break;
-    case 'item_12': {
-      const locked = HEROES.filter(h => !state.owned[h.id] && (h.rarity === 'RARE' || h.rarity === 'EPIC'));
-      if (locked.length > 0) {
-        const pick = locked[Math.floor(Math.random() * locked.length)];
-        state.owned[pick.id] = { level: 1, stars: 1 };
-        alert(`🔮 捕獲新異獸：【${pick.name}】！`);
-      } else { state.gems += 500; }
-      break;
-    }
-    case 'item_13': state.team.forEach(id => { if (state.owned[id]) state.owned[id].level += 2; }); alert('⚡ 出戰異獸全體 +2 等級！'); break;
-    case 'item_14': state.winStreak += 3; alert('🐉 連勝計數 +3！'); break;
-    case 'item_15': {
-      const bonus = 600 + Math.floor(Math.random() * 1601);
-      state.gold += bonus;
-      alert(`💰 開出 ${bonus} 枚金幣！`);
-      break;
-    }
-    case 'item_16':
-      setBiomeTheme(ELEM_KEYS[Math.floor(Math.random() * ELEM_KEYS.length)].toLowerCase());
-      state.gems += 150;
-      alert('🧭 切換天象並獲得 150 顆星鑽！');
-      break;
-    case 'item_17': state.tickets += 2; alert('🏹 獲得 2 張許願招募券！'); break;
-    case 'item_18': state.skillBonusPct += 5; alert('📜 全隊技能傷害倍率永久 +5%！'); break;
-    case 'item_19': {
-      const lockedMythic = HEROES.filter(h => !state.owned[h.id] && h.rarity === 'MYTHIC');
-      if (lockedMythic.length > 0) {
-        const pick = lockedMythic[Math.floor(Math.random() * lockedMythic.length)];
-        state.owned[pick.id] = { level: 1, stars: 1 };
-        alert(`🌌 捕獲神話異獸【${pick.name}】！`);
-      } else { state.gems += 1600; }
-      break;
-    }
-    case 'item_20': state.tickets += 3; state.gems += 500; state.gold += 2500; alert('🎁 獲得 3招募券 + 500星鑽 + 2500金幣！'); break;
+  // 48x48 Boss 與呼吸光環
+  if (st.boss) {
+    const bx = st.boss.x - camX, by = st.boss.y - camY;
+    const pulse = 36 + Math.sin(st.time * 5) * 6;
+    ctx.strokeStyle = 'rgba(248, 113, 113, 0.55)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(bx, by, pulse, 0, Math.PI * 2); ctx.stroke();
+    ctx.drawImage(st.boss.sprite, bx - 24, by - 24, 48, 48);
   }
 
-  updateTopUI();
-  renderExpeditionHub();
-  renderItemsWorkshop();
-  renderHeroesGrid();
-  renderQuestsList();
-  saveGame();
-}
+  // 主角星芽夥伴
+  ctx.drawImage(st.petCanvas, W / 2 - 18, H / 2 - 18, 36, 36);
 
-/* WebRTC P2P */
-let pc = null, dc = null;
-function initPeerConnection() {
-  pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-  pc.onicecandidate = () => {
-    if (pc.localDescription) document.getElementById('p2p-local-sdp').value = btoa(unescape(encodeURIComponent(JSON.stringify(pc.localDescription))));
-  };
-  pc.ondatachannel = (ev) => setupDataChannel(ev.channel);
-}
-function setupDataChannel(channel) {
-  dc = channel;
-  dc.onopen = () => {
-    p2pConnected = true;
-    document.getElementById('p2p-status').textContent = '🟢 雙人連線已建立（全隊戰力 +25%）';
-    document.getElementById('p2p-status').style.color = '#4ade80';
-    updateTopUI();
-    renderExpeditionHub();
-  };
-  dc.onmessage = () => { state.gold += 300; updateTopUI(); };
-}
-async function createP2POffer() { initPeerConnection(); setupDataChannel(pc.createDataChannel('starsprout-coop')); const o = await pc.createOffer(); await pc.setLocalDescription(o); }
-async function acceptP2POffer() {
-  const raw = document.getElementById('p2p-remote-sdp').value.trim();
-  if (!raw) return;
-  initPeerConnection();
-  await pc.setRemoteDescription(JSON.parse(decodeURIComponent(escape(atob(raw)))));
-  const a = await pc.createAnswer();
-  await pc.setLocalDescription(a);
-}
-async function finalizeP2PAnswer() {
-  const raw = document.getElementById('p2p-remote-sdp').value.trim();
-  if (!raw || !pc) return;
-  await pc.setRemoteDescription(JSON.parse(decodeURIComponent(escape(atob(raw)))));
-}
-function sendCoopCheer() {
-  state.gold += 500;
-  updateTopUI();
-  if (dc && dc.readyState === 'open') dc.send('cheer');
-  alert('🔥 已發送雙人合擊支援，獲得 +500 金幣！');
-}
+  // 彈幕
+  st.bullets.forEach(b => {
+    ctx.fillStyle = b.color;
+    ctx.beginPath(); ctx.arc(b.x - camX, b.y - camY, b.r, 0, Math.PI * 2); ctx.fill();
+  });
+  st.enemyBullets.forEach(eb => {
+    ctx.fillStyle = '#f87171';
+    ctx.beginPath(); ctx.arc(eb.x - camX, eb.y - camY, 5, 0, Math.PI * 2); ctx.fill();
+  });
 
-function setBiomeTheme(theme) { state.biomeTheme = theme; updateDynamicBiome(); saveGame(); }
-function updateDynamicBiome() {
-  const bg = document.getElementById('dynamic-bg');
-  const biomeGradients = {
-    forest: 'radial-gradient(circle at 25% 20%, #064e3b 0%, #070a11 75%)',
-    fire:   'radial-gradient(circle at 75% 20%, #7f1d1d 0%, #070a11 75%)',
-    water:  'radial-gradient(circle at 30% 25%, #164e63 0%, #070a11 75%)',
-    light:  'radial-gradient(circle at 50% 15%, #713f12 0%, #070a11 75%)',
-    dark:   'radial-gradient(circle at 60% 20%, #3b0764 0%, #070a11 75%)',
-    genesis:'radial-gradient(circle at 50% 20%, #831843 0%, #1e1b4b 50%, #070a11 85%)'
-  };
-  const keys = Object.keys(biomeGradients);
-  const activeKey = state.biomeTheme === 'auto' ? keys[(state.stage - 1) % 6] : state.biomeTheme;
-  bg.style.background = biomeGradients[activeKey] || biomeGradients.genesis;
-}
+  // 技能星爆特效
+  st.particles = st.particles.filter(pt => {
+    pt.life -= dt;
+    pt.r += (pt.maxR - pt.r) * 10 * dt;
+    ctx.strokeStyle = pt.color; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(pt.x - camX, pt.y - camY, pt.r, 0, Math.PI * 2); ctx.stroke();
+    return pt.life > 0;
+  });
 
-function initStarfield() {
-  const bg = document.getElementById('dynamic-bg');
-  for (let i = 0; i < 40; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'star-dot';
-    dot.style.width = '2px'; dot.style.height = '2px';
-    dot.style.left = (Math.random() * 100) + '%';
-    dot.style.top = (Math.random() * 100) + '%';
-    dot.style.animationDelay = (Math.random() * 3) + 's';
-    bg.appendChild(dot);
+  // 左手虛擬搖桿繪製
+  if (joy.active) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(joy.startX, joy.startY, 36, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = 'rgba(56, 229, 124, 0.65)';
+    ctx.beginPath(); ctx.arc(joy.startX + joy.dx * 24, joy.startY + joy.dy * 24, 14, 0, Math.PI * 2); ctx.fill();
   }
+
+  animFrameId = requestAnimationFrame(battleLoop);
 }
 
-function updateTopUI() {
-  document.getElementById('res-gold').textContent = state.gold.toLocaleString();
-  document.getElementById('res-gems').textContent = state.gems.toLocaleString();
-  document.getElementById('res-tickets').textContent = state.tickets;
-  document.getElementById('res-codex').textContent = Object.keys(state.owned).length;
-  document.getElementById('team-power').textContent = getTeamTotalPower().toLocaleString();
-  document.getElementById('win-streak').textContent = state.winStreak;
-  document.getElementById('pity-count').textContent = state.pity;
-}
-
-function switchTab(tabName) {
-  document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById(`tab-${tabName}`).classList.add('active');
-  const idxMap = { expedition: 0, quests: 1, gacha: 2, codex: 3, items: 4, coop: 5, settings: 6 };
-  document.querySelectorAll('.nav-btn')[idxMap[tabName]].classList.add('active');
-}
-
-function closeModal(id, ev) { if (ev.target.id === id) document.getElementById(id).classList.remove('open'); }
-function exportSaveCode() { prompt('請複製存檔代碼：', btoa(unescape(encodeURIComponent(JSON.stringify(state))))); }
-function importSaveCode() {
-  const code = prompt('請貼上存檔代碼：');
-  if (!code) return;
-  try {
-    state = { ...state, ...JSON.parse(decodeURIComponent(escape(atob(code.trim())))) };
-    saveGame(true);
-    location.reload();
-  } catch (e) { alert('❌ 代碼格式錯誤！'); }
-}
-
-/* BOOTSTRAP */
-initStarfield();
-loadGame();
-updateDynamicBiome();
-updateTopUI();
-renderExpeditionHub();
-renderQuestsList();
-renderGachaPools();
-renderHeroesGrid();
-renderItemsWorkshop();
+// 初始化執行
+renderPortalRoster('popular');
+renderPortalBosses();
+loadSave(1);
 </script>
 </body>
 </html>
