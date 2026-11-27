@@ -370,21 +370,37 @@
         </button>
       </section>
 
-      <!-- 分頁 2：招募 -->
+      <!-- 分頁 2：招募（五大元素獨立卡池） -->
       <section id="view-gacha" class="tab-view hidden">
-        <div class="pixel-box" style="background:linear-gradient(180deg,#271d4d,#171b33);padding:14px;text-align:center;">
-          <span style="display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(251,191,36,0.2);color:var(--amber);font-size:11px;font-weight:900;">✨ 全 500 隻原創星芽夥伴集結 ✨</span>
-          <h2 style="margin:6px 0 4px;font-size:19px;font-weight:900;">星光許願招募</h2>
-          <p style="margin:0;font-size:11px;color:#cbd5e1;">重複獲得的夥伴將自動轉換為養成金幣！</p>
+        <div id="gacha-banner-box" class="pixel-box" style="background:linear-gradient(180deg,#143d2b,#171b33);padding:14px;text-align:center;">
+          <!-- 5 大屬性卡池切換標籤 -->
+          <div class="grid-5" style="margin-bottom:10px;gap:5px;">
+            <button onclick="selectGachaPool('grass')" id="pool-tab-grass" class="pixel-btn" style="padding:7px 2px;border-radius:10px;font-size:11px;font-weight:900;border:2px solid #4ade80;background:#064e3b;color:#fff;">🌿 草池</button>
+            <button onclick="selectGachaPool('fire')"  id="pool-tab-fire"  class="pixel-btn" style="padding:7px 2px;border-radius:10px;font-size:11px;font-weight:900;border:2px solid #475569;background:#1e293b;color:#cbd5e1;">🔥 火池</button>
+            <button onclick="selectGachaPool('water')" id="pool-tab-water" class="pixel-btn" style="padding:7px 2px;border-radius:10px;font-size:11px;font-weight:900;border:2px solid #475569;background:#1e293b;color:#cbd5e1;">💧 水池</button>
+            <button onclick="selectGachaPool('light')" id="pool-tab-light" class="pixel-btn" style="padding:7px 2px;border-radius:10px;font-size:11px;font-weight:900;border:2px solid #475569;background:#1e293b;color:#cbd5e1;">✨ 光池</button>
+            <button onclick="selectGachaPool('dark')"  id="pool-tab-dark"  class="pixel-btn" style="padding:7px 2px;border-radius:10px;font-size:11px;font-weight:900;border:2px solid #475569;background:#1e293b;color:#cbd5e1;">🌙 暗池</button>
+          </div>
 
-          <div style="margin:12px auto;width:96px;height:96px;border-radius:22px;background:rgba(30,27,75,0.85);border:2px solid rgba(129,140,248,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;">
-            <span class="animate-float" style="font-size:44px;">🎁</span>
-            <span style="font-size:10px;font-weight:800;color:#a5b4fc;margin-top:2px;">星芽扭蛋機</span>
+          <span id="gacha-pool-badge" style="display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(52,211,153,0.2);color:#4ade80;font-size:11px;font-weight:900;">🌿 翡翠森羅・草屬性限定池 (100隻)</span>
+          <h2 id="gacha-pool-title" style="margin:6px 0 4px;font-size:19px;font-weight:900;">翡翠森羅召喚池</h2>
+          <p id="gacha-pool-desc" style="margin:0;font-size:11px;color:#cbd5e1;">100% 必出草屬性星芽夥伴！重複自動轉為養成金幣</p>
+
+          <div style="margin:10px auto;display:flex;align-items:center;justify-content:center;gap:10px;">
+            <div id="gacha-pool-icon-box" style="width:82px;height:82px;border-radius:20px;background:rgba(16,25,45,0.85);border:2px solid #4ade80;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <span id="gacha-pool-emoji" class="animate-float" style="font-size:38px;">🌿</span>
+              <span id="gacha-pool-collected" style="font-size:9px;font-weight:900;color:#4ade80;margin-top:2px;">已收錄 1/100</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(15,23,42,0.75);padding:6px 10px;border-radius:14px;border:1px solid rgba(255,255,255,0.12);">
+              <span style="font-size:9px;font-weight:900;color:var(--amber);">👑 本池神話代表</span>
+              <canvas id="gacha-featured-canvas" width="52" height="52" class="pixel-canvas" style="width:50px;height:50px;"></canvas>
+              <span id="gacha-featured-name" style="font-size:10px;font-weight:900;color:#fff;">創世星龍王</span>
+            </div>
           </div>
 
           <div style="background:rgba(16,19,36,0.9);border-radius:12px;padding:8px;border:1px solid rgba(99,102,241,0.3);text-align:left;">
             <div style="font-size:10px;font-weight:800;color:#cbd5e1;margin-bottom:6px;display:flex;justify-content:space-between;">
-              <span>📊 固定招募機率公示</span>
+              <span>📊 本屬性池固定招募機率</span>
               <span style="color:var(--amber);">重複自動轉金幣</span>
             </div>
             <div class="grid-5" style="text-align:center;font-size:10px;">
@@ -654,22 +670,32 @@
     </div>
   </div>
 
-  <!-- 帳號與多存檔彈窗 -->
+  <!-- 個人檔案與存檔／讀檔彈窗 -->
   <div id="account-modal" class="modal-backdrop hidden">
-    <div class="modal-card animate-pop">
+    <div class="modal-card animate-pop" style="max-width:410px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <h3 style="margin:0;font-size:16px;font-weight:900;">👤 冒險家帳號與存檔紀錄</h3>
+        <h3 style="margin:0;font-size:16px;font-weight:900;">👤 冒險家個人檔案與存檔／讀檔</h3>
         <button onclick="document.getElementById('account-modal').classList.add('hidden')" style="width:28px;height:28px;border-radius:50%;background:#1e293b;border:none;color:#cbd5e1;font-weight:900;cursor:pointer;">✕</button>
       </div>
-      <div style="background:#111529;border:1px solid rgba(52,211,153,0.4);border-radius:12px;padding:10px;margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div style="font-size:10px;color:var(--text-sub);">目前登入帳號</div>
-            <div id="acc-current-name" style="font-size:14px;font-weight:900;color:var(--emerald);">訪客冒險家</div>
+
+      <!-- 個人檔案卡片 -->
+      <div style="background:#111529;border:1px solid rgba(52,211,153,0.45);border-radius:12px;padding:10px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:52px;height:52px;border-radius:12px;background:#1e293b;border:2px solid var(--emerald);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <canvas id="acc-avatar-canvas" width="48" height="48" class="pixel-canvas" style="width:46px;height:46px;"></canvas>
           </div>
-          <span style="font-size:10px;padding:2px 8px;border-radius:999px;background:rgba(52,211,153,0.2);color:var(--emerald);font-weight:800;">● 自動存檔中</span>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+              <div id="acc-current-name" style="font-size:15px;font-weight:900;color:var(--emerald);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">訪客冒險家</div>
+              <span style="font-size:9px;padding:2px 7px;border-radius:999px;background:rgba(52,211,153,0.2);color:var(--emerald);font-weight:900;flex-shrink:0;">● 自動存檔</span>
+            </div>
+            <div id="acc-title-badge" style="font-size:10px;color:var(--amber);font-weight:800;margin-top:2px;">🏅 稱號：新芽見習冒險家</div>
+            <div style="font-size:10px;color:var(--text-sub);margin-top:1px;">UID：<span id="acc-profile-uid" style="color:#38bdf8;font-weight:800;">SPROUT-1000</span></div>
+          </div>
         </div>
-        <div class="grid-3" style="margin-top:8px;padding-top:8px;border-top:1px solid #1e293b;text-align:center;font-size:10px;">
+
+        <div class="grid-4" style="margin-top:8px;padding-top:8px;border-top:1px solid #1e293b;text-align:center;font-size:10px;">
+          <div><span style="color:var(--text-sub);display:block;">圖鑑進度</span><strong id="acc-dex-prog" style="color:var(--emerald);">1/500</strong></div>
           <div><span style="color:var(--text-sub);display:block;">最長生存</span><strong id="acc-best-time" style="color:var(--amber);">00:00</strong></div>
           <div><span style="color:var(--text-sub);display:block;">累計擊殺</span><strong id="acc-total-kills" style="color:var(--rose);">0</strong></div>
           <div><span style="color:var(--text-sub);display:block;">冒險次數</span><strong id="acc-total-runs" style="color:var(--sky);">0 次</strong></div>
@@ -677,26 +703,42 @@
         <div id="acc-last-saved" style="font-size:9px;color:#64748b;margin-top:6px;text-align:right;">最後存檔：剛剛</div>
       </div>
 
+      <!-- 手動存檔 / 讀檔快捷區 -->
+      <div style="background:#141830;border:1px solid rgba(56,189,248,0.4);border-radius:12px;padding:10px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:900;color:var(--sky);margin-bottom:6px;">💾 手動存檔與讀檔管理</div>
+        <div class="grid-2" style="gap:6px;">
+          <button onclick="manualSaveNow()" class="pixel-btn" style="padding:8px;border-radius:8px;background:linear-gradient(90deg,#10b981,#059669);color:#042f2e;font-weight:900;font-size:12px;">💾 立即手動存檔</button>
+          <button onclick="manualReloadNow()" class="pixel-btn" style="padding:8px;border-radius:8px;background:linear-gradient(90deg,#38bdf8,#0284c7);color:#fff;font-weight:900;font-size:12px;">📂 讀取目前存檔</button>
+        </div>
+        <div class="grid-2" style="gap:6px;margin-top:6px;">
+          <button onclick="exportSaveCode()" class="pixel-btn" style="padding:7px;border-radius:8px;background:#334155;color:#fff;font-weight:800;font-size:11px;">📤 匯出存檔代碼</button>
+          <button onclick="importSaveCode()" class="pixel-btn" style="padding:7px;border-radius:8px;background:#334155;color:#fff;font-weight:800;font-size:11px;">📥 匯入代碼讀檔</button>
+        </div>
+        <div class="grid-2" style="gap:6px;margin-top:6px;">
+          <button onclick="downloadSaveFile()" class="pixel-btn" style="padding:7px;border-radius:8px;background:#1e293b;border:1px solid #475569;color:#cbd5e1;font-weight:800;font-size:11px;">⬇️ 下載 JSON 存檔</button>
+          <label class="pixel-btn" style="padding:7px;border-radius:8px;background:#1e293b;border:1px solid #475569;color:#cbd5e1;font-weight:800;font-size:11px;text-align:center;cursor:pointer;">
+            ⬆️ 上傳 JSON 讀檔
+            <input type="file" accept=".json" onchange="uploadSaveFile(event)" style="display:none;" />
+          </label>
+        </div>
+      </div>
+
+      <!-- 帳號登入 / 註冊 -->
       <div style="background:#141830;border:1px solid #334155;border-radius:12px;padding:10px;margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:900;color:var(--amber);margin-bottom:6px;">🔑 登入 / 建立專屬冒險家帳號</div>
+        <div style="font-size:11px;font-weight:900;color:var(--amber);margin-bottom:6px;">🔑 切換 / 建立專屬冒險家帳號</div>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <input id="acc-input-user" type="text" maxlength="16" placeholder="輸入帳號名稱（例如：星芽勇者）" class="app-input" />
           <input id="acc-input-pass" type="password" maxlength="20" placeholder="輸入密碼（4位以上英數）" class="app-input" />
           <div class="grid-2">
-            <button onclick="handleAccountAuth('login')" class="pixel-btn" style="padding:8px;border-radius:8px;background:var(--emerald);color:#052e16;font-weight:900;font-size:12px;">登入帳號</button>
+            <button onclick="handleAccountAuth('login')" class="pixel-btn" style="padding:8px;border-radius:8px;background:var(--emerald);color:#052e16;font-weight:900;font-size:12px;">登入並讀檔</button>
             <button onclick="handleAccountAuth('register')" class="pixel-btn" style="padding:8px;border-radius:8px;background:var(--sky);color:#082f49;font-weight:900;font-size:12px;">註冊新帳號</button>
           </div>
         </div>
       </div>
 
-      <div style="margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:800;color:#cbd5e1;margin-bottom:5px;">📂 本機帳號存檔清單（點擊切換）</div>
+      <div>
+        <div style="font-size:11px;font-weight:800;color:#cbd5e1;margin-bottom:5px;">🗂️ 本機多帳號存檔槽（點擊切換讀取）</div>
         <div id="acc-saved-list" style="display:flex;flex-direction:column;gap:6px;max-height:110px;overflow-y:auto;font-size:11px;"></div>
-      </div>
-
-      <div class="grid-2" style="padding-top:8px;border-top:1px solid #334155;">
-        <button onclick="exportSaveCode()" class="pixel-btn" style="padding:8px;border-radius:8px;background:#334155;color:#fff;font-weight:800;font-size:11px;">📤 匯出存檔碼</button>
-        <button onclick="importSaveCode()" class="pixel-btn" style="padding:8px;border-radius:8px;background:#334155;color:#fff;font-weight:800;font-size:11px;">📥 匯入存檔碼</button>
       </div>
       <div id="save-feedback" style="text-align:center;font-size:11px;color:var(--amber);font-weight:800;margin-top:6px;min-height:16px;"></div>
     </div>
@@ -871,14 +913,56 @@
       { key: 'dark',  name: '暗屬性', icon: '🌙', color: '#c084fc', palettes: [['#c084fc','#7e22ce','#f3e8ff'],['#818cf8','#4338ca','#e0e7ff'],['#f472b6','#be185d','#fbcfe8']] }
     ];
 
-    const SKILL_POOL = [
-      { id: 'bolt',   icon: '✨', name: '星光連彈', desc: '高頻鎖定最近敵人連射星彈。', exDesc: 'EX：極速四重星軌連射，附帶穿透爆裂！', style: 'single', projColor: '#fde047', exColor: '#fef08a', cdMult: 0.85, dmgMult: 1.0 },
-      { id: 'spread', icon: '🍃', name: '扇形葉刃', desc: '朝前方扇形同時發射多枚葉刃。', exDesc: 'EX：7 連巨型黃金旋風刃，撕裂整片敵群！', style: 'spread', projColor: '#4ade80', exColor: '#fbbf24', cdMult: 1.05, dmgMult: 0.82 },
-      { id: 'nova',   icon: '💥', name: '元素新星', desc: '向八方釋放環形衝擊彈。', exDesc: 'EX：16 方向超新星雙層環彈＋震撼衝擊波！', style: 'nova',   projColor: '#fb923c', exColor: '#f43f5e', cdMult: 1.35, dmgMult: 0.95 },
-      { id: 'pierce', icon: '⚡', name: '貫穿光矢', desc: '射出可穿透敵人的高速光矢。', exDesc: 'EX：三道極光毀滅光束，貫穿全場所有敵人！', style: 'pierce', projColor: '#38bdf8', exColor: '#e0f2fe', cdMult: 1.25, dmgMult: 1.25 },
-      { id: 'orbit',  icon: '🌀', name: '守護星環', desc: '強化環繞身邊的守護星光球。', exDesc: 'EX：5 顆巨型神聖星球高速旋斬＋範圍震波！', style: 'orbit',  projColor: '#c084fc', exColor: '#f0abfc', cdMult: 1.15, dmgMult: 0.90 },
-      { id: 'meteor', icon: '☄️', name: '星隕轟炸', desc: '在敵群密集處引爆星辰爆裂。', exDesc: 'EX：三連超巨型星隕天降，造成毀滅性大爆炸！', style: 'bomb',   projColor: '#f43f5e', exColor: '#fbbf24', cdMult: 1.55, dmgMult: 1.65 }
+    const SKILL_ARCHETYPES = [
+      { style: 'single', icons: ['✨','🌟','💫','🎯','🔫'], nouns: ['星彈','連射','光彈','魔彈','星矢','飛彈'], descTpl: '鎖定最近敵人高速連射{name}（傷害倍率 {dmg}%）。', exDescTpl: 'EX：極速多重{name}軌跡連發，附帶穿透星爆！', baseCd: 0.86, baseDmg: 1.02 },
+      { style: 'spread', icons: ['🍃','🔥','🌊','❄️','🌸'], nouns: ['葉刃','烈焰波','水月斬','冰錐扇','花瓣雨','風刃'], descTpl: '朝前方扇形齊發多道{name}（覆蓋寬廣扇區）。', exDescTpl: 'EX：7 連巨型黃金{name}風暴，撕裂整片敵群！', baseCd: 1.04, baseDmg: 0.84 },
+      { style: 'nova',   icons: ['💥','☀️','🔮','🌋','🎇'], nouns: ['新星','脈衝','衝擊環','爆裂波','光輪','星環陣'], descTpl: '向四周環形釋放{name}彈幕擊退近身敵人。', exDescTpl: 'EX：16 方向超新星雙層{name}＋震撼衝擊波！', baseCd: 1.32, baseDmg: 0.96 },
+      { style: 'pierce', icons: ['⚡','🏹','☄️','🗡️','💠'], nouns: ['貫穿光矢','極光束','雷槍','破空箭','聖光矛','暗影穿刺'], descTpl: '發射可連續穿透多名敵人的高速{name}。', exDescTpl: 'EX：三道毀滅級{name}光束，貫穿全場所有敵人！', baseCd: 1.24, baseDmg: 1.26 },
+      { style: 'orbit',  icons: ['🌀','🛡️','🪐','🌙','💎'], nouns: ['守護星環','護體結界','衛星光球','月輪護盾','星晶環繞'], descTpl: '強化環繞自身的{name}並釋放近身震盪波。', exDescTpl: 'EX：5 顆巨型神聖{name}高速旋斬＋全周震波！', baseCd: 1.14, baseDmg: 0.92 },
+      { style: 'bomb',   icons: ['☄️','💣','🌠','🔥','🌌'], nouns: ['星隕轟炸','天降流星','元素爆破','深淵隕石','聖光審判'], descTpl: '精準鎖定敵群密集處引爆大範圍{name}。', exDescTpl: 'EX：三連超巨型{name}天降，造成毀滅性大爆炸！', baseCd: 1.50, baseDmg: 1.68 }
     ];
+
+    const ELEM_SKILL_PREFIX = {
+      grass: ['森羅','翡翠','青藤','花舞','自然','靈葉','春風','古樹','荆棘','生命'],
+      fire:  ['炎獄','熾焰','紅蓮','熔岩','烈陽','爆炎','火狐','焚天','赤焰','星火'],
+      water: ['滄瀾','碧波','霜華','潮汐','寒冰','水月','深海','鏡花','極寒','激流'],
+      light: ['聖耀','晨曦','極光','天照','星輝','璀璨','神聖','白晝','彩虹','榮光'],
+      dark:  ['幽冥','夜影','深淵','紫晶','幻夢','暗蝕','星界','永夜','虛空','月蝕']
+    };
+
+    const SLOT_SKILL_TAG = ['一式', '二式', '三式', '終極奧義'];
+
+    function generateCharacterUniqueSkills(charId, charName, elem, rCfg) {
+      const shortHero = charName.slice(0, 2);
+      const prefixes = ELEM_SKILL_PREFIX[elem.key] || ELEM_SKILL_PREFIX.grass;
+      const charSkills = [];
+      for (let slot = 0; slot < 4; slot++) {
+        const arch = SKILL_ARCHETYPES[(charId * 3 + slot * 2 + (slot === 3 ? 1 : 0)) % SKILL_ARCHETYPES.length];
+        const pfx = prefixes[(charId * 5 + slot * 3) % prefixes.length];
+        const noun = arch.nouns[(charId + slot * 4) % arch.nouns.length];
+        const icon = arch.icons[(charId + slot) % arch.icons.length];
+        const skillName = slot === 3 ? `${shortHero}·${pfx}${noun}` : `${pfx}${noun}·${SLOT_SKILL_TAG[slot]}`;
+        const seedFactor = 0.92 + ((charId * 11 + slot * 7) % 17) * 0.01;
+        const slotPowerBonus = 1 + slot * 0.08 + (rCfg.mult - 1) * 0.15;
+        const dmgMult = +(arch.baseDmg * seedFactor * slotPowerBonus).toFixed(2);
+        const cdMult = +(arch.baseCd * (1.04 - ((charId + slot * 3) % 9) * 0.01)).toFixed(2);
+        const projColors = elem.palettes[(charId + slot) % elem.palettes.length];
+        charSkills.push({
+          id: `c${charId}_s${slot}`,
+          slot,
+          icon,
+          name: skillName,
+          desc: arch.descTpl.replace('{name}', skillName).replace('{dmg}', Math.round(dmgMult * 100)),
+          exDesc: arch.exDescTpl.replace('{name}', skillName),
+          style: arch.style,
+          projColor: projColors[0],
+          exColor: projColors[2] || '#fef08a',
+          cdMult,
+          dmgMult
+        });
+      }
+      return charSkills;
+    }
 
     const FEATURED_NAMES = {
       1: '星芽寶寶', 2: '焰尾小狐', 3: '水滴水母', 4: '光耀星靈', 5: '夜影小貓',
@@ -903,14 +987,9 @@
         else if (id > 200) rarityKey = 'rare';
         const rCfg = RARITY_CONFIG[rarityKey];
 
-        const elem = ELEMENTS[(id * 7 + Math.floor(id / 10)) % ELEMENTS.length];
+        // 確保每個稀有度區間內「草、火、水、光、暗」五大屬性完全均分（每屬性各 100 隻）
+        const elem = ELEMENTS[(id - 1) % ELEMENTS.length];
         const palette = elem.palettes[id % elem.palettes.length];
-        const skills = [
-          SKILL_POOL[id % SKILL_POOL.length],
-          SKILL_POOL[(id + 1) % SKILL_POOL.length],
-          SKILL_POOL[(id + 3) % SKILL_POOL.length],
-          SKILL_POOL[(id + 5) % SKILL_POOL.length]
-        ];
 
         let name = FEATURED_NAMES[id];
         if (!name) {
@@ -922,6 +1001,7 @@
           while (usedNames.has(name)) name = p + c + '·' + suffixIdx++;
         }
         usedNames.add(name);
+        const skills = generateCharacterUniqueSkills(id, name, elem, rCfg);
 
         const variance = 0.92 + ((id * 19) % 17) * 0.01;
         CHARACTERS.push({
@@ -1351,14 +1431,31 @@
       document.getElementById('top-dex-count').textContent = Object.keys(gameState.owned).length;
     }
 
+    function getAdventurerTitle() {
+      const dexCount = Object.keys(gameState.owned || {}).length;
+      const kills = gameState.stats.kills || 0;
+      if (dexCount >= 300) return '👑 稱號：星界全知大宗師';
+      if (dexCount >= 100) return '🌟 稱號：百獸星芽收藏家';
+      if (kills >= 500) return '⚔️ 稱號：深淵討伐英雄';
+      if (dexCount >= 20) return '✨ 稱號：星光探索者';
+      return '🌱 稱號：新芽見習冒險家';
+    }
+
     function openAccountModal() {
       document.getElementById('save-feedback').textContent = '';
       document.getElementById('acc-current-name').textContent = currentUsername;
+      document.getElementById('acc-title-badge').textContent = getAdventurerTitle();
+      document.getElementById('acc-profile-uid').textContent = getMyUid();
+      const dexCount = Object.keys(gameState.owned || {}).length;
+      document.getElementById('acc-dex-prog').textContent = `${dexCount}/500`;
       const bt = gameState.stats.bestTime || 0;
       document.getElementById('acc-best-time').textContent = `${String(Math.floor(bt / 60)).padStart(2, '0')}:${String(Math.floor(bt % 60)).padStart(2, '0')}`;
       document.getElementById('acc-total-kills').textContent = gameState.stats.kills || 0;
       document.getElementById('acc-total-runs').textContent = `${gameState.stats.runs || 0} 次`;
       document.getElementById('acc-last-saved').textContent = `最後存檔：${gameState.lastSaved || '剛剛'}`;
+
+      const equippedChar = CHARACTERS[(gameState.equippedId || 1) - 1] || CHARACTERS[0];
+      drawCharToCanvas(document.getElementById('acc-avatar-canvas'), equippedChar, false);
 
       const listEl = document.getElementById('acc-saved-list');
       listEl.innerHTML = Object.keys(accountsDB).map(name => {
@@ -1371,11 +1468,71 @@
               <div style="font-weight:900;color:#fff;">${name} ${isCur ? '<span style="font-size:9px;color:var(--emerald);">(目前使用)</span>' : ''}</div>
               <div style="font-size:10px;color:var(--text-sub);">圖鑑 ${dex}/500 ・ 🪙${d.coins} ・ 🎫${d.tickets}</div>
             </div>
-            <span style="font-size:10px;color:var(--sky);font-weight:800;">切換 →</span>
+            <span style="font-size:10px;color:var(--sky);font-weight:800;">讀取此檔 →</span>
           </div>
         `;
       }).join('');
       document.getElementById('account-modal').classList.remove('hidden');
+    }
+
+    function manualSaveNow() {
+      saveGame();
+      openAccountModal();
+      document.getElementById('save-feedback').textContent = `✅ 已手動將【${currentUsername}】進度完整寫入存檔！`;
+      showToast('💾 手動存檔成功！');
+    }
+
+    function manualReloadNow() {
+      loadAccountsDB();
+      updateTopBar();
+      updateQuestBadge();
+      switchTab(currentTab);
+      openAccountModal();
+      document.getElementById('save-feedback').textContent = `✅ 已成功讀取【${currentUsername}】的最新存檔！`;
+      showToast('📂 讀取存檔成功！');
+    }
+
+    function downloadSaveFile() {
+      try {
+        saveGame();
+        const blob = new Blob([JSON.stringify(gameState, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `StarSprout_${currentUsername}_save.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        document.getElementById('save-feedback').textContent = '✅ 已下載 JSON 備份存檔！';
+      } catch (e) {
+        document.getElementById('save-feedback').textContent = '❌ 匯出檔案失敗';
+      }
+    }
+
+    function uploadSaveFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const parsed = JSON.parse(ev.target.result);
+          if (parsed && parsed.owned) {
+            gameState = Object.assign(createDefaultState(currentUsername), parsed);
+            saveGame();
+            switchTab(currentTab);
+            openAccountModal();
+            document.getElementById('save-feedback').textContent = '✅ JSON 存檔檔案讀取還原成功！';
+            showToast('📂 讀檔成功！');
+          } else {
+            document.getElementById('save-feedback').textContent = '❌ 檔案格式不符';
+          }
+        } catch (err) {
+          document.getElementById('save-feedback').textContent = '❌ JSON 解析失敗';
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
     }
 
     function handleAccountAuth(mode) {
@@ -1435,6 +1592,170 @@
       } catch (e) { document.getElementById('save-feedback').textContent = '❌ 格式錯誤'; }
     }
 
+
+    /*************************************************************************
+     * 5B. 好友與跨分頁即時多人連線系統 (BroadcastChannel + LocalStorage 同步)
+     *************************************************************************/
+    const FRIEND_STORAGE_KEY = 'star_sprout_friends_v3';
+    let coopChannel = null;
+    let activeCoopRoom = '';
+    let invitedFriend = null;
+    let remotePartnerState = null;
+
+    function getMyUid() {
+      let hash = 0;
+      for (let i = 0; i < currentUsername.length; i++) hash = (hash * 31 + currentUsername.charCodeAt(i)) % 9000;
+      return 'SPROUT-' + String(1000 + Math.abs(hash));
+    }
+
+    function getFriendList() {
+      try {
+        const raw = localStorage.getItem(FRIEND_STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      const defaults = [
+        { uid: 'SPROUT-1024', name: '星光小導師', charId: 486, lv: 25, online: true, isBot: true },
+        { uid: 'SPROUT-2048', name: '焰尾小狐迷', charId: 2, lv: 15, online: true, isBot: true },
+        { uid: 'SPROUT-4096', name: '極光神狐使', charId: 492, lv: 30, online: true, isBot: true }
+      ];
+      localStorage.setItem(FRIEND_STORAGE_KEY, JSON.stringify(defaults));
+      return defaults;
+    }
+
+    function saveFriendList(list) {
+      try { localStorage.setItem(FRIEND_STORAGE_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+
+    function openFriendsModal() {
+      document.getElementById('my-friend-uid').textContent = getMyUid();
+      renderFriendsList();
+      updateCoopStatusUI();
+      document.getElementById('friends-modal').classList.remove('hidden');
+    }
+
+    function copyMyFriendUid() {
+      const uid = getMyUid();
+      const temp = document.createElement('textarea');
+      temp.value = uid;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast(`📋 已複製我的 UID：${uid}`);
+    }
+
+    function addFriendByInput() {
+      const inp = document.getElementById('friend-add-input');
+      const val = inp.value.trim();
+      if (!val) { showToast('請輸入好友名稱或 UID'); return; }
+      const list = getFriendList();
+      const isUid = val.toUpperCase().startsWith('SPROUT-');
+      const uid = isUid ? val.toUpperCase() : 'SPROUT-' + Math.floor(1000 + Math.random() * 8999);
+      const name = isUid ? `冒險家_${uid.slice(-4)}` : val;
+      if (list.some(f => f.uid === uid || f.name === name)) {
+        showToast('此好友已在清單中！');
+        return;
+      }
+      const randCharId = 1 + (uid.charCodeAt(uid.length - 1) * 37) % 500;
+      list.unshift({ uid, name, charId: randCharId, lv: 12, online: true, isBot: true });
+      saveFriendList(list);
+      inp.value = '';
+      renderFriendsList();
+      showToast(`✅ 已成功新增好友：${name}`);
+    }
+
+    function joinCoopChannel() {
+      const code = document.getElementById('coop-room-input').value.trim().toUpperCase();
+      if (!code) { showToast('請輸入連線頻道碼（例如 ROOM888）'); return; }
+      if (coopChannel) coopChannel.close();
+      activeCoopRoom = code;
+      remotePartnerState = null;
+      if ('BroadcastChannel' in window) {
+        coopChannel = new BroadcastChannel('star_sprout_coop_' + code);
+        coopChannel.onmessage = (ev) => {
+          const msg = ev.data;
+          if (!msg || msg.senderUid === getMyUid()) return;
+          if (msg.type === 'hello' || msg.type === 'sync') {
+            remotePartnerState = msg;
+            updateCoopStatusUI();
+          }
+        };
+        coopChannel.postMessage({
+          type: 'hello',
+          senderUid: getMyUid(),
+          senderName: currentUsername,
+          charId: gameState.equippedId || 1,
+          x: 0, y: 0
+        });
+      }
+      updateCoopStatusUI();
+      showToast(`🔗 已連線至頻道【${code}】，同瀏覽器開啟另一分頁輸入相同頻道碼即可即時同場作戰！`);
+    }
+
+    function toggleInviteFriend(uid) {
+      const list = getFriendList();
+      const target = list.find(f => f.uid === uid);
+      if (!target) return;
+      if (invitedFriend && invitedFriend.uid === uid) {
+        invitedFriend = null;
+        showToast(`已取消與 ${target.name} 組隊`);
+      } else {
+        invitedFriend = target;
+        showToast(`🤝 已邀請【${target.name}】共同出戰！`);
+      }
+      renderFriendsList();
+      updateCoopStatusUI();
+    }
+
+    function updateCoopStatusUI() {
+      const badge = document.getElementById('coop-selected-badge');
+      const advText = document.getElementById('adv-coop-text');
+      const roomStatus = document.getElementById('coop-room-status');
+      if (remotePartnerState) {
+        if (badge) badge.textContent = `即時連線：${remotePartnerState.senderName}`;
+        if (advText) advText.textContent = `👥 多人連線中：與【${remotePartnerState.senderName}】即時同步並肩作戰！`;
+        if (roomStatus) roomStatus.textContent = `🟢 頻道【${activeCoopRoom}】已與【${remotePartnerState.senderName}】建立即時連線！`;
+      } else if (invitedFriend) {
+        if (badge) badge.textContent = `組隊夥伴：${invitedFriend.name}`;
+        if (advText) advText.textContent = `👥 組隊冒險：已邀請好友【${invitedFriend.name}】共同出戰！`;
+        if (roomStatus) roomStatus.textContent = activeCoopRoom
+          ? `🟡 頻道【${activeCoopRoom}】等待分頁連線中（目前由組隊好友助戰）`
+          : `🟢 已選擇好友【${invitedFriend.name}】共同出戰！`;
+      } else {
+        if (badge) badge.textContent = activeCoopRoom ? `頻道 ${activeCoopRoom} 等待中` : '未組隊';
+        if (advText) advText.textContent = activeCoopRoom
+          ? `👥 多人頻道【${activeCoopRoom}】已開啟（等待好友加入或選擇好友助戰）`
+          : '👥 多人連線：單人冒險中（點擊邀請好友並肩作戰）';
+        if (roomStatus) roomStatus.textContent = activeCoopRoom
+          ? `🟡 已加入頻道【${activeCoopRoom}】，請在另一分頁輸入相同頻道碼連線`
+          : '🟢 連線伺服器就緒（支援跨分頁即時連線與好友並肩作戰）';
+      }
+    }
+
+    function renderFriendsList() {
+      const box = document.getElementById('friends-list-box');
+      if (!box) return;
+      const list = getFriendList();
+      box.innerHTML = list.map(f => {
+        const c = CHARACTERS[(f.charId || 1) - 1] || CHARACTERS[0];
+        const isInvited = invitedFriend && invitedFriend.uid === f.uid;
+        return `
+          <div style="padding:8px 10px;border-radius:10px;border:1px solid ${isInvited ? '#34d399' : '#334155'};background:${isInvited ? 'rgba(6,78,59,0.45)' : '#111529'};display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#34d399;flex-shrink:0;"></span>
+              <div style="min-width:0;">
+                <div style="font-size:12px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.name} <span style="font-size:10px;color:#94a3b8;">(${f.uid})</span></div>
+                <div style="font-size:10px;color:#38bdf8;">出戰：${c.name} Lv.${f.lv}</div>
+              </div>
+            </div>
+            <button onclick="toggleInviteFriend('${f.uid}')" class="pixel-btn" style="padding:6px 10px;border-radius:8px;background:${isInvited ? '#e11d48' : '#10b981'};color:${isInvited ? '#fff' : '#052e16'};font-size:11px;font-weight:900;white-space:nowrap;">
+              ${isInvited ? '取消組隊' : '⚔️ 邀請出戰'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
     /*************************************************************************
      * 6. 遊戲大廳五分頁渲染
      *************************************************************************/
@@ -1450,7 +1771,7 @@
         btn.classList.toggle('active', btn.dataset.tab === tabName);
       });
       if (tabName === 'adventure') renderAdventureView();
-      else if (tabName === 'gacha') renderGachaHistory();
+      else if (tabName === 'gacha') { selectGachaPool(currentGachaPool); renderGachaHistory(); }
       else if (tabName === 'characters') renderCharacterList();
       else if (tabName === 'quests') renderQuestList();
       else if (tabName === 'dex') renderDexGrid();
@@ -1498,6 +1819,63 @@
       }).join('');
     }
 
+    const GACHA_POOLS_META = {
+      grass: { key: 'grass', icon: '🌿', title: '翡翠森羅召喚池', badge: '🌿 翡翠森羅・草屬性獨立卡池 (100隻)', desc: '100% 必出草屬性星芽夥伴！重複自動轉為養成金幣', color: '#4ade80', bgGrad: 'linear-gradient(180deg,#143d2b,#171b33)', tabBg: '#064e3b' },
+      fire:  { key: 'fire',  icon: '🔥', title: '紅蓮烈焰召喚池', badge: '🔥 紅蓮烈焰・火屬性獨立卡池 (100隻)', desc: '100% 必出火屬性星芽夥伴！重複自動轉為養成金幣', color: '#fb923c', bgGrad: 'linear-gradient(180deg,#4a1d16,#171b33)', tabBg: '#7c2d12' },
+      water: { key: 'water', icon: '💧', title: '滄瀾碧波召喚池', badge: '💧 滄瀾碧波・水屬性獨立卡池 (100隻)', desc: '100% 必出水屬性星芽夥伴！重複自動轉為養成金幣', color: '#38bdf8', bgGrad: 'linear-gradient(180deg,#123552,#171b33)', tabBg: '#0c4a6e' },
+      light: { key: 'light', icon: '✨', title: '聖耀極光召喚池', badge: '✨ 聖耀極光・光屬性獨立卡池 (100隻)', desc: '100% 必出光屬性星芽夥伴！重複自動轉為養成金幣', color: '#fde047', bgGrad: 'linear-gradient(180deg,#473912,#171b33)', tabBg: '#713f12' },
+      dark:  { key: 'dark',  icon: '🌙', title: '幽冥星界召喚池', badge: '🌙 幽冥星界・暗屬性獨立卡池 (100隻)', desc: '100% 必出暗屬性星芽夥伴！重複自動轉為養成金幣', color: '#c084fc', bgGrad: 'linear-gradient(180deg,#33184d,#171b33)', tabBg: '#581c87' }
+    };
+    let currentGachaPool = 'grass';
+
+    function selectGachaPool(elemKey) {
+      if (!GACHA_POOLS_META[elemKey]) elemKey = 'grass';
+      currentGachaPool = elemKey;
+      const meta = GACHA_POOLS_META[elemKey];
+
+      ['grass', 'fire', 'water', 'light', 'dark'].forEach(k => {
+        const btn = document.getElementById(`pool-tab-${k}`);
+        if (!btn) return;
+        const m = GACHA_POOLS_META[k];
+        if (k === elemKey) {
+          btn.style.borderColor = m.color;
+          btn.style.background = m.tabBg;
+          btn.style.color = '#ffffff';
+          btn.style.transform = 'scale(1.04)';
+        } else {
+          btn.style.borderColor = '#475569';
+          btn.style.background = '#1e293b';
+          btn.style.color = '#94a3b8';
+          btn.style.transform = 'scale(1)';
+        }
+      });
+
+      const bannerBox = document.getElementById('gacha-banner-box');
+      if (bannerBox) bannerBox.style.background = meta.bgGrad;
+      const badgeEl = document.getElementById('gacha-pool-badge');
+      if (badgeEl) { badgeEl.textContent = meta.badge; badgeEl.style.color = meta.color; }
+      const titleEl = document.getElementById('gacha-pool-title');
+      if (titleEl) titleEl.textContent = meta.title;
+      const descEl = document.getElementById('gacha-pool-desc');
+      if (descEl) descEl.textContent = meta.desc;
+      const iconBox = document.getElementById('gacha-pool-icon-box');
+      if (iconBox) iconBox.style.borderColor = meta.color;
+      const emojiEl = document.getElementById('gacha-pool-emoji');
+      if (emojiEl) emojiEl.textContent = meta.icon;
+
+      const elemChars = CHARACTERS.filter(c => c.element.key === elemKey);
+      const ownedInElem = elemChars.filter(c => !!gameState.owned[c.id]).length;
+      const collEl = document.getElementById('gacha-pool-collected');
+      if (collEl) { collEl.textContent = `已收錄 ${ownedInElem}/${elemChars.length}`; collEl.style.color = meta.color; }
+
+      const mythicMascot = elemChars.filter(c => c.rarity === 'mythic').slice(-1)[0] || elemChars[elemChars.length - 1];
+      if (mythicMascot) {
+        drawCharToCanvas(document.getElementById('gacha-featured-canvas'), mythicMascot, false);
+        const fName = document.getElementById('gacha-featured-name');
+        if (fName) fName.textContent = mythicMascot.name;
+      }
+    }
+
     function rollRarity() {
       const r = Math.random();
       let acc = 0;
@@ -1517,11 +1895,14 @@
       const results = [];
       let totalConvertedCoins = 0;
       let newCount = 0;
+      const poolMeta = GACHA_POOLS_META[currentGachaPool] || GACHA_POOLS_META.grass;
 
       for (let i = 0; i < count; i++) {
         const rarityKey = rollRarity();
-        const pool = CHARACTERS.filter(c => c.rarity === rarityKey);
-        const picked = pool[Math.floor(Math.random() * pool.length)];
+        const pool = CHARACTERS.filter(c => c.element.key === currentGachaPool && c.rarity === rarityKey);
+        const fallbackPool = CHARACTERS.filter(c => c.element.key === currentGachaPool);
+        const activePool = pool.length ? pool : fallbackPool;
+        const picked = activePool[Math.floor(Math.random() * activePool.length)];
         const isNew = !gameState.owned[picked.id];
         let converted = 0;
         if (isNew) { gameState.owned[picked.id] = 1; newCount++; }
@@ -1536,9 +1917,10 @@
 
       SoundFX.play('gacha');
       saveGame();
+      selectGachaPool(currentGachaPool);
       renderGachaHistory();
 
-      document.getElementById('gacha-convert-summary').textContent = `新夥伴 ${newCount} 隻 ・ 重複轉換金幣 +${totalConvertedCoins}`;
+      document.getElementById('gacha-convert-summary').textContent = `【${poolMeta.title}】新夥伴 ${newCount} 隻 ・ 重複轉換金幣 +${totalConvertedCoins}`;
       const grid = document.getElementById('gacha-cards-grid');
       grid.innerHTML = results.map((item, idx) => {
         const rCfg = RARITY_CONFIG[item.char.rarity];
@@ -1867,6 +2249,7 @@
         vx: 12 + Math.random() * 18, vy: 15 + Math.random() * 20, size: 2 + Math.floor(Math.random() * 3)
       }));
 
+      Battle.ally = null;
       Battle.player = {
         x: 0, y: 0,
         hp: baseStats.hp, maxHp: baseStats.hp,
@@ -1877,7 +2260,8 @@
 
       charObj.skills.forEach((sk, idx) => {
         document.getElementById(`skill-icon-${idx}`).textContent = sk.icon;
-        document.getElementById(`skill-label-${idx}`).textContent = sk.name.slice(0, 4);
+        const cleanLabel = sk.name.includes('·') ? sk.name.split('·')[1] : sk.name;
+        document.getElementById(`skill-label-${idx}`).textContent = cleanLabel.slice(0, 4);
       });
       setSkillMode('auto');
 
@@ -2455,6 +2839,62 @@
         if (ap.y > p.y + 500) ap.y -= 1000;
       }
 
+      // 多人連線 / 好友並肩作戰更新
+      if (coopChannel && activeCoopRoom) {
+        coopChannel.postMessage({
+          type: 'sync',
+          senderUid: getMyUid(),
+          senderName: currentUsername,
+          charId: Battle.charObj.id,
+          x: p.x,
+          y: p.y
+        });
+      }
+      if (invitedFriend || remotePartnerState) {
+        if (!Battle.ally) {
+          const allyCharId = remotePartnerState ? remotePartnerState.charId : invitedFriend.charId;
+          const allyName = remotePartnerState ? remotePartnerState.senderName : invitedFriend.name;
+          Battle.ally = {
+            x: p.x - 42, y: p.y + 24,
+            charObj: CHARACTERS[(allyCharId || 1) - 1] || CHARACTERS[0],
+            name: allyName,
+            shootCd: 0.7
+          };
+        }
+        const ally = Battle.ally;
+        if (remotePartnerState) {
+          ally.charObj = CHARACTERS[(remotePartnerState.charId || 1) - 1] || ally.charObj;
+          ally.name = remotePartnerState.senderName;
+          ally.x += (remotePartnerState.x - ally.x) * Math.min(1, dt * 12);
+          ally.y += (remotePartnerState.y - ally.y) * Math.min(1, dt * 12);
+        } else {
+          const targetX = p.x + Math.cos(Battle.elapsed * 1.4) * 56;
+          const targetY = p.y + Math.sin(Battle.elapsed * 1.4) * 56;
+          ally.x += (targetX - ally.x) * Math.min(1, dt * 5);
+          ally.y += (targetY - ally.y) * Math.min(1, dt * 5);
+        }
+        ally.shootCd -= dt;
+        if (ally.shootCd <= 0 && Battle.enemies.length > 0) {
+          ally.shootCd = 0.75;
+          let nearE = null, minD = Infinity;
+          for (const e of Battle.enemies) {
+            const d = Math.hypot(e.x - ally.x, e.y - ally.y);
+            if (d < minD) { minD = d; nearE = e; }
+          }
+          if (nearE) {
+            const aAng = Math.atan2(nearE.y - ally.y, nearE.x - ally.x);
+            Battle.projectiles.push({
+              x: ally.x, y: ally.y,
+              vx: Math.cos(aAng) * 420, vy: Math.sin(aAng) * 420,
+              dmg: Math.max(8, Math.round(p.atk * 0.65)),
+              r: 6, color: '#38bdf8', pierce: 1, life: 1.3, isEx: false, style: 'single'
+            });
+          }
+        }
+      } else {
+        Battle.ally = null;
+      }
+
       // 更新頂部 HUD
       document.getElementById('hud-run-lv').textContent = `Lv.${p.runLv}`;
       document.getElementById('hud-hp-text').textContent = `${Math.max(0, Math.round(p.hp))} / ${p.maxHp}`;
@@ -2574,6 +3014,15 @@
       const heroSpr = getCharacterSprite(Battle.charObj);
       if (!(p.invuln > 0 && Math.floor(p.invuln * 20) % 2 === 0)) {
         ctx.drawImage(heroSpr, p.x - 22, p.y - 22, 44, 44);
+      }
+      // 渲染連線好友 / 組隊夥伴
+      if (Battle.ally) {
+        const allySpr = getCharacterSprite(Battle.ally.charObj);
+        ctx.drawImage(allySpr, Battle.ally.x - 20, Battle.ally.y - 20, 40, 40);
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('👥 ' + Battle.ally.name, Battle.ally.x, Battle.ally.y - 25);
       }
 
       // 守護星環光球
