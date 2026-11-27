@@ -1388,6 +1388,7 @@
         selectedMapId: 'meadow',
         stats: { kills: 0, runs: 0, bossKills: 0, pulls: 0, bestTime: 0 },
         claimedQuests: {},
+        questLevels: {},
         gachaHistory: [],
         lastSaved: new Date().toLocaleString('zh-TW', { hour12: false })
       };
@@ -1403,6 +1404,12 @@
       merged.owned = Object.assign({}, base.owned, rawSave.owned || {});
       merged.stats = Object.assign({}, base.stats, rawSave.stats || {});
       merged.claimedQuests = Object.assign({}, base.claimedQuests, rawSave.claimedQuests || {});
+      merged.questLevels = Object.assign({}, base.questLevels, rawSave.questLevels || {});
+      Object.keys(merged.claimedQuests).forEach(qid => {
+        if (merged.claimedQuests[qid] && (!merged.questLevels[qid] || merged.questLevels[qid] < 2)) {
+          merged.questLevels[qid] = 2;
+        }
+      });
       merged.gachaHistory = Array.isArray(rawSave.gachaHistory) ? rawSave.gachaHistory : [];
       if (typeof merged.coins !== 'number' || Number.isNaN(merged.coins)) merged.coins = base.coins;
       if (typeof merged.tickets !== 'number' || Number.isNaN(merged.tickets)) merged.tickets = base.tickets;
@@ -2083,18 +2090,55 @@
     let dexPage = 0;
     const DEX_PER_PAGE = 50;
 
+    function getQuestStageInfo(baseQ) {
+      if (!gameState.questLevels) gameState.questLevels = {};
+      const stage = Math.max(1, gameState.questLevels[baseQ.id] || 1);
+      // 難度隨階段越來越難（目標數值逐階遞增）
+      let target;
+      if (baseQ.statKey === 'dex') {
+        target = Math.min(500, Math.round(baseQ.target * Math.pow(1.45, stage - 1) + (stage - 1) * 4));
+      } else {
+        target = Math.round(baseQ.target * Math.pow(1.6, stage - 1) + (stage - 1) * Math.ceil(baseQ.target * 0.5));
+      }
+      // 獎勵隨階段越來越多
+      const rewardCoins = Math.round(baseQ.rewardCoins * (1 + (stage - 1) * 0.45));
+      const rewardTickets = baseQ.rewardTickets + (stage - 1) * Math.max(1, Math.ceil(baseQ.rewardTickets * 0.5));
+
+      let desc = baseQ.desc;
+      if (baseQ.statKey === 'kills') desc = `累計擊敗 ${target} 隻怪物`;
+      else if (baseQ.statKey === 'runs') desc = `完成 ${target} 次冒險挑戰`;
+      else if (baseQ.statKey === 'pulls') desc = `累計進行 ${target} 次招募`;
+      else if (baseQ.statKey === 'bossKills') desc = `累計擊敗 ${target} 隻首領 (Boss)`;
+      else if (baseQ.statKey === 'dex') desc = `收集 ${target} 隻不同星芽夥伴`;
+
+      return {
+        id: baseQ.id,
+        stage,
+        title: `${baseQ.title} (階段 ${stage})`,
+        desc,
+        target,
+        statKey: baseQ.statKey,
+        rewardCoins,
+        rewardTickets
+      };
+    }
+
     function getQuestProgress(q) { return q.statKey === 'dex' ? Object.keys(gameState.owned).length : (gameState.stats[q.statKey] || 0); }
 
     function updateQuestBadge() {
-      const hasClaimable = QUESTS.some(q => !gameState.claimedQuests[q.id] && getQuestProgress(q) >= q.target);
+      const hasClaimable = QUESTS.some(baseQ => {
+        const q = getQuestStageInfo(baseQ);
+        return getQuestProgress(q) >= q.target;
+      });
       document.getElementById('quest-badge').classList.toggle('hidden', !hasClaimable);
     }
 
     function renderQuestList() {
-      document.getElementById('quest-list').innerHTML = QUESTS.map(q => {
-        const cur = Math.min(q.target, getQuestProgress(q));
-        const claimed = !!gameState.claimedQuests[q.id];
-        const canClaim = !claimed && getQuestProgress(q) >= q.target;
+      document.getElementById('quest-list').innerHTML = QUESTS.map(baseQ => {
+        const q = getQuestStageInfo(baseQ);
+        const rawProgress = getQuestProgress(q);
+        const cur = Math.min(q.target, rawProgress);
+        const canClaim = rawProgress >= q.target;
         const pct = Math.min(100, Math.round((cur / q.target) * 100));
         return `
           <div class="pixel-box" style="background:#1b203b;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -2107,7 +2151,7 @@
               <div style="font-size:10px;color:var(--text-sub);margin-top:4px;">進度：${cur}/${q.target} ｜ <span style="color:var(--amber);font-weight:800;">獎勵：🪙${q.rewardCoins} + 🎫${q.rewardTickets}</span></div>
             </div>
             <button onclick="claimQuest('${q.id}')" ${canClaim ? '' : 'disabled'} class="pixel-btn" style="padding:9px 12px;border-radius:10px;font-weight:900;font-size:11px;background:${canClaim ? 'var(--amber)' : '#1e293b'};color:${canClaim ? '#0f172a' : '#64748b'};">
-              ${claimed ? '已領取' : canClaim ? '領取獎勵' : '進行中'}
+              ${canClaim ? '領取獎勵' : '進行中'}
             </button>
           </div>
         `;
@@ -2115,14 +2159,17 @@
     }
 
     function claimQuest(questId) {
-      const q = QUESTS.find(item => item.id === questId);
-      if (!q || gameState.claimedQuests[q.id] || getQuestProgress(q) < q.target) return;
-      gameState.claimedQuests[q.id] = true;
+      const baseQ = QUESTS.find(item => item.id === questId);
+      if (!baseQ) return;
+      const q = getQuestStageInfo(baseQ);
+      if (getQuestProgress(q) < q.target) return;
       gameState.coins += q.rewardCoins;
       gameState.tickets += q.rewardTickets;
+      if (!gameState.questLevels) gameState.questLevels = {};
+      gameState.questLevels[q.id] = q.stage + 1;
       SoundFX.play('gacha');
       saveGame(); renderQuestList();
-      showToast(`🎁 領取任務獎勵：🪙+${q.rewardCoins}、🎫+${q.rewardTickets}！`);
+      showToast(`🎁 領取任務獎勵：🪙+${q.rewardCoins}、🎫+${q.rewardTickets}！已開啟階段 ${q.stage + 1} 任務！`);
     }
 
     function changeDexPage(delta) {
@@ -2168,6 +2215,7 @@
       obstacles: new Map(), ambientParticles: [], particles: [], shockwaves: [],
       skillMode: 'auto', autoSkillIndex: 0, autoSwitchTimer: 0,
       zone: 'main', arenaRadius: 0, savedMainPos: { x: 0, y: 0 }, portal: null,
+      blackHolePortal: null, blackHoleTimer: 0, checkedBlackHoleMins: new Set(),
       triggeredMiniMins: new Set(), triggeredPortalMins: new Set(), finalBossTriggered: false,
       bossDefeatedCount: 0, elapsed: 0, kills: 0, coinsEarned: 0, ticketsEarned: 0,
       spawnTimer: 0, hordeTimer: 32, hordeActive: false, hordeDuration: 0, hordeWarned: false, hordeMult: 2.5, chestTimer: 8, shootTimer: 0, orbitAngle: 0,
@@ -2250,6 +2298,9 @@
       Battle.zone = 'main';
       Battle.arenaRadius = 0;
       Battle.portal = null;
+      Battle.blackHolePortal = null;
+      Battle.blackHoleTimer = 0;
+      Battle.checkedBlackHoleMins = new Set();
       Battle.triggeredMiniMins = new Set();
       Battle.triggeredPortalMins = new Set();
       Battle.finalBossTriggered = false;
@@ -2562,7 +2613,9 @@
 
     function updateBattle(dt) {
       const p = Battle.player;
-      Battle.elapsed += dt;
+      if (Battle.zone !== 'blackhole') {
+        Battle.elapsed += dt;
+      }
       Battle.orbitAngle += dt * 3.4;
 
       if (Battle.skillMode === 'auto') {
@@ -2646,6 +2699,57 @@
           showBannerWarning('🌌 進入時空異空間！', '擊敗中 Boss 即可獲得豐厚戰利品並返回主世界！');
         } else if (Battle.portal.life <= 0) {
           Battle.portal = null;
+        }
+      }
+
+      // 1～10 分鐘，每進行一分鐘有 1% 機率在玩家旁不遠處出現「秘之黑洞」（有 20 秒時間可進入）
+      if (Battle.zone === 'main' && curMin >= 1 && curMin <= 10 && !Battle.checkedBlackHoleMins.has(curMin)) {
+        Battle.checkedBlackHoleMins.add(curMin);
+        if (Math.random() < 0.01 && !Battle.blackHolePortal) {
+          const bhAng = Math.random() * Math.PI * 2;
+          Battle.blackHolePortal = {
+            x: p.x + Math.cos(bhAng) * 115,
+            y: p.y + Math.sin(bhAng) * 115,
+            life: 20
+          };
+          SoundFX.play('boss');
+          showBannerWarning('🕳️ 秘之黑洞出現！', '玩家旁不遠處開啟了異次元黑洞，20 秒內進入可獲得大量招募券！');
+        }
+      }
+
+      // 秘之黑洞傳送門倒數與進入判定
+      if (Battle.blackHolePortal) {
+        Battle.blackHolePortal.life -= dt;
+        if (Battle.zone === 'main' && Math.hypot(p.x - Battle.blackHolePortal.x, p.y - Battle.blackHolePortal.y) < 42) {
+          Battle.savedMainPos = { x: p.x, y: p.y };
+          Battle.zone = 'blackhole';
+          Battle.arenaRadius = 380;
+          Battle.blackHoleTimer = 60;
+          p.x = 0; p.y = 0;
+          Battle.blackHolePortal = null;
+          Battle.portal = null;
+          Battle.enemies = [];
+          Battle.enemyProjectiles = [];
+          SoundFX.play('ex_awaken');
+          showBannerWarning('🕳️ 已進入【秘之黑洞】！', '限時 1 分鐘（不計入原世界時間）！敵人 2 倍數值，每打倒 1 隻獲得 1 張招募券！');
+        } else if (Battle.blackHolePortal && Battle.blackHolePortal.life <= 0) {
+          Battle.blackHolePortal = null;
+        }
+      }
+
+      // 秘之黑洞特殊區域倒數計時（1 分鐘後強制傳送回原世界）
+      if (Battle.zone === 'blackhole') {
+        Battle.blackHoleTimer -= dt;
+        if (Battle.blackHoleTimer <= 0) {
+          Battle.blackHoleTimer = 0;
+          Battle.zone = 'main';
+          Battle.arenaRadius = 0;
+          p.x = Battle.savedMainPos.x;
+          p.y = Battle.savedMainPos.y;
+          Battle.enemies = [];
+          Battle.enemyProjectiles = [];
+          SoundFX.play('levelup');
+          showBannerWarning('🌀 秘之黑洞時間結束！', '已強制傳送回原世界，繼續原本的冒險！');
         }
       }
 
@@ -2738,13 +2842,16 @@
         for (let s = 0; s < spawnCount; s++) {
           if (Battle.enemies.length >= maxEnemies) break;
           const ang = Math.random() * Math.PI * 2;
+          const bhMult = Battle.zone === 'blackhole' ? 2 : 1;
+          const eHp = Math.max(1, Math.round(((28 * hpScale) / 3 * 1.5) * bhMult));
+          const eAtk = Math.max(1, Math.round(((9 * Battle.map.rewardMult) / 3 * 1.5) * bhMult));
           Battle.enemies.push({
             x: (Battle.zone === 'main' ? p.x : 0) + Math.cos(ang) * dist,
             y: (Battle.zone === 'main' ? p.y : 0) + Math.sin(ang) * dist,
-            hp: Math.max(1, Math.round((28 * hpScale) / 3 * 1.5)), maxHp: Math.max(1, Math.round((28 * hpScale) / 3 * 1.5)),
-            atk: Math.max(1, Math.round((9 * Battle.map.rewardMult) / 3 * 1.5)),
-            spd: 62 + Math.min(45, Battle.elapsed * 0.05),
-            r: 14, isBoss: false
+            hp: eHp, maxHp: eHp,
+            atk: eAtk,
+            spd: (62 + Math.min(45, Battle.elapsed * 0.05)) * (Battle.zone === 'blackhole' ? 1.15 : 1),
+            r: 14, isBoss: false, inBlackHole: Battle.zone === 'blackhole'
           });
         }
       }
@@ -2803,7 +2910,10 @@
 
         if (e.hp <= 0) {
           Battle.kills++;
-          spawnParticles(e.x, e.y, e.isBoss ? '#fbbf24' : Battle.map.enemyCol, e.isBoss ? 34 : 7);
+          if (Battle.zone === 'blackhole' || e.inBlackHole) {
+            Battle.ticketsEarned += 1;
+          }
+          spawnParticles(e.x, e.y, e.isBoss ? '#fbbf24' : (e.inBlackHole ? '#c084fc' : Battle.map.enemyCol), e.isBoss ? 34 : 7);
           if (e.isBoss) {
             spawnShockwave(e.x, e.y, 140, '#fbbf24');
             Battle.bossDefeatedCount++;
@@ -2959,7 +3069,7 @@
       document.getElementById('hud-hp-bar').style.width = `${Math.max(0, (p.hp / p.maxHp) * 100)}%`;
       document.getElementById('hud-exp-bar').style.width = `${Math.min(100, (p.exp / p.nextExp) * 100)}%`;
       document.getElementById('hud-timer').textContent = `${String(Math.floor(Battle.elapsed / 60)).padStart(2, '0')}:${String(Math.floor(Battle.elapsed % 60)).padStart(2, '0')}`;
-      document.getElementById('hud-zone-badge').textContent = Battle.zone === 'abyss' ? '🌑 深遠之洞' : Battle.zone === 'portal' ? '🌀 時空空間' : '🌿 主世界';
+      document.getElementById('hud-zone-badge').textContent = Battle.zone === 'abyss' ? '🌑 深遠之洞' : Battle.zone === 'portal' ? '🌀 時空空間' : Battle.zone === 'blackhole' ? `🕳️ 秘之黑洞 (${Math.ceil(Battle.blackHoleTimer)}s)` : '🌿 主世界';
       document.getElementById('hud-kills').textContent = Battle.kills;
       document.getElementById('hud-coins').textContent = Battle.coinsEarned;
       document.getElementById('hud-tickets').textContent = Battle.ticketsEarned;
@@ -2971,7 +3081,7 @@
       const p = Battle.player;
       ctx.save();
 
-      ctx.fillStyle = Battle.zone === 'abyss' ? '#19081c' : Battle.zone === 'portal' ? '#16113a' : Battle.map.bg;
+      ctx.fillStyle = Battle.zone === 'abyss' ? '#19081c' : Battle.zone === 'portal' ? '#16113a' : Battle.zone === 'blackhole' ? '#090514' : Battle.map.bg;
       ctx.fillRect(0, 0, w, h);
 
       ctx.translate(w / 2 - p.x, h / 2 - p.y);
@@ -2985,7 +3095,7 @@
       for (let c = startCol; c <= endCol; c++) {
         for (let r = startRow; r <= endRow; r++) {
           if ((c + r) % 2 === 0) {
-            ctx.fillStyle = Battle.zone === 'abyss' ? '#240b29' : Battle.zone === 'portal' ? '#1f184f' : Battle.map.tileAlt;
+            ctx.fillStyle = Battle.zone === 'abyss' ? '#240b29' : Battle.zone === 'portal' ? '#1f184f' : Battle.zone === 'blackhole' ? '#130a2a' : Battle.map.tileAlt;
             ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
           }
           const hash = Math.abs((c * 928371) ^ (r * 364921)) % 17;
@@ -3024,6 +3134,20 @@
         ctx.beginPath(); ctx.arc(Battle.portal.x, Battle.portal.y, 34 + Math.sin(Battle.elapsed * 8) * 4, 0, Math.PI * 2); ctx.stroke();
         ctx.fillStyle = 'rgba(168,85,247,0.45)';
         ctx.beginPath(); ctx.arc(Battle.portal.x, Battle.portal.y, 28, 0, Math.PI * 2); ctx.fill();
+      }
+
+      if (Battle.blackHolePortal) {
+        const pulse = Math.sin(Battle.elapsed * 10) * 4;
+        ctx.fillStyle = '#05020d';
+        ctx.beginPath(); ctx.arc(Battle.blackHolePortal.x, Battle.blackHolePortal.y, 30 + pulse, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.arc(Battle.blackHolePortal.x, Battle.blackHolePortal.y, 34 + pulse, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(Battle.blackHolePortal.x, Battle.blackHolePortal.y, 22 - pulse * 0.5, 0, Math.PI * 2); ctx.stroke();
+        ctx.fillStyle = '#f3e8ff';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`🕳️ 秘之黑洞 (${Math.ceil(Battle.blackHolePortal.life)}s)`, Battle.blackHolePortal.x, Battle.blackHolePortal.y - 42);
       }
 
       // 寶箱與 3 秒進度條
