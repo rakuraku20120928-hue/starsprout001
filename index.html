@@ -2145,7 +2145,7 @@
       zone: 'main', arenaRadius: 0, savedMainPos: { x: 0, y: 0 }, portal: null,
       triggeredMiniMins: new Set(), triggeredPortalMins: new Set(), finalBossTriggered: false,
       bossDefeatedCount: 0, elapsed: 0, kills: 0, coinsEarned: 0, ticketsEarned: 0,
-      spawnTimer: 0, chestTimer: 8, shootTimer: 0, orbitAngle: 0,
+      spawnTimer: 0, hordeTimer: 32, hordeActive: false, hordeDuration: 0, hordeWarned: false, hordeMult: 2.5, chestTimer: 8, shootTimer: 0, orbitAngle: 0,
       keys: {}, joy: { active: false, id: null, startX: 0, startY: 0, curX: 0, curY: 0, dx: 0, dy: 0 }
     };
 
@@ -2230,6 +2230,11 @@
       Battle.finalBossTriggered = false;
       Battle.bossDefeatedCount = 0;
       Battle.spawnTimer = 0;
+      Battle.hordeTimer = 30 + Math.random() * 10;
+      Battle.hordeActive = false;
+      Battle.hordeDuration = 0;
+      Battle.hordeWarned = false;
+      Battle.hordeMult = 2.5;
       Battle.chestTimer = 6;
       Battle.shootTimer = 0;
       Battle.skillMode = 'auto';
@@ -2368,12 +2373,12 @@
       const p = Battle.player;
       const ang = Math.random() * Math.PI * 2;
       const dist = 260;
-      const baseHp = Math.max(1, Math.round(((480 + Battle.elapsed * 9) * Battle.map.rewardMult * hpMult) / 3));
+      const baseHp = Math.max(1, Math.round(((480 + Battle.elapsed * 9) * Battle.map.rewardMult * hpMult) / 3 * 1.5));
       Battle.enemies.push({
         x: p.x + Math.cos(ang) * dist,
         y: p.y + Math.sin(ang) * dist,
         hp: baseHp, maxHp: baseHp,
-        atk: Math.max(1, Math.round(((18 + Battle.elapsed * 0.14) * Battle.map.rewardMult) / 3)),
+        atk: Math.max(1, Math.round(((18 + Battle.elapsed * 0.14) * Battle.map.rewardMult) / 3 * 1.5)),
         spd: tier === 'final' ? 68 : 78,
         r: tier === 'final' ? 38 : 30,
         isBoss: true, bossTier: tier, bossKey, bossName: customName,
@@ -2674,21 +2679,49 @@
         }
       }
 
-      // 生成一般怪物
+      // 不定期怪潮控制（約每 30~40 秒一次，開始前 3 秒出現提示詞，短期內生成數量 * 2~3 倍）
+      if (!Battle.hordeActive) {
+        Battle.hordeTimer -= dt;
+        if (Battle.hordeTimer <= 3.0 && !Battle.hordeWarned) {
+          Battle.hordeWarned = true;
+          showBannerWarning('🌊 警告：前方即將爆發怪潮！', '大量魔物正在集結，短期內怪物生成數量將暴增 2~3 倍！');
+        }
+        if (Battle.hordeTimer <= 0) {
+          Battle.hordeActive = true;
+          Battle.hordeDuration = 10;
+          Battle.hordeMult = 2 + Math.random(); // 2.0 ~ 3.0 倍
+          Battle.hordeWarned = false;
+          SoundFX.play('boss');
+        }
+      } else {
+        Battle.hordeDuration -= dt;
+        if (Battle.hordeDuration <= 0) {
+          Battle.hordeActive = false;
+          Battle.hordeTimer = 30 + Math.random() * 10;
+        }
+      }
+
+      // 生成一般怪物（基礎小怪數量提升，怪潮期間生成數量與上限再乘 2~3 倍）
       Battle.spawnTimer -= dt;
-      if (Battle.spawnTimer <= 0 && Battle.enemies.length < 48) {
-        Battle.spawnTimer = Math.max(0.28, 1.15 - Battle.elapsed * 0.0012);
-        const ang = Math.random() * Math.PI * 2;
+      const maxEnemies = Battle.hordeActive ? Math.round(90 * Battle.hordeMult) : 90;
+      if (Battle.spawnTimer <= 0 && Battle.enemies.length < maxEnemies) {
+        const baseInterval = Math.max(0.18, 0.72 - Battle.elapsed * 0.001);
+        Battle.spawnTimer = Battle.hordeActive ? (baseInterval / Battle.hordeMult) : baseInterval;
+        const spawnCount = Battle.hordeActive ? Math.round(2 * Battle.hordeMult) : 2;
         const dist = Battle.zone === 'main' ? 360 : Battle.arenaRadius - 30;
         const hpScale = (1 + Battle.elapsed * 0.015) * Battle.map.rewardMult;
-        Battle.enemies.push({
-          x: (Battle.zone === 'main' ? p.x : 0) + Math.cos(ang) * dist,
-          y: (Battle.zone === 'main' ? p.y : 0) + Math.sin(ang) * dist,
-          hp: Math.max(1, Math.round((28 * hpScale) / 3)), maxHp: Math.max(1, Math.round((28 * hpScale) / 3)),
-          atk: Math.max(1, Math.round((9 * Battle.map.rewardMult) / 3)),
-          spd: 62 + Math.min(45, Battle.elapsed * 0.05),
-          r: 14, isBoss: false
-        });
+        for (let s = 0; s < spawnCount; s++) {
+          if (Battle.enemies.length >= maxEnemies) break;
+          const ang = Math.random() * Math.PI * 2;
+          Battle.enemies.push({
+            x: (Battle.zone === 'main' ? p.x : 0) + Math.cos(ang) * dist,
+            y: (Battle.zone === 'main' ? p.y : 0) + Math.sin(ang) * dist,
+            hp: Math.max(1, Math.round((28 * hpScale) / 3 * 1.5)), maxHp: Math.max(1, Math.round((28 * hpScale) / 3 * 1.5)),
+            atk: Math.max(1, Math.round((9 * Battle.map.rewardMult) / 3 * 1.5)),
+            spd: 62 + Math.min(45, Battle.elapsed * 0.05),
+            r: 14, isBoss: false
+          });
+        }
       }
 
       // 更新投射物
