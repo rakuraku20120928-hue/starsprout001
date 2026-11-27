@@ -303,6 +303,9 @@
         <button onclick="returnToPortal()" class="pixel-btn" style="background:#262d52;border:1px solid #475569;color:#e2e8f0;border-radius:10px;padding:5px 8px;font-size:11px;font-weight:900;">
           🏠 官網
         </button>
+        <button onclick="openFriendsModal()" class="pixel-btn" style="background:#1e293b;border:1px solid rgba(56,189,248,0.65);color:#38bdf8;border-radius:10px;padding:5px 8px;font-size:11px;font-weight:900;position:relative;">
+          👥 好友<span id="friend-online-dot" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#34d399;margin-left:3px;vertical-align:middle;"></span>
+        </button>
         <button onclick="openAccountModal()" style="display:flex;align-items:center;gap:5px;background:#12162b;border:1px solid rgba(52,211,153,0.5);border-radius:10px;padding:4px 8px;cursor:pointer;color:#fff;">
           <span style="font-size:13px;">🌱</span>
           <div style="text-align:left;">
@@ -348,7 +351,11 @@
 
         <div style="background:#161b33;border:1px solid rgba(99,102,241,0.45);border-radius:12px;padding:8px 10px;font-size:11px;color:#cbd5e1;display:flex;justify-content:space-between;align-items:center;">
           <span>⏱️ <strong>首領：</strong>3m 小Boss ｜ 6m 時空門 ｜ 15m 深遠洞</span>
-          <span style="color:var(--amber);font-weight:900;">✨ 招式滿5級變 EX</span>
+          <span style="color:var(--amber);font-weight:900;">✨ 2000專屬技能・滿5級EX</span>
+        </div>
+        <div id="adv-coop-bar" onclick="openFriendsModal()" style="background:linear-gradient(90deg,rgba(14,116,144,0.35),rgba(67,56,202,0.35));border:1px solid rgba(56,189,248,0.55);border-radius:12px;padding:8px 10px;font-size:11px;color:#e0f2fe;display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
+          <span id="adv-coop-text">👥 多人連線：單人冒險中（點擊邀請好友並肩作戰）</span>
+          <span style="color:#34d399;font-weight:900;">組隊設定 →</span>
         </div>
 
         <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -503,7 +510,8 @@
               ⏸️ 暫停
             </button>
           </div>
-          <div style="background:rgba(15,23,42,0.85);border:1px solid #334155;padding:3px 7px;border-radius:8px;font-size:10px;font-weight:900;display:flex;gap:6px;">
+          <div style="background:rgba(15,23,42,0.85);border:1px solid #334155;padding:3px 7px;border-radius:8px;font-size:10px;font-weight:900;display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">
+            <span id="hud-time-phase" style="color:#fde047;">🌅 晨曦</span>
             <span id="hud-zone-badge" style="color:var(--emerald);">🌿 主世界</span>
             <span>👾<span id="hud-kills">0</span></span>
             <span style="color:var(--amber);">🪙<span id="hud-coins">0</span></span>
@@ -691,6 +699,52 @@
         <button onclick="importSaveCode()" class="pixel-btn" style="padding:8px;border-radius:8px;background:#334155;color:#fff;font-weight:800;font-size:11px;">📥 匯入存檔碼</button>
       </div>
       <div id="save-feedback" style="text-align:center;font-size:11px;color:var(--amber);font-weight:800;margin-top:6px;min-height:16px;"></div>
+    </div>
+  </div>
+
+    <!-- 好友與多人連線彈窗 -->
+  <div id="friends-modal" class="modal-backdrop hidden">
+    <div class="modal-card animate-pop" style="max-width:410px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="margin:0;font-size:16px;font-weight:900;color:#38bdf8;">👥 星芽好友與多人連線大廳</h3>
+        <button onclick="document.getElementById('friends-modal').classList.add('hidden')" style="width:28px;height:28px;border-radius:50%;background:#1e293b;border:none;color:#cbd5e1;font-weight:900;cursor:pointer;">✕</button>
+      </div>
+
+      <!-- 我的連線 ID 與房間碼 -->
+      <div style="background:#111529;border:1px solid rgba(56,189,248,0.45);border-radius:12px;padding:10px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:10px;color:#94a3b8;">我的冒險家 UID（分享給好友加入）</div>
+            <div id="my-friend-uid" style="font-size:14px;font-weight:900;color:#fbbf24;letter-spacing:1px;">SPROUT-8842</div>
+          </div>
+          <button onclick="copyMyFriendUid()" class="pixel-btn" style="padding:6px 10px;border-radius:8px;background:#0284c7;color:#fff;font-size:11px;font-weight:900;">📋 複製 UID</button>
+        </div>
+        <div id="coop-room-status" style="margin-top:8px;padding-top:8px;border-top:1px solid #1e293b;font-size:11px;color:#34d399;font-weight:800;">
+          🟢 連線伺服器就緒（支援同螢幕/跨分頁即時 P2P 連線與 AI 好友助戰）
+        </div>
+      </div>
+
+      <!-- 新增好友 / 輸入房間碼連線 -->
+      <div style="background:#141830;border:1px solid #334155;border-radius:12px;padding:10px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:900;color:#fbbf24;margin-bottom:6px;">➕ 新增好友或輸入房間碼即時連線</div>
+        <div style="display:flex;gap:6px;">
+          <input id="friend-add-input" type="text" maxlength="20" placeholder="輸入好友名稱或 UID（如 SPROUT-1024）" class="app-input" />
+          <button onclick="addFriendByInput()" class="pixel-btn" style="padding:8px 12px;border-radius:10px;background:#10b981;color:#052e16;font-weight:900;font-size:12px;white-space:nowrap;">加入</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <input id="coop-room-input" type="text" maxlength="16" placeholder="跨分頁連線頻道碼（例如：ROOM888）" class="app-input" />
+          <button onclick="joinCoopChannel()" class="pixel-btn" style="padding:8px 12px;border-radius:10px;background:#6366f1;color:#fff;font-weight:900;font-size:12px;white-space:nowrap;">🔗 連線頻道</button>
+        </div>
+      </div>
+
+      <!-- 好友清單與組隊開關 -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:11px;font-weight:900;color:#cbd5e1;">📋 好友列表（可邀請 1 位好友共同出戰）</span>
+          <span id="coop-selected-badge" style="font-size:10px;color:#38bdf8;font-weight:800;">未組隊</span>
+        </div>
+        <div id="friends-list-box" style="display:flex;flex-direction:column;gap:6px;max-height:190px;overflow-y:auto;"></div>
+      </div>
     </div>
   </div>
 
