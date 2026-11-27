@@ -1435,170 +1435,6 @@
       } catch (e) { document.getElementById('save-feedback').textContent = '❌ 格式錯誤'; }
     }
 
-
-    /*************************************************************************
-     * 5B. 好友與跨分頁即時多人連線系統 (BroadcastChannel + LocalStorage 同步)
-     *************************************************************************/
-    const FRIEND_STORAGE_KEY = 'star_sprout_friends_v3';
-    let coopChannel = null;
-    let activeCoopRoom = '';
-    let invitedFriend = null;
-    let remotePartnerState = null;
-
-    function getMyUid() {
-      let hash = 0;
-      for (let i = 0; i < currentUsername.length; i++) hash = (hash * 31 + currentUsername.charCodeAt(i)) % 9000;
-      return 'SPROUT-' + String(1000 + Math.abs(hash));
-    }
-
-    function getFriendList() {
-      try {
-        const raw = localStorage.getItem(FRIEND_STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
-      } catch (e) {}
-      const defaults = [
-        { uid: 'SPROUT-1024', name: '星光小導師', charId: 486, lv: 25, online: true, isBot: true },
-        { uid: 'SPROUT-2048', name: '焰尾小狐迷', charId: 2, lv: 15, online: true, isBot: true },
-        { uid: 'SPROUT-4096', name: '極光神狐使', charId: 492, lv: 30, online: true, isBot: true }
-      ];
-      localStorage.setItem(FRIEND_STORAGE_KEY, JSON.stringify(defaults));
-      return defaults;
-    }
-
-    function saveFriendList(list) {
-      try { localStorage.setItem(FRIEND_STORAGE_KEY, JSON.stringify(list)); } catch (e) {}
-    }
-
-    function openFriendsModal() {
-      document.getElementById('my-friend-uid').textContent = getMyUid();
-      renderFriendsList();
-      updateCoopStatusUI();
-      document.getElementById('friends-modal').classList.remove('hidden');
-    }
-
-    function copyMyFriendUid() {
-      const uid = getMyUid();
-      const temp = document.createElement('textarea');
-      temp.value = uid;
-      document.body.appendChild(temp);
-      temp.select();
-      document.execCommand('copy');
-      document.body.removeChild(temp);
-      showToast(`📋 已複製我的 UID：${uid}`);
-    }
-
-    function addFriendByInput() {
-      const inp = document.getElementById('friend-add-input');
-      const val = inp.value.trim();
-      if (!val) { showToast('請輸入好友名稱或 UID'); return; }
-      const list = getFriendList();
-      const isUid = val.toUpperCase().startsWith('SPROUT-');
-      const uid = isUid ? val.toUpperCase() : 'SPROUT-' + Math.floor(1000 + Math.random() * 8999);
-      const name = isUid ? `冒險家_${uid.slice(-4)}` : val;
-      if (list.some(f => f.uid === uid || f.name === name)) {
-        showToast('此好友已在清單中！');
-        return;
-      }
-      const randCharId = 1 + (uid.charCodeAt(uid.length - 1) * 37) % 500;
-      list.unshift({ uid, name, charId: randCharId, lv: 12, online: true, isBot: true });
-      saveFriendList(list);
-      inp.value = '';
-      renderFriendsList();
-      showToast(`✅ 已成功新增好友：${name}`);
-    }
-
-    function joinCoopChannel() {
-      const code = document.getElementById('coop-room-input').value.trim().toUpperCase();
-      if (!code) { showToast('請輸入連線頻道碼（例如 ROOM888）'); return; }
-      if (coopChannel) coopChannel.close();
-      activeCoopRoom = code;
-      remotePartnerState = null;
-      if ('BroadcastChannel' in window) {
-        coopChannel = new BroadcastChannel('star_sprout_coop_' + code);
-        coopChannel.onmessage = (ev) => {
-          const msg = ev.data;
-          if (!msg || msg.senderUid === getMyUid()) return;
-          if (msg.type === 'hello' || msg.type === 'sync') {
-            remotePartnerState = msg;
-            updateCoopStatusUI();
-          }
-        };
-        coopChannel.postMessage({
-          type: 'hello',
-          senderUid: getMyUid(),
-          senderName: currentUsername,
-          charId: gameState.equippedId || 1,
-          x: 0, y: 0
-        });
-      }
-      updateCoopStatusUI();
-      showToast(`🔗 已連線至頻道【${code}】，同瀏覽器開啟另一分頁輸入相同頻道碼即可即時同場作戰！`);
-    }
-
-    function toggleInviteFriend(uid) {
-      const list = getFriendList();
-      const target = list.find(f => f.uid === uid);
-      if (!target) return;
-      if (invitedFriend && invitedFriend.uid === uid) {
-        invitedFriend = null;
-        showToast(`已取消與 ${target.name} 組隊`);
-      } else {
-        invitedFriend = target;
-        showToast(`🤝 已邀請【${target.name}】共同出戰！`);
-      }
-      renderFriendsList();
-      updateCoopStatusUI();
-    }
-
-    function updateCoopStatusUI() {
-      const badge = document.getElementById('coop-selected-badge');
-      const advText = document.getElementById('adv-coop-text');
-      const roomStatus = document.getElementById('coop-room-status');
-      if (remotePartnerState) {
-        if (badge) badge.textContent = `即時連線：${remotePartnerState.senderName}`;
-        if (advText) advText.textContent = `👥 多人連線中：與【${remotePartnerState.senderName}】即時同步並肩作戰！`;
-        if (roomStatus) roomStatus.textContent = `🟢 頻道【${activeCoopRoom}】已與【${remotePartnerState.senderName}】建立即時連線！`;
-      } else if (invitedFriend) {
-        if (badge) badge.textContent = `組隊夥伴：${invitedFriend.name}`;
-        if (advText) advText.textContent = `👥 組隊冒險：已邀請好友【${invitedFriend.name}】共同出戰！`;
-        if (roomStatus) roomStatus.textContent = activeCoopRoom
-          ? `🟡 頻道【${activeCoopRoom}】等待分頁連線中（目前由組隊好友助戰）`
-          : `🟢 已選擇好友【${invitedFriend.name}】共同出戰！`;
-      } else {
-        if (badge) badge.textContent = activeCoopRoom ? `頻道 ${activeCoopRoom} 等待中` : '未組隊';
-        if (advText) advText.textContent = activeCoopRoom
-          ? `👥 多人頻道【${activeCoopRoom}】已開啟（等待好友加入或選擇好友助戰）`
-          : '👥 多人連線：單人冒險中（點擊邀請好友並肩作戰）';
-        if (roomStatus) roomStatus.textContent = activeCoopRoom
-          ? `🟡 已加入頻道【${activeCoopRoom}】，請在另一分頁輸入相同頻道碼連線`
-          : '🟢 連線伺服器就緒（支援跨分頁即時連線與好友並肩作戰）';
-      }
-    }
-
-    function renderFriendsList() {
-      const box = document.getElementById('friends-list-box');
-      if (!box) return;
-      const list = getFriendList();
-      box.innerHTML = list.map(f => {
-        const c = CHARACTERS[(f.charId || 1) - 1] || CHARACTERS[0];
-        const isInvited = invitedFriend && invitedFriend.uid === f.uid;
-        return `
-          <div style="padding:8px 10px;border-radius:10px;border:1px solid ${isInvited ? '#34d399' : '#334155'};background:${isInvited ? 'rgba(6,78,59,0.45)' : '#111529'};display:flex;justify-content:space-between;align-items:center;gap:8px;">
-            <div style="display:flex;align-items:center;gap:8px;min-width:0;">
-              <span style="width:8px;height:8px;border-radius:50%;background:#34d399;flex-shrink:0;"></span>
-              <div style="min-width:0;">
-                <div style="font-size:12px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${f.name} <span style="font-size:10px;color:#94a3b8;">(${f.uid})</span></div>
-                <div style="font-size:10px;color:#38bdf8;">出戰：${c.name} Lv.${f.lv}</div>
-              </div>
-            </div>
-            <button onclick="toggleInviteFriend('${f.uid}')" class="pixel-btn" style="padding:6px 10px;border-radius:8px;background:${isInvited ? '#e11d48' : '#10b981'};color:${isInvited ? '#fff' : '#052e16'};font-size:11px;font-weight:900;white-space:nowrap;">
-              ${isInvited ? '取消組隊' : '⚔️ 邀請出戰'}
-            </button>
-          </div>
-        `;
-      }).join('');
-    }
-
     /*************************************************************************
      * 6. 遊戲大廳五分頁渲染
      *************************************************************************/
@@ -2031,7 +1867,6 @@
         vx: 12 + Math.random() * 18, vy: 15 + Math.random() * 20, size: 2 + Math.floor(Math.random() * 3)
       }));
 
-      Battle.ally = null;
       Battle.player = {
         x: 0, y: 0,
         hp: baseStats.hp, maxHp: baseStats.hp,
@@ -2620,62 +2455,6 @@
         if (ap.y > p.y + 500) ap.y -= 1000;
       }
 
-      // 多人連線 / 好友並肩作戰更新
-      if (coopChannel && activeCoopRoom) {
-        coopChannel.postMessage({
-          type: 'sync',
-          senderUid: getMyUid(),
-          senderName: currentUsername,
-          charId: Battle.charObj.id,
-          x: p.x,
-          y: p.y
-        });
-      }
-      if (invitedFriend || remotePartnerState) {
-        if (!Battle.ally) {
-          const allyCharId = remotePartnerState ? remotePartnerState.charId : invitedFriend.charId;
-          const allyName = remotePartnerState ? remotePartnerState.senderName : invitedFriend.name;
-          Battle.ally = {
-            x: p.x - 42, y: p.y + 24,
-            charObj: CHARACTERS[(allyCharId || 1) - 1] || CHARACTERS[0],
-            name: allyName,
-            shootCd: 0.7
-          };
-        }
-        const ally = Battle.ally;
-        if (remotePartnerState) {
-          ally.charObj = CHARACTERS[(remotePartnerState.charId || 1) - 1] || ally.charObj;
-          ally.name = remotePartnerState.senderName;
-          ally.x += (remotePartnerState.x - ally.x) * Math.min(1, dt * 12);
-          ally.y += (remotePartnerState.y - ally.y) * Math.min(1, dt * 12);
-        } else {
-          const targetX = p.x + Math.cos(Battle.elapsed * 1.4) * 56;
-          const targetY = p.y + Math.sin(Battle.elapsed * 1.4) * 56;
-          ally.x += (targetX - ally.x) * Math.min(1, dt * 5);
-          ally.y += (targetY - ally.y) * Math.min(1, dt * 5);
-        }
-        ally.shootCd -= dt;
-        if (ally.shootCd <= 0 && Battle.enemies.length > 0) {
-          ally.shootCd = 0.75;
-          let nearE = null, minD = Infinity;
-          for (const e of Battle.enemies) {
-            const d = Math.hypot(e.x - ally.x, e.y - ally.y);
-            if (d < minD) { minD = d; nearE = e; }
-          }
-          if (nearE) {
-            const aAng = Math.atan2(nearE.y - ally.y, nearE.x - ally.x);
-            Battle.projectiles.push({
-              x: ally.x, y: ally.y,
-              vx: Math.cos(aAng) * 420, vy: Math.sin(aAng) * 420,
-              dmg: Math.max(8, Math.round(p.atk * 0.65)),
-              r: 6, color: '#38bdf8', pierce: 1, life: 1.3, isEx: false, style: 'single'
-            });
-          }
-        }
-      } else {
-        Battle.ally = null;
-      }
-
       // 更新頂部 HUD
       document.getElementById('hud-run-lv').textContent = `Lv.${p.runLv}`;
       document.getElementById('hud-hp-text').textContent = `${Math.max(0, Math.round(p.hp))} / ${p.maxHp}`;
@@ -2795,15 +2574,6 @@
       const heroSpr = getCharacterSprite(Battle.charObj);
       if (!(p.invuln > 0 && Math.floor(p.invuln * 20) % 2 === 0)) {
         ctx.drawImage(heroSpr, p.x - 22, p.y - 22, 44, 44);
-      }
-      // 渲染連線好友 / 組隊夥伴
-      if (Battle.ally) {
-        const allySpr = getCharacterSprite(Battle.ally.charObj);
-        ctx.drawImage(allySpr, Battle.ally.x - 20, Battle.ally.y - 20, 40, 40);
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 10px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('👥 ' + Battle.ally.name, Battle.ally.x, Battle.ally.y - 25);
       }
 
       // 守護星環光球
