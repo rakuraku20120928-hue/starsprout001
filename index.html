@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>星芽紀元 StarSprout：500英雄與六大許願池終極整合版</title>
+<title>星芽紀元 StarSprout：500像素幻獸與六大許願池終極版</title>
 <style>
   :root {
-    --bg: #0b0f1a;
-    --panel: #131a2b;
-    --panel-2: #1a233a;
-    --border: #2a3759;
-    --text: #eef3ff;
-    --muted: #93a3c7;
+    --bg: #0b101e;
+    --panel: #131c31;
+    --panel-2: #1b2642;
+    --border: #2c3e66;
+    --text: #f0f4ff;
+    --muted: #94a3b8;
     --accent: #38bdf8;
     --gold: #fbbf24;
     --mythic: #f43f5e;
@@ -32,15 +32,14 @@
     background: var(--bg);
     color: var(--text);
     overflow-x: hidden;
-    padding-bottom: 72px;
+    padding-bottom: 70px;
   }
-  /* Dynamic Animated Sky & Biome Background */
   #dynamic-bg {
     position: fixed;
     inset: 0;
     z-index: -1;
-    background: radial-gradient(circle at 20% 20%, #1e293b 0%, #0b0f1a 70%);
-    transition: background 1s ease;
+    background: radial-gradient(circle at 25% 20%, #1e293b 0%, #0b101e 75%);
+    transition: background 0.8s ease;
     overflow: hidden;
   }
   .star-dot {
@@ -54,13 +53,22 @@
     from { opacity: 0.2; transform: scale(0.8); }
     to { opacity: 0.9; transform: scale(1.2); }
   }
+  @keyframes floatPet {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+  }
+  .pixel-art {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    animation: floatPet 2.4s ease-in-out infinite;
+  }
 
-  /* Top Resource Bar */
+  /* Header */
   header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(11, 15, 26, 0.92);
+    background: rgba(11, 16, 30, 0.94);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border);
     padding: 8px 12px;
@@ -73,15 +81,15 @@
     flex-wrap: wrap;
   }
   .brand {
-    font-weight: 800;
+    font-weight: 900;
     font-size: 15px;
-    background: linear-gradient(90deg, #38bdf8, #f472b6, #fbbf24);
+    background: linear-gradient(90deg, #4ade80, #38bdf8, #fbbf24);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   .resources {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
     font-size: 12px;
   }
@@ -93,16 +101,16 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    font-weight: 600;
+    font-weight: 700;
   }
 
-  /* Navigation Tabs */
+  /* Nav */
   nav.main-nav {
     display: flex;
     gap: 6px;
     overflow-x: auto;
     padding: 8px 12px;
-    background: rgba(19, 26, 43, 0.95);
+    background: rgba(19, 28, 49, 0.96);
     border-bottom: 1px solid var(--border);
     scrollbar-width: none;
   }
@@ -115,18 +123,17 @@
     padding: 7px 12px;
     border-radius: 10px;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
     transition: 0.2s;
   }
   .nav-btn.active {
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    background: linear-gradient(135deg, #10b981, #2563eb);
     color: #fff;
-    border-color: #60a5fa;
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    border-color: #6ee7b7;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
   }
 
-  /* Main Container */
   main {
     max-width: 1100px;
     margin: 0 auto;
@@ -136,7 +143,7 @@
   .tab-section.active { display: block; }
 
   .card {
-    background: rgba(19, 26, 43, 0.92);
+    background: rgba(19, 28, 49, 0.94);
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 14px;
@@ -150,6 +157,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   /* Buttons */
@@ -157,7 +166,7 @@
     background: var(--panel-2);
     color: var(--text);
     border: 1px solid var(--border);
-    padding: 8px 14px;
+    padding: 8px 13px;
     border-radius: 10px;
     font-size: 13px;
     font-weight: 700;
@@ -165,11 +174,153 @@
     transition: 0.15s;
   }
   .btn:active { transform: scale(0.96); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
   .btn-primary { background: linear-gradient(135deg, #2563eb, #3b82f6); border-color: #60a5fa; color: #fff; }
   .btn-gold { background: linear-gradient(135deg, #d97706, #f59e0b); border-color: #fcd34d; color: #111827; }
   .btn-mythic { background: linear-gradient(135deg, #e11d48, #9333ea); border-color: #f43f5e; color: #fff; }
   .btn-green { background: linear-gradient(135deg, #059669, #10b981); border-color: #34d399; color: #fff; }
   .btn-sm { padding: 5px 9px; font-size: 12px; border-radius: 8px; }
+
+  /* World Map Selection Grid */
+  .maps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+    gap: 12px;
+  }
+  .map-card {
+    border-radius: 14px;
+    padding: 14px;
+    border: 2px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    transition: transform 0.2s;
+  }
+  .map-card:hover { transform: translateY(-2px); }
+  .map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .map-title {
+    font-size: 17px;
+    font-weight: 900;
+    margin: 2px 0;
+  }
+  .map-desc {
+    font-size: 12px;
+    color: #e2e8f0;
+    line-height: 1.45;
+  }
+  .map-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(11, 16, 30, 0.65);
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  /* Turn-Based Interactive Battle Arena (Version 1 Style) */
+  .battle-arena {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.88), rgba(27, 38, 66, 0.95));
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .combatants-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .fighter-panel {
+    background: rgba(11, 16, 30, 0.72);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px;
+    text-align: center;
+  }
+  .vs-badge {
+    font-size: 18px;
+    font-weight: 900;
+    color: #fbbf24;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  }
+  .bar-wrap {
+    width: 100%;
+    height: 9px;
+    background: #090d16;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 5px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .hp-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #86efac); transition: width 0.25s; }
+  .enemy-hp { background: linear-gradient(90deg, #ef4444, #fca5a5); }
+  .mp-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.25s; }
+
+  .skill-deck {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .skill-btn {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 9px 10px;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .skill-btn:hover:not(:disabled) { border-color: #38bdf8; background: #223052; }
+  .skill-btn:active:not(:disabled) { transform: scale(0.97); }
+  .skill-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .party-switch-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+  }
+  .party-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .party-chip.active-unit {
+    border-color: #4ade80;
+    background: rgba(16, 185, 129, 0.2);
+  }
+
+  .battle-log {
+    height: 135px;
+    overflow-y: auto;
+    background: #080c14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px;
+    font-size: 12px;
+    line-height: 1.55;
+    color: #cbd5e1;
+  }
 
   /* 6 Gacha Pools with Mythic Cover Art */
   .pools-grid {
@@ -178,7 +329,6 @@
     gap: 14px;
   }
   .pool-card {
-    position: relative;
     border-radius: 16px;
     overflow: hidden;
     border: 2px solid var(--border);
@@ -186,7 +336,6 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.2s;
   }
   .pool-banner {
     position: relative;
@@ -227,10 +376,10 @@
   .pool-cover-art {
     position: relative;
     z-index: 2;
-    width: 118px;
-    height: 118px;
+    width: 116px;
+    height: 116px;
     border-radius: 16px;
-    background: rgba(11, 15, 26, 0.65);
+    background: rgba(11, 16, 30, 0.68);
     border: 2px solid rgba(255,255,255,0.35);
     box-shadow: 0 8px 24px rgba(0,0,0,0.6);
     display: flex;
@@ -244,68 +393,19 @@
     position: absolute;
     bottom: 4px;
     font-size: 10px;
-    background: rgba(0,0,0,0.75);
+    background: rgba(0,0,0,0.78);
     padding: 2px 6px;
     border-radius: 6px;
     color: #fff;
   }
   .pool-actions {
     padding: 10px 12px;
-    background: rgba(11, 15, 26, 0.85);
+    background: rgba(11, 16, 30, 0.88);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
     border-top: 1px solid rgba(255,255,255,0.1);
-  }
-
-  /* Battle Arena */
-  .battle-stage {
-    background: linear-gradient(180deg, rgba(15,23,42,0.85), rgba(30,41,59,0.9));
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  .arena-teams {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  .unit-box {
-    background: var(--panel-2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .hp-bar {
-    width: 100%;
-    height: 7px;
-    background: #0f172a;
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 4px;
-  }
-  .hp-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #22c55e, #86efac);
-    transition: width 0.25s;
-  }
-  .enemy-hp { background: linear-gradient(90deg, #ef4444, #fca5a5); }
-  .battle-log {
-    height: 130px;
-    overflow-y: auto;
-    background: #090d16;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px;
-    font-size: 12px;
-    line-height: 1.5;
-    color: #cbd5e1;
   }
 
   /* Hero Grid & Codex */
@@ -338,9 +438,9 @@
     cursor: pointer;
     transition: 0.15s;
   }
-  .hero-card.locked { opacity: 0.48; filter: grayscale(0.65); }
-  .hero-card.rarity-MYTHIC { border-color: var(--mythic); box-shadow: inset 0 0 14px rgba(244,63,94,0.22); }
-  .hero-card.rarity-EPIC { border-color: var(--epic); box-shadow: inset 0 0 12px rgba(168,85,247,0.2); }
+  .hero-card.locked { opacity: 0.5; filter: grayscale(0.65); }
+  .hero-card.rarity-MYTHIC { border-color: var(--mythic); box-shadow: inset 0 0 14px rgba(244,63,94,0.24); }
+  .hero-card.rarity-EPIC { border-color: var(--epic); box-shadow: inset 0 0 12px rgba(168,85,247,0.22); }
   .hero-card.rarity-RARE { border-color: var(--rare); }
   .rarity-tag {
     position: absolute;
@@ -433,12 +533,10 @@
     gap: 8px;
     margin-top: 10px;
   }
-
-  /* P2P Coop */
   textarea.coop-box {
     width: 100%;
     height: 74px;
-    background: #090d16;
+    background: #080c14;
     color: #93c5fd;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -453,89 +551,107 @@
 
 <header>
   <div class="top-row">
-    <div class="brand">✦ 星芽紀元 StarSprout (500英雄終極版)</div>
+    <div class="brand">🌱 星芽紀元 StarSprout (500像素幻獸終極版)</div>
     <div class="resources">
-      <div class="res-pill">🪙 <span id="res-gold">5000</span></div>
+      <div class="res-pill">🪙 <span id="res-gold">3000</span></div>
       <div class="res-pill">💎 <span id="res-gems">3200</span></div>
       <div class="res-pill">🎫 招募券 <span id="res-tickets">20</span></div>
-      <div class="res-pill">🌟 圖鑑 <span id="res-codex">0</span>/500</div>
+      <div class="res-pill">🐾 圖鑑 <span id="res-codex">0</span>/500</div>
     </div>
   </div>
 </header>
 
 <nav class="main-nav">
-  <button class="nav-btn active" onclick="switchTab('camp')">⛺ 營地出戰</button>
+  <button class="nav-btn active" onclick="switchTab('map')">🗺️ 世界地圖探索</button>
+  <button class="nav-btn" onclick="switchTab('battle')">⚔️ 手動回合對戰</button>
   <button class="nav-btn" onclick="switchTab('gacha')">🌠 六大許願池</button>
-  <button class="nav-btn" onclick="switchTab('heroes')">📖 500英雄圖鑑</button>
+  <button class="nav-btn" onclick="switchTab('heroes')">📖 500幻獸圖鑑</button>
   <button class="nav-btn" onclick="switchTab('items')">🎒 道具工坊 (20種)</button>
   <button class="nav-btn" onclick="switchTab('coop')">🤝 P2P雙人連線</button>
-  <button class="nav-btn" onclick="switchTab('settings')">⚙️ 場景與存檔</button>
+  <button class="nav-btn" onclick="switchTab('settings')">⚙️ 天象與存檔</button>
 </nav>
 
 <main>
-  <!-- 1. CAMP & BATTLE -->
-  <section id="tab-camp" class="tab-section active">
-    <div class="battle-stage">
+  <!-- 1. WORLD MAP SELECTION (DEFAULT HOME SCREEN LIKE V1) -->
+  <section id="tab-map" class="tab-section active">
+    <div class="card">
       <div class="card-title">
-        <span>⚔️ 星界遠征：第 <span id="stage-num">1</span> 關（<span id="stage-biome">翡翠星森</span>）</span>
-        <div>
-          <button class="btn btn-sm btn-green" id="btn-auto-battle" onclick="toggleAutoBattle()">▶️ 自動戰鬥：開啟</button>
-          <button class="btn btn-sm btn-gold" onclick="challengeBoss()">🔥 挑戰首領</button>
-        </div>
+        <span>🗺️ 星芽大陸 — 選擇冒險地圖與探索區域</span>
+        <span style="font-size:12px;color:#4ade80;">目前出戰夥伴：<strong id="map-active-pet-name">星芽史萊姆</strong></span>
       </div>
-      <div style="font-size:12px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;">
-        <span>隊伍總戰力：<strong id="team-power" style="color:#38bdf8;">0</strong></span>
-        <span>掛機收益：每分鐘 +<span id="idle-rate">120</span> 金幣 / +<span id="idle-gem-rate">5</span> 星鑽</span>
-        <span>連勝獎勵：<span id="win-streak" style="color:#fbbf24;">0</span> 連勝</span>
+      <p style="font-size:12px;color:var(--muted);margin-top:0;">
+        歡迎回到星芽大陸！請點選下方任意地圖區域進入探索，遭遇野生像素幻獸或區域首領並進行**親自操控的回合制對戰**！
+      </p>
+      <div class="maps-grid" id="maps-grid"></div>
+    </div>
+  </section>
+
+  <!-- 2. TURN-BASED MANUAL BATTLE (VERSION 1 CORE COMBAT) -->
+  <section id="tab-battle" class="tab-section">
+    <div class="battle-arena">
+      <div class="card-title">
+        <span>⚔️ <span id="battle-map-title">翡翠星森</span> — 第 <span id="battle-wave">1</span> 區遭遇戰</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="switchTab('map')">🗺️ 返回地圖</button>
+          <button class="btn btn-sm btn-green" onclick="encounterWildEnemy()">🔍 尋找下一個敵人</button>
+          <button class="btn btn-sm btn-gold" onclick="encounterMapBoss()">👑 挑戰區域首領</button>
+        </div>
       </div>
 
-      <div class="arena-teams">
-        <div>
-          <div style="font-size:12px;font-weight:800;color:#60a5fa;margin-bottom:6px;">🛡️ 我方出戰陣容（最多4名）</div>
-          <div id="player-team-list" style="display:flex;flex-direction:column;gap:6px;"></div>
-        </div>
-        <div>
-          <div style="font-size:12px;font-weight:800;color:#f87171;margin-bottom:6px;">👾 敵方守關魔物</div>
-          <div id="enemy-team-list" style="display:flex;flex-direction:column;gap:6px;"></div>
-        </div>
+      <div class="combatants-row">
+        <!-- Player Active Pet -->
+        <div class="fighter-panel" id="player-fighter-box"></div>
+        <div class="vs-badge">VS</div>
+        <!-- Enemy Wild Creature -->
+        <div class="fighter-panel" id="enemy-fighter-box"></div>
       </div>
 
-      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-primary btn-sm" onclick="manualAttack()">⚡ 立即發動合擊</button>
-        <button class="btn btn-mythic btn-sm" onclick="castUltimateBurst()">💥 全隊 EX 奧義爆發</button>
-        <button class="btn btn-sm" onclick="claimIdleReward()">🎁 領取離線掛機寶箱</button>
+      <!-- Manual Action Buttons & 4 Skills -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+        <button class="btn btn-primary" style="flex:1;" id="btn-normal-atk" onclick="playerUseBasicAttack()">👊 普通撞擊 (回復 +20 MP)</button>
+        <button class="btn btn-green" style="flex:1;" id="btn-heal-meditate" onclick="playerMeditate()">✨ 聚氣回魔 (+35 MP / 少量回血)</button>
+        <button class="btn btn-gold" id="btn-capture" onclick="attemptCaptureWild()" title="敵方血量低於 40% 時可嘗試收服！">🔮 丟出星芽球收服</button>
       </div>
+
+      <div style="font-size:12px;font-weight:800;color:#38bdf8;margin-top:10px;">⚡ 點擊施放幻獸專屬技能（消耗 MP）：</div>
+      <div class="skill-deck" id="battle-skill-deck"></div>
+
+      <!-- Switch Active Pet in Team -->
+      <div class="party-switch-bar" id="battle-party-bar"></div>
     </div>
 
     <div class="card">
-      <div class="card-title"><span>📜 戰鬥實況日誌（2,000種專屬技能觸發）</span></div>
+      <div class="card-title">
+        <span>📜 戰鬥實況紀錄</span>
+        <button class="btn btn-sm" onclick="document.getElementById('battle-log').innerHTML=''">清空紀錄</button>
+      </div>
       <div class="battle-log" id="battle-log"></div>
     </div>
   </section>
 
-  <!-- 2. SIX GACHA POOLS WITH MYTHIC COVER ART -->
+  <!-- 3. SIX GACHA POOLS WITH MYTHIC COVER ART -->
   <section id="tab-gacha" class="tab-section">
     <div class="card">
       <div class="card-title">
-        <span>🌠 六大元素許願池（點擊封面立繪可預覽神話/史詩UP角色）</span>
-        <span style="font-size:12px;color:#fbbf24;">保底計數：<span id="pity-count">0</span>/50 必出神話</span>
+        <span>🌠 六大元素許願池（點擊封面像素幻獸可預覽神話/史詩UP詳情）</span>
+        <span style="font-size:12px;color:#fbbf24;">神話保底計數：<span id="pity-count">0</span>/50</span>
       </div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">
-        全卡池收錄 500 位 100% 獨立造型英雄（絕無重複外觀）。單抽消耗 1 招募券或 160 星鑽；十連抽必出史詩以上！
+        全卡池收錄 500 隻 100% 獨立造型的可愛像素小生物（絕無重複外觀）。單抽消耗 1 招募券或 160 星鑽；十連抽必出史詩以上！
       </div>
       <div class="pools-grid" id="pools-container"></div>
     </div>
   </section>
 
-  <!-- 3. 500 HEROES CODEX -->
+  <!-- 4. 500 PIXEL CREATURES CODEX -->
   <section id="tab-heroes" class="tab-section">
     <div class="card">
       <div class="card-title">
-        <span>📖 500 英雄全圖鑑（每人 4 項專屬技能，共 2,000 技能）</span>
-        <button class="btn btn-sm btn-primary" onclick="autoEquipBestTeam()">✨ 一鍵最強編隊</button>
+        <span>📖 500 隻像素幻獸全圖鑑（每隻 4 項專屬技能，共 2,000 技能）</span>
+        <button class="btn btn-sm btn-primary" onclick="autoEquipBestTeam()">✨ 一鍵編入最強4寵</button>
       </div>
       <div class="filter-bar">
-        <input type="text" id="hero-search" placeholder="搜尋角色名稱 / 編號..." oninput="renderHeroesGrid()" />
+        <input type="text" id="hero-search" placeholder="搜尋幻獸名稱 / 編號..." oninput="renderHeroesGrid()" />
         <select id="filter-elem" onchange="renderHeroesGrid()">
           <option value="ALL">全部屬性</option>
           <option value="FOREST">🌿 森之靈</option>
@@ -554,12 +670,12 @@
         </select>
         <select id="filter-owned" onchange="renderHeroesGrid()">
           <option value="ALL">全部顯示 (500)</option>
-          <option value="OWNED">僅顯示已解鎖</option>
-          <option value="LOCKED">僅顯示未解鎖</option>
+          <option value="OWNED">僅顯示已收服</option>
+          <option value="LOCKED">僅顯示未收服</option>
         </select>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;color:var(--muted);">
-        <span id="codex-showing-text">顯示第 1 - 60 名英雄</span>
+        <span id="codex-showing-text">顯示第 1 - 48 隻幻獸</span>
         <div style="display:flex;gap:6px;">
           <button class="btn btn-sm" onclick="changeCodexPage(-1)">◀ 上一頁</button>
           <span id="codex-page-num" style="padding:4px 8px;">1</span>
@@ -570,23 +686,23 @@
     </div>
   </section>
 
-  <!-- 4. 20 ITEMS WORKSHOP -->
+  <!-- 5. 20 ITEMS WORKSHOP -->
   <section id="tab-items" class="tab-section">
     <div class="card">
       <div class="card-title">
-        <span>🎒 星界道具工坊（20種奇蹟聖物與消耗品）</span>
-        <span style="font-size:12px;color:#38bdf8;">持有道具可即時強化全隊或補充資源</span>
+        <span>🎒 星界道具工坊（20種奇蹟聖物與戰鬥補給品）</span>
+        <span style="font-size:12px;color:#38bdf8;">戰鬥中或平時皆可使用道具強化幻獸</span>
       </div>
       <div class="items-grid" id="items-grid"></div>
     </div>
   </section>
 
-  <!-- 5. P2P COOP -->
+  <!-- 6. P2P COOP -->
   <section id="tab-coop" class="tab-section">
     <div class="card">
       <div class="card-title"><span>🤝 WebRTC P2P 雙人免伺服器即時連線</span></div>
       <p style="font-size:12px;color:var(--muted);margin-top:0;">
-        無需任何後端伺服器，透過交換連線代碼即可與好友建立點對點（P2P）連線，共享雙人戰力加成（+25% 全屬性）並發送即時應援！
+        無需伺服器，交換連線代碼即可與好友建立點對點連線，獲得 +25% 雙人羈絆全屬性加成並互贈應援金幣！
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
         <button class="btn btn-primary btn-sm" onclick="createP2POffer()">1. 建立房主邀請碼 (Offer)</button>
@@ -599,19 +715,17 @@
       <textarea id="p2p-remote-sdp" class="coop-box" placeholder="在此貼上好友的代碼..."></textarea>
       <div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
         <span style="font-size:13px;">連線狀態：<strong id="p2p-status" style="color:#fbbf24;">單人冒險中</strong></span>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-sm btn-mythic" onclick="sendCoopCheer()">🔥 發送雙人合擊應援 (+500金幣)</button>
-        </div>
+        <button class="btn btn-sm btn-mythic" onclick="sendCoopCheer()">🔥 發送雙人應援 (+500金幣)</button>
       </div>
     </div>
   </section>
 
-  <!-- 6. SETTINGS & DYNAMIC BIOME -->
+  <!-- 7. SETTINGS & BIOME -->
   <section id="tab-settings" class="tab-section">
     <div class="card">
       <div class="card-title"><span>🌌 動態天象與背景主題切換</span></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-sm" onclick="setBiomeTheme('auto')">🔄 隨關卡自動變換</button>
+        <button class="btn btn-sm" onclick="setBiomeTheme('auto')">🔄 隨探索地圖自動變換</button>
         <button class="btn btn-sm" onclick="setBiomeTheme('forest')">🌿 翡翠星森</button>
         <button class="btn btn-sm" onclick="setBiomeTheme('fire')">🌋 熔岩赤壁</button>
         <button class="btn btn-sm" onclick="setBiomeTheme('water')">🌊 深海星淵</button>
@@ -624,7 +738,7 @@
     <div class="card">
       <div class="card-title"><span>💾 本機存檔與備份管理</span></div>
       <p style="font-size:12px;color:var(--muted);">
-        遊戲進度自動儲存於瀏覽器本機空間，更新網頁不會遺失已解鎖角色與資源。您也可以匯出存檔代碼備份。
+        遊戲進度自動儲存於瀏覽器本機空間，也可匯出存檔代碼手動備份。
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-primary btn-sm" onclick="saveGame(true)">💾 立即手動存檔</button>
@@ -639,7 +753,7 @@
 <div class="modal-backdrop" id="hero-modal" onclick="closeModal('hero-modal', event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <strong id="modal-hero-title" style="font-size:17px;">角色詳情</strong>
+      <strong id="modal-hero-title" style="font-size:17px;">幻獸詳情</strong>
       <button class="btn btn-sm" onclick="document.getElementById('hero-modal').classList.remove('open')">✕ 關閉</button>
     </div>
     <div id="modal-hero-body"></div>
@@ -659,33 +773,34 @@
 
 <script>
 /* ============================================================================
-   1. PROCEDURAL UNIQUE 500 HEROES & 2,000 SKILLS ENGINE (ZERO DUPLICATE LOOKS)
+   1. 500 UNIQUE CUTE PIXEL CREATURES & 2,000 SKILLS GENERATOR
    ============================================================================ */
 const ELEMENTS = {
-  FOREST: { id: 'FOREST', name: '森之靈', icon: '🌿', color: '#22c55e', bg: 'linear-gradient(135deg, #064e3b, #15803d)' },
-  FIRE:   { id: 'FIRE',   name: '炎之魂', icon: '🔥', color: '#ef4444', bg: 'linear-gradient(135deg, #7f1d1d, #dc2626)' },
-  WATER:  { id: 'WATER',  name: '水之潮', icon: '💧', color: '#06b6d4', bg: 'linear-gradient(135deg, #164e63, #0284c7)' },
-  LIGHT:  { id: 'LIGHT',  name: '光之聖', icon: '☀️', color: '#facc15', bg: 'linear-gradient(135deg, #713f12, #ca8a04)' },
-  DARK:   { id: 'DARK',   name: '暗之影', icon: '🌙', color: '#a855f7', bg: 'linear-gradient(135deg, #3b0764, #7e22ce)' },
-  GENESIS:{ id: 'GENESIS',name: '創世星', icon: '🌌', color: '#f472b6', bg: 'linear-gradient(135deg, #500724, #be185d, #4338ca)' }
+  FOREST: { id: 'FOREST', name: '森之靈', icon: '🌿', color: '#22c55e' },
+  FIRE:   { id: 'FIRE',   name: '炎之魂', icon: '🔥', color: '#ef4444' },
+  WATER:  { id: 'WATER',  name: '水之潮', icon: '💧', color: '#06b6d4' },
+  LIGHT:  { id: 'LIGHT',  name: '光之聖', icon: '☀️', color: '#facc15' },
+  DARK:   { id: 'DARK',   name: '暗之影', icon: '🌙', color: '#a855f7' },
+  GENESIS:{ id: 'GENESIS',name: '創世星', icon: '🌌', color: '#f472b6' }
 };
 const ELEM_KEYS = Object.keys(ELEMENTS);
 
-const PREFIXES = [
-  '星輝','蒼穹','緋紅','霜華','雷鳴','聖詠','幽影','翡翠','永恆','晨曦',
-  '暮光','虛空','龍裔','幻夢','天啟','琉璃','赤焰','碧落','銀月','金陽',
-  '風語','岩核','潮汐','雷光','星塵','神諭','暗夜','白羽','紫電','青嵐',
-  '熾天使','深淵','靈樹','極光','隕星','時空','烈陽','寒冰','疾風','聖盾',
-  '星核','幻影','雷帝','海皇','森羅','炎帝','光輝','冥王','創世','星芽'
-];
-const ROLES = [
-  '劍聖','大魔導','神射手','聖騎士','影舞者','召喚師','龍騎士','星術師','守護者','狂戰士'
+const CREATURE_ADJS = [
+  '星芽','軟綿','絨絨','閃光','泡泡','小火','露珠','月光','彩虹','糖霜',
+  '翡翠','赤焰','冰晶','雷電','雲朵','琉璃','幻夢','蜜糖','星塵','翠葉',
+  '珊瑚','琥珀','銀翼','金冠','暗影','極光','奶昔','櫻花','青嵐','紫電',
+  '朝露','暮光','烈陽','寒霜','微風','晶核','星海','龍鱗','靈羽','天啟',
+  '萌芽','跳跳','圓滾','星光','聖詠','深淵','奇蹟','永恆','幻彩','創世'
 ];
 
-const SKILL_VERBS = ['裂空','星爆','裁決','庇護','疾風','詠唱','審判','瞬影','共鳴','覺醒','奔流','焚天','聖癒','破曉','終焉'];
-const SKILL_NOUNS = ['星辰斬','靈能波','結界陣','流星雨','龍息炮','聖光盾','影分身','元素核','時空鎖','創世曲'];
+const CREATURE_SPECIES_NAMES = [
+  '史萊姆','毛球獸','小萌龍','翼貓精','水母靈','星芽精','小狐仙','方塊機',
+  '獨角獸','小企鵝','蘑菇怪','雲朵羊','小海豹','火焰鳥','晶石龜','幽靈喵'
+];
 
-// Deterministic PRNG per hero ID so each of 500 heroes is 100% unique & consistent
+const SKILL_VERBS = ['萌力','星爆','連環','治癒','疾風','元素','審判','瞬閃','共鳴','覺醒','奔流','焚天','聖光','幻影','終極'];
+const SKILL_NOUNS = ['泡泡彈','星辰衝擊','守護膜','流星雨','龍息吐息','治癒波','影分身','結晶刺','能量球','創世之光'];
+
 function mulberry32(a) {
   return function() {
     var t = a += 0x6D2B79F5;
@@ -695,70 +810,234 @@ function mulberry32(a) {
   };
 }
 
-// Generate 500 heroes with guaranteed unique visual trait tuples
-const HEROES = [];
-const usedVisualSignatures = new Set();
+// 16x16 Pixel Art Body Silhouettes (8 distinct cute creature silhouettes)
+// Legend: '.' = transparent, 'O' = outline, 'B' = primary body, 'S' = secondary belly/pattern, 'E' = eye, 'C' = cheek/accent
+const PIXEL_SILHOUETTES = [
+  // 0: Cute Slime / Sprout Blob
+  [
+    ".......OO.......",
+    "......OSSO......",
+    ".......OO.......",
+    ".....OOOOOO.....",
+    "...OOBBBBBBOO...",
+    "..OBBBBBBBBBBO..",
+    ".OBBBBBBBBBBBBO.",
+    ".OBBBEBBBBBEBBBO",
+    ".OBBBEBBBBBEBBBO",
+    "OBBCBBBBBBBBBCBO",
+    "OBBBBSSSSSSBBBBO",
+    "OBBBSSSSSSSSBBBO",
+    ".OBBSSSSSSSSBBO.",
+    "..OOOOOOOOOOOO..",
+    "................",
+    "................"
+  ],
+  // 1: Fluffy Bunny / Fox Creature
+  [
+    "...OO......OO...",
+    "..OBBO....OBBO..",
+    "..OBSO....OSBO..",
+    "..OBBOOOOOOBBO..",
+    "..OBBBBBBBBBBO..",
+    ".OBBBBBBBBBBBBO.",
+    ".OBBBEBBBBBEBBBO",
+    ".OBBCBBBBBBBCBO.",
+    "..OBBBBSSBBBBO..",
+    "...OBBSSSSBBO...",
+    "..OBBBSSSSBBBO..",
+    "..OBBBBBBBBBBO..",
+    "...OOBBBBBBOO...",
+    "....OO....OO....",
+    "................",
+    "................"
+  ],
+  // 2: Baby Dragon / Dino
+  [
+    ".....OOOOOO.....",
+    "....OBBBBBBO....",
+    "...OBBBSSBBBO...",
+    "...OBBEBBBBEBO..",
+    "...OBBBBBBBBBO..",
+    "....OOBBBBBBO...",
+    "..OO.OBBSSSBO...",
+    ".OSSOOBBSSSBOO..",
+    ".OSSOOBBBBBBSBO.",
+    "..OO.OBBBBBBSBO.",
+    ".....OBBBBBBBO..",
+    "....OOBBO.OOBBO.",
+    "....OOOO..OOOO..",
+    "................",
+    "................",
+    "................"
+  ],
+  // 3: Winged Cat / Owl Spirit
+  [
+    "..OO........OO..",
+    ".OBBOOOOOOOBBO..",
+    ".OBBBBBBBBBBBO..",
+    "OOBBBEBBBBBEBBBO",
+    "OSSBBCBBBBBCBBBO",
+    "OSSBBBBSSBBBBBSO",
+    ".OOBBBSSSSBBBOO.",
+    "..OBBBSSSSBBBO..",
+    "..OBBBBBBBBBBO..",
+    "...OBBBBBBBBO...",
+    "....OOBOOOBO....",
+    ".....OO..OO.....",
+    "................",
+    "................",
+    "................",
+    "................"
+  ],
+  // 4: Floating Jellyfish / Star Spirit
+  [
+    "....OOOOOOOO....",
+    "..OOBBBBBBBBOO..",
+    ".OBBSSSSSSSSBBO.",
+    ".OBBBBBBBBBBBBO.",
+    "OBBBBEBBBBBEBBBO",
+    "OBBBCBBBBBBBCBO.",
+    "OBBBBBBBBBBBBBBO",
+    ".OOOOOOOOOOOOOO.",
+    "..OBO.OSBO.OBO..",
+    "..OBO.OSBO.OBO..",
+    ".OBO...OBO..OBO.",
+    ".OO....OO....OO.",
+    "................",
+    "................",
+    "................",
+    "................"
+  ],
+  // 5: Cute Cube Bot / Golem
+  [
+    "......OOOO......",
+    ".....OSSSSO.....",
+    "......OOOO......",
+    "..OOOOOOOOOOOO..",
+    ".OBBBBBBBBBBBBO.",
+    ".OBOOOOOOOOOOBO.",
+    ".OBOEEOOOOEEOBO.",
+    ".OBOOOOOOOOOOBO.",
+    ".OBBBBBSSBBBBBO.",
+    "OOBBBBSSSSBBBBOO",
+    "OSSBBBBBBBBBBSSO",
+    ".OOBBBBBBBBBBOO.",
+    "..OOOOOOOOOOOO..",
+    "...OOO....OOO...",
+    "................",
+    "................"
+  ],
+  // 6: Chubby Penguin / Bird
+  [
+    ".....OOOOOO.....",
+    "....OBBBBBBO....",
+    "...OBBBBBBBBO...",
+    "...OBBEBBBBEBO..",
+    "...OBBBCCBBBO...",
+    "..OBBBSSSSBBBO..",
+    ".OOBBSSSSSSBBBO.",
+    ".OBBBSSSSSSBBBO.",
+    ".OBBBSSSSSSBBBO.",
+    "..OBBBSSSSBBBO..",
+    "...OOBBBBBBOO...",
+    "...OCCO..OCCO...",
+    "...OOO....OOO...",
+    "................",
+    "................",
+    "................"
+  ],
+  // 7: Crystal Turtle / Mushroom
+  [
+    "....OOOOOOOO....",
+    "..OOBBSSSSBBOO..",
+    ".OBBSSSSSSSSBBO.",
+    "OBBSSBBBBBBSBBBO",
+    "OBBBBBBBBBBBBBBO",
+    ".OOOOOOOOOOOOOO.",
+    "...OBBBBBBBBO...",
+    "..OBBBEBBBEBBBO.",
+    "..OBBCBBBBBCBO..",
+    "...OBBBBBBBBO...",
+    "..OOBBO..OOBBO..",
+    "..OOOO....OOOO..",
+    "................",
+    "................",
+    "................",
+    "................"
+  ]
+];
 
-(function build500Heroes() {
+// Top Accessories (8 distinct pixel hats/horns/halos/crowns)
+const PIXEL_TOPS = [
+  [], // 0: none
+  [[0,6,'#fbbf24'],[0,9,'#fbbf24'],[1,6,'#fbbf24'],[1,7,'#fbbf24'],[1,8,'#fbbf24'],[1,9,'#fbbf24']], // Crown
+  [[0,5,'#fde047'],[0,6,'#fde047'],[0,7,'#fde047'],[0,8,'#fde047'],[0,9,'#fde047'],[0,10,'#fde047']], // Halo
+  [[1,4,'#f43f5e'],[1,5,'#f43f5e'],[2,4,'#f43f5e'],[2,5,'#f43f5e']], // Ribbon
+  [[0,7,'#22c55e'],[0,8,'#22c55e'],[1,6,'#4ade80'],[1,7,'#22c55e']], // Leaf sprout
+  [[1,4,'#e2e8f0'],[2,4,'#cbd5e1'],[1,11,'#e2e8f0'],[2,11,'#cbd5e1']], // Little horns
+  [[0,7,'#38bdf8'],[1,6,'#38bdf8'],[1,7,'#bae6fd'],[1,8,'#38bdf8']], // Crystal horn
+  [[1,5,'#f97316'],[0,6,'#ef4444'],[0,8,'#facc15'],[1,9,'#f97316']]  // Flame crest
+];
+
+const HEROES = [];
+const usedPixelSignatures = new Set();
+
+(function build500PixelCreatures() {
   for (let id = 1; id <= 500; id++) {
-    const rng = mulberry32(id * 9973 + 1337);
+    const rng = mulberry32(id * 8191 + 4242);
     const elemKey = ELEM_KEYS[(id - 1) % 6];
     const elem = ELEMENTS[elemKey];
 
-    // Rarity distribution: 30 Mythic, 95 Epic, 175 Rare, 200 Common
     let rarity = 'COMMON';
     if (id <= 30 || id % 17 === 0) rarity = 'MYTHIC';
     else if (id <= 125 || id % 5 === 0) rarity = 'EPIC';
     else if (id <= 300 || id % 2 === 0) rarity = 'RARE';
 
-    const pIdx = (id * 7 + Math.floor(rng() * 13)) % PREFIXES.length;
-    const rIdx = (id * 3 + Math.floor(rng() * 7)) % ROLES.length;
-    const suffixNum = Math.ceil(id / 50);
+    const aIdx = (id * 7 + Math.floor(rng() * 11)) % CREATURE_ADJS.length;
+    const sIdx = (id * 3 + Math.floor(rng() * 5)) % CREATURE_SPECIES_NAMES.length;
     const titleTag = rarity === 'MYTHIC' ? '【神話】' : (rarity === 'EPIC' ? '【史詩】' : '');
-    const name = `${PREFIXES[pIdx]}${ROLES[rIdx]}·${String(id).padStart(3, '0')}`;
+    const name = `${CREATURE_ADJS[aIdx]}${CREATURE_SPECIES_NAMES[sIdx]}·${String(id).padStart(3, '0')}`;
 
-    // Guarantee 100% unique visual combination across all 500 heroes
     let sig = '';
     let traits = {};
     let salt = 0;
     do {
-      const r2 = mulberry32(id * 7919 + salt * 101);
+      const r2 = mulberry32(id * 6571 + salt * 97);
       traits = {
-        species: Math.floor(r2() * 8),      // 0:Human, 1:Elf, 2:Dragonkin, 3:Beastkin, 4:Mecha, 5:Celestial, 6:Spirit, 7:Demonkin
-        hairStyle: Math.floor(r2() * 10),   // 10 distinct hairstyles
-        headgear: Math.floor(r2() * 9),     // 9 headgears (crown, halo, horns, hood, visor, tiara, ribbon, helm, none)
-        eyeStyle: Math.floor(r2() * 6),     // 6 eye shapes
-        armorStyle: Math.floor(r2() * 8),   // 8 outfit/armor designs
-        weaponType: Math.floor(r2() * 9),   // 9 weapons (greatsword, staff, bow, daggers, shield, wings, orb, spear, scythe)
-        auraType: Math.floor(r2() * 6),     // 6 back auras
-        huePrimary: (id * 47 + salt * 19) % 360,
-        hueSecondary: (id * 83 + salt * 31 + 120) % 360,
-        skinTone: ['#fde6d8', '#f8d3bd', '#e5b89b', '#c68e6b', '#8d5b3c', '#dbeafe', '#e9d5ff', '#dcfce7'][Math.floor(r2() * 8)]
+        silIdx: Math.floor(r2() * PIXEL_SILHOUETTES.length),
+        topIdx: Math.floor(r2() * PIXEL_TOPS.length),
+        hueBody: (id * 53 + salt * 23) % 360,
+        hueBelly: (id * 97 + salt * 37 + 60) % 360,
+        hueEye: (id * 131 + salt * 17 + 180) % 360,
+        patternMod: Math.floor(r2() * 6), // extra pixel spots/stripes
+        bgRing: Math.floor(r2() * 4)
       };
-      sig = `${traits.species}-${traits.hairStyle}-${traits.headgear}-${traits.eyeStyle}-${traits.armorStyle}-${traits.weaponType}-${traits.huePrimary}`;
+      sig = `${traits.silIdx}-${traits.topIdx}-${traits.hueBody}-${traits.hueBelly}-${traits.patternMod}`;
       salt++;
-    } while (usedVisualSignatures.has(sig));
-    usedVisualSignatures.add(sig);
+    } while (usedPixelSignatures.has(sig));
+    usedPixelSignatures.add(sig);
 
-    const mult = rarity === 'MYTHIC' ? 2.4 : rarity === 'EPIC' ? 1.75 : rarity === 'RARE' ? 1.3 : 1.0;
-    const baseAtk = Math.round((120 + (id % 45) * 4) * mult);
-    const baseHp  = Math.round((850 + (id % 60) * 18) * mult);
-    const baseDef = Math.round((65 + (id % 30) * 3) * mult);
+    const mult = rarity === 'MYTHIC' ? 2.35 : rarity === 'EPIC' ? 1.72 : rarity === 'RARE' ? 1.28 : 1.0;
+    const baseAtk = Math.round((95 + (id % 40) * 4) * mult);
+    const baseHp  = Math.round((680 + (id % 55) * 16) * mult);
+    const baseMp  = 100;
 
-    // 4 Unique Skills per Hero = 2,000 total skills
+    // 4 Unique Skills per Creature = 2,000 total skills
     const skills = [];
     for (let s = 0; s < 4; s++) {
       const sv = SKILL_VERBS[(id * 3 + s * 5) % SKILL_VERBS.length];
       const sn = SKILL_NOUNS[(id * 7 + s * 3) % SKILL_NOUNS.length];
-      const skType = ['主動技', '被動光環', '連攜追擊', 'EX 終極奧義'][s];
-      const powerPct = (130 + s * 45 + (id % 25)) * (rarity === 'MYTHIC' ? 1.25 : 1);
+      const mpCost = [20, 35, 50, 80][s];
+      const powerPct = Math.round((135 + s * 48 + (id % 22)) * (rarity === 'MYTHIC' ? 1.25 : 1));
+      const isHeal = (s === 1 && id % 3 === 0);
       skills.push({
         name: `${elem.name}·${sv}${sn}`,
-        type: skType,
-        power: Math.round(powerPct),
-        desc: s === 1
-          ? `永久提升全隊 ${10 + (id % 15)}% ${elem.name}屬性傷害與暴擊率。`
-          : `對敵方造成 ${Math.round(powerPct)}% ${elem.name}屬性傷害並附加能量共鳴。`
+        mpCost,
+        power: powerPct,
+        isHeal,
+        desc: isHeal
+          ? `消耗 ${mpCost} MP，回復自身 ${powerPct}% 攻擊力的生命值並淨化負面狀態。`
+          : `消耗 ${mpCost} MP，對敵方造成 ${powerPct}% ${elem.name}屬性像素衝擊傷害！`
       });
     }
 
@@ -770,7 +1049,7 @@ const usedVisualSignatures = new Set();
       rarity,
       baseAtk,
       baseHp,
-      baseDef,
+      baseMp,
       traits,
       skills
     });
@@ -778,131 +1057,128 @@ const usedVisualSignatures = new Set();
 })();
 
 /* ============================================================================
-   2. UNIQUE SVG PROCEDURAL CHARACTER RENDERER (500 DISTINCT SPRITES)
+   2. CRISP 16x16 PIXEL ART SVG RENDERER (500 DISTINCT CUTE CREATURES)
    ============================================================================ */
 function renderHeroSVG(hero, size = 84) {
   const t = hero.traits;
-  const c1 = `hsl(${t.huePrimary}, 78%, 56%)`;
-  const c2 = `hsl(${t.hueSecondary}, 82%, 62%)`;
-  const cDark = `hsl(${t.huePrimary}, 65%, 24%)`;
-  const eyeColor = `hsl(${(t.hueSecondary + 40) % 360}, 90%, 60%)`;
+  const sil = PIXEL_SILHOUETTES[t.silIdx];
+  const topAcc = PIXEL_TOPS[t.topIdx];
 
-  // Back Aura
-  let auraSvg = '';
-  if (t.auraType === 1) {
-    auraSvg = `<circle cx="50" cy="52" r="40" fill="none" stroke="${c2}" stroke-width="2" stroke-dasharray="6 4" opacity="0.8"/>`;
-  } else if (t.auraType === 2) {
-    auraSvg = `<polygon points="50,6 62,36 94,36 68,56 78,88 50,68 22,88 32,56 6,36 38,36" fill="${c1}" opacity="0.22"/>`;
-  } else if (t.auraType === 3) {
-    auraSvg = `<path d="M18,65 Q10,30 35,40 Q25,55 32,68 Z M82,65 Q90,30 65,40 Q75,55 68,68 Z" fill="${c2}" opacity="0.85"/>`;
-  } else if (t.auraType === 4) {
-    auraSvg = `<circle cx="50" cy="50" r="36" fill="${c1}" opacity="0.2"/><circle cx="50" cy="50" r="28" fill="none" stroke="#fff" stroke-width="1" opacity="0.5"/>`;
-  } else if (t.auraType === 5) {
-    auraSvg = `<path d="M22,72 L12,24 L36,48 Z M78,72 L88,24 L64,48 Z" fill="${c1}" opacity="0.75"/>`;
+  const cBody = `hsl(${t.hueBody}, 78%, 58%)`;
+  const cShadow = `hsl(${t.hueBody}, 72%, 40%)`;
+  const cBelly = `hsl(${t.hueBelly}, 85%, 72%)`;
+  const cEye = t.hueEye % 2 === 0 ? '#111827' : `hsl(${t.hueEye}, 90%, 45%)`;
+  const cCheek = '#fb7185';
+  const cOutline = '#0f172a';
+
+  let rects = '';
+  for (let r = 0; r < 16; r++) {
+    const rowStr = sil[r];
+    for (let c = 0; c < 16; c++) {
+      const ch = rowStr[c];
+      if (ch === '.') continue;
+      let fill = cBody;
+      if (ch === 'O') fill = cOutline;
+      else if (ch === 'S') fill = cBelly;
+      else if (ch === 'E') fill = cEye;
+      else if (ch === 'C') fill = cCheek;
+      else if (ch === 'B') {
+        // Add unique pixel spots/stripes per creature
+        if (t.patternMod === 1 && (r + c) % 4 === 0 && r > 4 && r < 12) fill = cShadow;
+        else if (t.patternMod === 2 && r === 6 && (c === 7 || c === 8)) fill = cBelly;
+        else if (t.patternMod === 3 && (c === 4 || c === 11) && r > 5 && r < 10) fill = cBelly;
+        else fill = cBody;
+      }
+      rects += `<rect x="${c}" y="${r}" width="1" height="1" fill="${fill}"/>`;
+      // Cute white eye sparkle
+      if (ch === 'E' && r > 0) {
+        rects += `<rect x="${c}" y="${r}" width="0.45" height="0.45" fill="#ffffff"/>`;
+      }
+    }
   }
 
-  // Species Ears / Horns
-  let speciesSvg = '';
-  if (t.species === 1) { // Elf ears
-    speciesSvg = `<polygon points="27,44 15,38 28,50" fill="${t.skinTone}"/><polygon points="73,44 85,38 72,50" fill="${t.skinTone}"/>`;
-  } else if (t.species === 2) { // Dragon horns
-    speciesSvg = `<path d="M32,32 Q20,14 28,10 Q36,18 38,30 Z" fill="${c2}"/><path d="M68,32 Q80,14 72,10 Q64,18 62,30 Z" fill="${c2}"/>`;
-  } else if (t.species === 3) { // Beast ears
-    speciesSvg = `<polygon points="30,32 26,12 42,26" fill="${c1}"/><polygon points="70,32 74,12 58,26" fill="${c1}"/>`;
-  } else if (t.species === 4) { // Mecha antennas
-    speciesSvg = `<rect x="24" y="24" width="4" height="20" rx="2" fill="#94a3b8"/><rect x="72" y="24" width="4" height="20" rx="2" fill="#94a3b8"/><circle cx="26" cy="22" r="3" fill="${c2}"/><circle cx="74" cy="22" r="3" fill="${c2}"/>`;
-  }
+  // Render Top Accessory pixels
+  topAcc.forEach(([r, c, color]) => {
+    rects += `<rect x="${c}" y="${r}" width="1" height="1" fill="${color}"/>`;
+  });
 
-  // Armor / Body
-  const armorVariants = [
-    `<path d="M26,92 L32,62 L68,62 L74,92 Z" fill="${c1}" stroke="#fff" stroke-width="1.2"/>`,
-    `<path d="M22,92 L30,60 L50,68 L70,60 L78,92 Z" fill="${cDark}" stroke="${c2}" stroke-width="1.8"/>`,
-    `<rect x="30" y="62" width="40" height="30" rx="10" fill="${c1}"/><path d="M36,62 L50,78 L64,62" fill="${c2}"/>`,
-    `<path d="M24,92 Q50,54 76,92 Z" fill="${c1}"/><circle cx="50" cy="74" r="5" fill="#fbbf24"/>`,
-    `<path d="M28,92 L34,62 L66,62 L72,92 Z" fill="#1e293b" stroke="${c1}" stroke-width="2"/><path d="M40,62 L50,84 L60,62" fill="${c1}"/>`,
-    `<path d="M25,92 L33,61 L67,61 L75,92 Z" fill="${c2}"/><rect x="38" y="66" width="24" height="16" rx="4" fill="${cDark}"/>`,
-    `<path d="M26,92 L30,63 L70,63 L74,92 Z" fill="${c1}"/><path d="M30,63 L70,92 M70,63 L30,92" stroke="#fff" stroke-width="1.5" opacity="0.6"/>`,
-    `<path d="M22,92 L34,60 L66,60 L78,92 Z" fill="${cDark}"/><polygon points="50,63 58,75 50,87 42,75" fill="${c2}"/>`
-  ];
-  const bodySvg = armorVariants[t.armorStyle % armorVariants.length];
-
-  // Hair Back & Front
-  const hairBack = t.hairStyle % 2 === 0
-    ? `<path d="M25,44 Q20,76 30,82 L70,82 Q80,76 75,44 Z" fill="${cDark}"/>`
-    : `<circle cx="50" cy="44" r="25" fill="${cDark}"/>`;
-
-  const hairFrontVariants = [
-    `<path d="M27,42 Q32,20 50,20 Q68,20 73,42 Q60,30 50,36 Q40,30 27,42 Z" fill="${c1}"/>`,
-    `<path d="M26,44 L34,18 L44,34 L50,16 L56,34 L66,18 L74,44 Q50,32 26,44 Z" fill="${c1}"/>`,
-    `<path d="M27,45 Q28,19 50,19 Q72,19 73,45 Q64,36 50,32 Q36,36 27,45 Z" fill="${c2}"/>`,
-    `<path d="M26,42 Q50,14 74,42 L66,34 L50,39 L34,34 Z" fill="${c1}"/>`,
-    `<circle cx="30" cy="28" r="8" fill="${c1}"/><circle cx="70" cy="28" r="8" fill="${c1}"/><path d="M28,42 Q50,18 72,42 Z" fill="${c1}"/>`
-  ];
-  const hairFront = hairFrontVariants[t.hairStyle % hairFrontVariants.length];
-
-  // Eyes
-  const eyeVariants = [
-    `<circle cx="41" cy="46" r="3.2" fill="${eyeColor}"/><circle cx="59" cy="46" r="3.2" fill="${eyeColor}"/><circle cx="42" cy="45" r="1" fill="#fff"/><circle cx="60" cy="45" r="1" fill="#fff"/>`,
-    `<ellipse cx="41" cy="46" rx="4" ry="2.4" fill="${eyeColor}"/><ellipse cx="59" cy="46" rx="4" ry="2.4" fill="${eyeColor}"/>`,
-    `<path d="M36,45 L45,47 L37,48 Z" fill="${eyeColor}"/><path d="M64,45 L55,47 L63,48 Z" fill="${eyeColor}"/>`,
-    `<rect x="36" y="44" width="10" height="4" rx="2" fill="${eyeColor}"/><rect x="54" y="44" width="10" height="4" rx="2" fill="${eyeColor}"/>`,
-    `<circle cx="41" cy="46" r="3.5" fill="#111827"/><circle cx="59" cy="46" r="3.5" fill="#111827"/><circle cx="41" cy="46" r="1.8" fill="${eyeColor}"/><circle cx="59" cy="46" r="1.8" fill="${eyeColor}"/>`,
-    `<path d="M37,47 Q41,42 45,47" fill="none" stroke="${eyeColor}" stroke-width="2.4"/><path d="M55,47 Q59,42 63,47" fill="none" stroke="${eyeColor}" stroke-width="2.4"/>`
-  ];
-  const eyesSvg = eyeVariants[t.eyeStyle % eyeVariants.length];
-
-  // Headgear
-  const headgearVariants = [
-    '', // 0: none
-    `<polygon points="35,22 40,10 50,18 60,10 65,22" fill="#fbbf24" stroke="#fff" stroke-width="0.8"/>`, // 1: crown
-    `<ellipse cx="50" cy="13" rx="16" ry="4" fill="none" stroke="#fde047" stroke-width="2.2"/>`, // 2: halo
-    `<path d="M24,42 Q50,8 76,42 Q50,24 24,42 Z" fill="${cDark}" stroke="${c2}" stroke-width="1.5"/>`, // 3: hood
-    `<rect x="33" y="42" width="34" height="7" rx="3" fill="${c2}" opacity="0.75"/>`, // 4: cyber visor
-    `<path d="M34,24 L50,12 L66,24 L50,20 Z" fill="${c2}"/>`, // 5: tiara
-    `<polygon points="32,24 22,16 36,18" fill="#f43f5e"/><polygon points="68,24 78,16 64,18" fill="#f43f5e"/>`, // 6: ribbons
-    `<path d="M28,36 Q50,12 72,36" fill="none" stroke="#e2e8f0" stroke-width="4"/>`, // 7: circlet
-    `<circle cx="50" cy="18" r="5" fill="${c2}" stroke="#fff" stroke-width="1.2"/>` // 8: star gem
-  ];
-  const headSvg = headgearVariants[t.headgear % headgearVariants.length];
-
-  // Weapons
-  const weaponVariants = [
-    `<rect x="81" y="22" width="5" height="62" rx="2" fill="#e2e8f0" stroke="${c1}" stroke-width="1.2"/><rect x="76" y="66" width="15" height="4" fill="#fbbf24"/>`, // Greatsword
-    `<line x1="83" y1="18" x2="83" y2="88" stroke="#d97706" stroke-width="3.5"/><circle cx="83" cy="18" r="7" fill="${c2}" stroke="#fff" stroke-width="1.5"/>`, // Staff
-    `<path d="M80,22 Q94,52 80,82" fill="none" stroke="#fbbf24" stroke-width="3"/><line x1="80" y1="22" x2="80" y2="82" stroke="#fff" stroke-width="1"/>`, // Bow
-    `<polygon points="15,44 21,68 12,68" fill="#cbd5e1"/><polygon points="85,44 88,68 79,68" fill="#cbd5e1"/>`, // Twin daggers
-    `<path d="M10,54 Q20,48 28,54 L26,76 Q19,84 12,76 Z" fill="${c1}" stroke="#fbbf24" stroke-width="2"/>`, // Shield
-    `<circle cx="16" cy="34" r="6" fill="${c2}"/><circle cx="84" cy="34" r="6" fill="${c2}"/>`, // Floating orbs
-    `<line x1="84" y1="12" x2="84" y2="88" stroke="#94a3b8" stroke-width="3"/><polygon points="84,8 79,22 89,22" fill="${c1}"/>`, // Spear
-    `<path d="M82,16 L82,88 M64,20 Q82,10 92,26" fill="none" stroke="${c2}" stroke-width="3.2"/>`, // Scythe
-    `<rect x="77" y="48" width="14" height="22" rx="3" fill="${cDark}" stroke="#fbbf24" stroke-width="1.5"/>` // Grimoire
-  ];
-  const weaponSvg = weaponVariants[t.weaponType % weaponVariants.length];
+  const ringStroke = hero.rarity === 'MYTHIC' ? '#f43f5e' : hero.rarity === 'EPIC' ? '#a855f7' : hero.rarity === 'RARE' ? '#38bdf8' : '#475569';
 
   return `
-  <svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <radialGradient id="bg-${hero.id}" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="${c1}" stop-opacity="0.35"/>
-        <stop offset="100%" stop-color="#0b0f1a" stop-opacity="0.05"/>
-      </radialGradient>
-    </defs>
-    <circle cx="50" cy="50" r="46" fill="url(#bg-${hero.id})" stroke="${c1}" stroke-width="1.5" stroke-opacity="0.55"/>
-    ${auraSvg}
-    ${hairBack}
-    ${speciesSvg}
-    ${bodySvg}
-    <circle cx="50" cy="44" r="19" fill="${t.skinTone}"/>
-    ${eyesSvg}
-    <path d="M46,54 Q50,57 54,54" fill="none" stroke="#7c2d12" stroke-width="1.6" stroke-linecap="round"/>
-    ${hairFront}
-    ${headSvg}
-    ${weaponSvg}
+  <svg class="pixel-art" width="${size}" height="${size}" viewBox="-1 -1 18 18" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+    <rect x="-0.5" y="-0.5" width="17" height="17" rx="3" fill="rgba(15,23,42,0.55)" stroke="${ringStroke}" stroke-width="0.5"/>
+    ${rects}
   </svg>`;
 }
 
 /* ============================================================================
-   3. SIX GACHA POOLS WITH FEATURED MYTHIC / EPIC COVER HEROES
+   3. WORLD MAPS (VERSION 1 EXPLORATION & MANUAL ENCOUNTERS)
+   ============================================================================ */
+const WORLD_MAPS = [
+  {
+    id: 'MAP_FOREST',
+    name: '🌿 翡翠星芽森林',
+    elem: 'FOREST',
+    recLv: 'Lv.1 ~ 10',
+    desc: '充滿星露與草系像素精靈的初始森林，適合新手訓練師探索與收服第一批夥伴。',
+    bg: 'linear-gradient(135deg, #064e3b, #15803d)',
+    border: '#22c55e',
+    difficulty: 1.0
+  },
+  {
+    id: 'MAP_FIRE',
+    name: '🌋 赤焰龍息火山',
+    elem: 'FIRE',
+    recLv: 'Lv.8 ~ 20',
+    desc: '地底岩漿湧動的熾熱峽谷，棲息著高攻擊力的火系小萌龍與炎靈獸。',
+    bg: 'linear-gradient(135deg, #7f1d1d, #dc2626)',
+    border: '#ef4444',
+    difficulty: 1.6
+  },
+  {
+    id: 'MAP_WATER',
+    name: '💧 深海珊瑚星淵',
+    elem: 'WATER',
+    recLv: 'Lv.15 ~ 30',
+    desc: '閃耀藍光的海底遺跡，水母靈與冰晶幻獸在此守護著古老星鑽寶箱。',
+    bg: 'linear-gradient(135deg, #164e63, #0284c7)',
+    border: '#06b6d4',
+    difficulty: 2.3
+  },
+  {
+    id: 'MAP_LIGHT',
+    name: '☀️ 聖光雲端神殿',
+    elem: 'LIGHT',
+    recLv: 'Lv.25 ~ 45',
+    desc: '漂浮於雲海之上的黃金聖殿，光屬性獨角獸與翼貓精會考驗訓練師的戰術。',
+    bg: 'linear-gradient(135deg, #713f12, #ca8a04)',
+    border: '#facc15',
+    difficulty: 3.2
+  },
+  {
+    id: 'MAP_DARK',
+    name: '🌙 永夜幻影沼澤',
+    elem: 'DARK',
+    recLv: 'Lv.35 ~ 60',
+    desc: '終年籠罩在紫月下的神秘領域，幽靈喵與暗影精靈擅長高爆發奇襲。',
+    bg: 'linear-gradient(135deg, #3b0764, #7e22ce)',
+    border: '#a855f7',
+    difficulty: 4.4
+  },
+  {
+    id: 'MAP_GENESIS',
+    name: '🌌 創世星核聖域',
+    elem: 'GENESIS',
+    recLv: 'Lv.50 以上',
+    desc: '星芽大陸的最高殿堂，傳說中的神話級像素幻獸在此等待最強訓練師挑戰！',
+    bg: 'linear-gradient(135deg, #831843, #4338ca)',
+    border: '#f472b6',
+    difficulty: 6.0
+  }
+];
+
+/* ============================================================================
+   4. SIX GACHA POOLS WITH MYTHIC PIXEL COVER ART
    ============================================================================ */
 const GACHA_POOLS = [
   {
@@ -962,148 +1238,155 @@ const GACHA_POOLS = [
 ];
 
 /* ============================================================================
-   4. TWENTY ITEMS WORKSHOP DEFINITIONS
+   5. TWENTY ITEMS WORKSHOP
    ============================================================================ */
 const ITEMS_DB = [
-  { id: 'item_01', icon: '🧪', name: '星芽生命靈藥', costGold: 300, desc: '立即回復我方全隊 100% 生命值並獲得 200 經驗值。' },
-  { id: 'item_02', icon: '🎫', name: '星界許願招募券', costGold: 800, desc: '使用後獲得 1 張許願招募券，可用於六大許願池。' },
-  { id: 'item_03', icon: '⚔️', name: '破曉龍紋磨刀石', costGold: 600, desc: '永久提升全隊攻擊力等級 +1。' },
-  { id: 'item_04', icon: '🛡️', name: '世界樹守護徽章', costGold: 600, desc: '永久提升全隊防禦與生命等級 +1。' },
-  { id: 'item_05', icon: '💎', name: '高純度星鑽原石', costGold: 1200, desc: '立即提煉出 320 顆星鑽（可進行 2 次許願）。' },
-  { id: 'item_06', icon: '🔥', name: '炎帝狂暴秘藥', costGold: 500, desc: '立即發動一次 300% 威力的全屏火焰轟炸！' },
-  { id: 'item_07', icon: '🌿', name: '翡翠豐收號角', costGold: 750, desc: '立即領取相當於 10 分鐘的離線掛機金幣與星鑽。' },
-  { id: 'item_08', icon: '💧', name: '潮汐時光沙漏', costGold: 900, desc: '直接推進 1 個星界關卡並獲得首通獎勵。' },
-  { id: 'item_09', icon: '☀️', name: '聖光覺醒聖典', costGold: 1500, desc: '為目前出戰陣容的所有英雄增加 +2 星級覺醒！' },
-  { id: 'item_10', icon: '🌙', name: '暗影幸運骰子', costGold: 1000, desc: '許願保底計數直接 +10，加速神話英雄降臨！' },
-  { id: 'item_11', icon: '👑', name: '王者榮耀皇冠', costGold: 2000, desc: '永久提升掛機金幣與星鑽產出效率 +15%。' },
-  { id: 'item_12', icon: '🔮', name: '命運召喚水晶球', costGold: 2500, desc: '立即隨機解鎖 1 位尚未擁有的稀有或史詩英雄！' },
-  { id: 'item_13', icon: '⚡', name: '雷神超載核心', costGold: 700, desc: '立即將全隊 EX 奧義能量充能至 100% 並釋放。' },
-  { id: 'item_14', icon: '🐉', name: '古龍逆鱗護符', costGold: 1100, desc: '連勝計數 +3，大幅提升下一場首領戰掉落。' },
-  { id: 'item_15', icon: '🌸', name: '櫻吹雪祝福符', costGold: 450, desc: '隨機獲得 500～2,000 枚金幣的幸運紅包。' },
-  { id: 'item_16', icon: '🧭', name: '星海羅盤', costGold: 850, desc: '解鎖並隨機切換至一個高收益星界天象。' },
-  { id: 'item_17', icon: '🏹', name: '精靈神射手箭袋', costGold: 650, desc: '對當前敵方首領造成 50% 最大生命值的精準狙擊。' },
-  { id: 'item_18', icon: '📜', name: '失落技能殘頁', costGold: 1300, desc: '全隊技能傷害倍率永久 +5%。' },
-  { id: 'item_19', icon: '🌌', name: '創世星核碎片', costGold: 3500, desc: '立即召喚 1 位尚未擁有的【神話】級英雄加入圖鑑！' },
+  { id: 'item_01', icon: '🧪', name: '星芽生命靈藥', costGold: 250, desc: '戰鬥中或平時使用，立即回復出戰幻獸 100% HP 與 MP！' },
+  { id: 'item_02', icon: '🔮', name: '高級星芽捕捉球', costGold: 400, desc: '使用後大幅提升收服野生幻獸成功率並立即嘗試捕捉！' },
+  { id: 'item_03', icon: '🎫', name: '星界許願招募券', costGold: 800, desc: '獲得 1 張許願招募券，可用於六大許願池召喚神話幻獸。' },
+  { id: 'item_04', icon: '⚔️', name: '破曉龍紋磨刀石', costGold: 600, desc: '永久提升所有夥伴攻擊力等級 +1。' },
+  { id: 'item_05', icon: '🛡️', name: '世界樹守護徽章', costGold: 600, desc: '永久提升所有夥伴生命上限等級 +1。' },
+  { id: 'item_06', icon: '💎', name: '高純度星鑽原石', costGold: 1200, desc: '立即提煉出 320 顆星鑽（可進行 2 次許願）。' },
+  { id: 'item_07', icon: '🔥', name: '炎帝爆裂手榴彈', costGold: 450, desc: '對當前野生敵人直接造成 450 點固定火焰傷害！' },
+  { id: 'item_08', icon: '🍰', name: '彩虹經驗蛋糕', costGold: 500, desc: '餵食目前出戰的幻獸，使其等級立即 +2！' },
+  { id: 'item_09', icon: '☀️', name: '聖光覺醒聖典', costGold: 1500, desc: '為出戰陣容的所有幻獸增加 +2 星級覺醒！' },
+  { id: 'item_10', icon: '🌙', name: '暗影幸運骰子', costGold: 1000, desc: '許願神話保底計數直接 +10！' },
+  { id: 'item_11', icon: '👑', name: '王者榮耀皇冠', costGold: 2000, desc: '永久提升戰鬥勝利獲得的金幣獎勵 +20%。' },
+  { id: 'item_12', icon: '🥚', name: '神秘幻獸孵化蛋', costGold: 2200, desc: '立即孵化並解鎖 1 隻尚未擁有的稀有或史詩幻獸！' },
+  { id: 'item_13', icon: '⚡', name: '雷神能量電池', costGold: 350, desc: '立即將當前出戰幻獸的 MP 補滿至 100%！' },
+  { id: 'item_14', icon: '🐉', name: '古龍逆鱗護符', costGold: 1100, desc: '全隊技能傷害倍率永久 +6%。' },
+  { id: 'item_15', icon: '🌸', name: '櫻吹雪祝福紅包', costGold: 450, desc: '隨機開出 500～2,000 枚金幣的幸運紅包。' },
+  { id: 'item_16', icon: '🧭', name: '星海羅盤', costGold: 850, desc: '切換星界天象並發現 150 顆星鑽。' },
+  { id: 'item_17', icon: '🏹', name: '精靈麻痺吹箭', costGold: 550, desc: '削去當前敵人 40% 生命值，方便丟球收服！' },
+  { id: 'item_18', icon: '📜', name: '古老訓練師筆記', costGold: 950, desc: '出戰隊伍全部幻獸經驗與等級 +1。' },
+  { id: 'item_19', icon: '🌌', name: '創世星核碎片', costGold: 3500, desc: '立即召喚 1 隻尚未擁有的【神話】級幻獸加入圖鑑！' },
   { id: 'item_20', icon: '🎁', name: '冒險者豪華補給箱', costGold: 1800, desc: '同時獲得 3 張招募券 + 500 星鑽 + 2,500 金幣。' }
 ];
 
 /* ============================================================================
-   5. GAME STATE & PERSISTENCE (PRESERVING EXISTING PROGRESS)
+   6. GAME STATE & SAVE SYSTEM
    ============================================================================ */
 let state = {
-  gold: 5000,
+  gold: 3000,
   gems: 3200,
   tickets: 20,
-  stage: 1,
-  winStreak: 0,
   pity: 0,
   atkLv: 1,
   defLv: 1,
-  idleBonusPct: 0,
+  goldBonusPct: 0,
   skillBonusPct: 0,
   biomeTheme: 'auto',
+  currentMapId: 'MAP_FOREST',
+  mapWaves: { MAP_FOREST: 1, MAP_FIRE: 1, MAP_WATER: 1, MAP_LIGHT: 1, MAP_DARK: 1, MAP_GENESIS: 1 },
   owned: {
-    1: { level: 1, stars: 1 },
-    2: { level: 1, stars: 1 },
-    3: { level: 1, stars: 1 },
-    4: { level: 1, stars: 1 }
+    1: { level: 3, stars: 1 },
+    2: { level: 2, stars: 1 },
+    3: { level: 2, stars: 1 },
+    4: { level: 2, stars: 1 }
   },
   team: [1, 2, 3, 4],
+  activeSlot: 0,
   inventory: {
-    item_01: 3,
-    item_02: 2,
-    item_05: 1
-  },
-  lastSaveTime: Date.now()
+    item_01: 5,
+    item_02: 3,
+    item_03: 2
+  }
 };
 
 function loadGame() {
   try {
-    const raw = localStorage.getItem('starsprout_save_v4') || localStorage.getItem('starsprout_save');
+    const raw = localStorage.getItem('starsprout_pixel_v5');
     if (raw) {
       const parsed = JSON.parse(raw);
       state = { ...state, ...parsed };
       if (!state.owned || Object.keys(state.owned).length === 0) {
-        state.owned = { 1: { level: 1, stars: 1 }, 2: { level: 1, stars: 1 } };
+        state.owned = { 1: { level: 3, stars: 1 }, 2: { level: 2, stars: 1 } };
       }
       if (!state.team || state.team.length === 0) {
         state.team = Object.keys(state.owned).slice(0, 4).map(Number);
       }
-      // Calculate offline idle rewards
-      const elapsedSec = Math.min(86400, Math.floor((Date.now() - (state.lastSaveTime || Date.now())) / 1000));
-      if (elapsedSec > 15) {
-        const mins = elapsedSec / 60;
-        const gainGold = Math.floor(mins * getIdleGoldPerMin());
-        const gainGems = Math.floor(mins * getIdleGemPerMin());
-        if (gainGold > 0) {
-          state.gold += gainGold;
-          state.gems += gainGems;
-          setTimeout(() => addLog(`🎁 歡迎回來！離線 ${Math.floor(mins)} 分鐘自動獲得 ${gainGold} 金幣與 ${gainGems} 星鑽。`, '#fbbf24'), 400);
-        }
-      }
     }
-  } catch (e) { console.warn('Save load fallback:', e); }
+  } catch (e) { console.warn(e); }
 }
 
 function saveGame(showToast = false) {
-  state.lastSaveTime = Date.now();
-  localStorage.setItem('starsprout_save_v4', JSON.stringify(state));
-  if (showToast) alert('✅ 遊戲進度已成功儲存至本機！');
+  localStorage.setItem('starsprout_pixel_v5', JSON.stringify(state));
+  if (showToast) alert('✅ 遊戲進度已成功儲存！');
 }
 
 /* ============================================================================
-   6. BATTLE & IDLE SIMULATION
+   7. TURN-BASED MANUAL BATTLE ENGINE (NO IDLE AUTO-FIGHT!)
    ============================================================================ */
-let autoBattle = true;
-let enemies = [];
-let playerHps = {};
+let p2pConnected = false;
+let playerStats = { hp: 500, maxHp: 500, mp: 100, maxMp: 100 };
+let enemyUnit = null;
+let battleBusy = false;
 let codexPage = 1;
 const PAGE_SIZE = 48;
-let p2pConnected = false;
 
-function getHeroPower(heroId) {
+function getCreatureStats(heroId) {
   const h = HEROES[heroId - 1];
   const own = state.owned[heroId] || { level: 1, stars: 1 };
   const starMult = 1 + (own.stars - 1) * 0.25;
-  const lvMult = 1 + (own.level - 1) * 0.08;
+  const lvMult = 1 + (own.level - 1) * 0.12;
   const coopMult = p2pConnected ? 1.25 : 1.0;
   const atk = Math.round(h.baseAtk * starMult * lvMult * (1 + (state.atkLv - 1) * 0.1) * coopMult);
-  const hp  = Math.round(h.baseHp * starMult * lvMult * (1 + (state.defLv - 1) * 0.1) * coopMult);
-  return { atk, hp, total: atk * 3 + hp };
+  const maxHp = Math.round(h.baseHp * starMult * lvMult * (1 + (state.defLv - 1) * 0.1) * coopMult);
+  return { atk, maxHp, total: atk * 3 + maxHp };
 }
 
-function getTeamTotalPower() {
-  return state.team.reduce((sum, id) => sum + getHeroPower(id).total, 0);
+function getActiveHero() {
+  const id = state.team[state.activeSlot] || state.team[0] || 1;
+  return HEROES[id - 1];
 }
 
-function getIdleGoldPerMin() {
-  return Math.round((100 + state.stage * 25) * (1 + state.idleBonusPct / 100));
-}
-function getIdleGemPerMin() {
-  return Math.max(2, Math.round((4 + Math.floor(state.stage / 3)) * (1 + state.idleBonusPct / 100)));
-}
-
-function spawnStageEnemies() {
-  const count = state.stage % 5 === 0 ? 1 : 3;
-  const isBoss = state.stage % 5 === 0;
-  enemies = [];
-  for (let i = 0; i < count; i++) {
-    const sampleHero = HEROES[((state.stage * 13 + i * 37) % 500)];
-    const scale = Math.pow(1.14, state.stage - 1) * (isBoss ? 2.6 : 1.0);
-    const maxHp = Math.round(650 * scale);
-    enemies.push({
-      uid: `e-${i}`,
-      name: isBoss ? `👑 深淵首領·${sampleHero.name}` : `星蝕魔物·${sampleHero.name.split('·')[0]}`,
-      hero: sampleHero,
-      maxHp,
-      hp: maxHp,
-      atk: Math.round(75 * scale)
-    });
+function syncActivePlayerStats(fullHeal = false) {
+  const h = getActiveHero();
+  const st = getCreatureStats(h.id);
+  playerStats.maxHp = st.maxHp;
+  playerStats.maxMp = 100;
+  if (fullHeal || playerStats.hp <= 0 || playerStats.hp > st.maxHp) {
+    playerStats.hp = st.maxHp;
+    playerStats.mp = 100;
   }
-  state.team.forEach(id => {
-    playerHps[id] = getHeroPower(id).hp;
-  });
+}
+
+function enterMap(mapId) {
+  state.currentMapId = mapId;
+  syncActivePlayerStats(true);
+  encounterWildEnemy(false);
   updateDynamicBiome();
+  switchTab('battle');
+  saveGame();
+}
+
+function encounterWildEnemy(isBoss = false) {
+  const mapObj = WORLD_MAPS.find(m => m.id === state.currentMapId) || WORLD_MAPS[0];
+  const wave = state.mapWaves[mapObj.id] || 1;
+
+  // Pick a creature matching the map's element
+  const pool = HEROES.filter(h => h.elem === mapObj.elem && (isBoss ? h.rarity === 'MYTHIC' || h.rarity === 'EPIC' : true));
+  const chosen = pool[Math.floor(Math.random() * pool.length)] || HEROES[0];
+
+  const scale = mapObj.difficulty * (1 + (wave - 1) * 0.18) * (isBoss ? 2.2 : 1.0);
+  const maxHp = Math.round(420 * scale);
+  const atk = Math.round(52 * scale);
+
+  enemyUnit = {
+    hero: chosen,
+    name: isBoss ? `👑 區域首領·${chosen.name}` : `野生 ${chosen.name}`,
+    isBoss,
+    maxHp,
+    hp: maxHp,
+    atk
+  };
+  battleBusy = false;
+  addLog(`🌿 在【${mapObj.name}】遭遇了 <strong>${enemyUnit.name}</strong>！請選擇指令進行對戰！`, '#38bdf8');
+  renderBattleScreen();
+}
+
+function encounterMapBoss() {
+  encounterWildEnemy(true);
 }
 
 function addLog(msg, color = '#cbd5e1') {
@@ -1111,92 +1394,243 @@ function addLog(msg, color = '#cbd5e1') {
   if (!box) return;
   const line = document.createElement('div');
   line.style.color = color;
-  line.innerHTML = `[${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'})}] ${msg}`;
+  line.innerHTML = `▸ ${msg}`;
   box.prepend(line);
-  while (box.children.length > 45) box.removeChild(box.lastChild);
+  while (box.children.length > 40) box.removeChild(box.lastChild);
 }
 
-function battleTick(isUltimate = false) {
-  if (enemies.length === 0) spawnStageEnemies();
+function playerUseBasicAttack() {
+  if (battleBusy || !enemyUnit || enemyUnit.hp <= 0) return;
+  battleBusy = true;
+  const h = getActiveHero();
+  const st = getCreatureStats(h.id);
+  const dmg = Math.round(st.atk * (0.9 + Math.random() * 0.25));
 
-  // Player attacks
-  state.team.forEach(id => {
-    if ((playerHps[id] || 0) <= 0) return;
-    const h = HEROES[id - 1];
-    const pwr = getHeroPower(id);
-    const skill = isUltimate ? h.skills[3] : h.skills[Math.floor(Math.random() * 3)];
-    const target = enemies.find(e => e.hp > 0);
-    if (!target) return;
+  enemyUnit.hp = Math.max(0, enemyUnit.hp - dmg);
+  playerStats.mp = Math.min(playerStats.maxMp, playerStats.mp + 20);
+  addLog(`👊 <strong>${h.name}</strong> 使出普通撞擊，對 ${enemyUnit.name} 造成 <strong style="color:#38bdf8;">${dmg}</strong> 傷害！（回復 20 MP）`);
 
-    const dmg = Math.round(pwr.atk * (skill.power / 100) * (1 + state.skillBonusPct / 100) * (isUltimate ? 1.8 : 1));
-    target.hp = Math.max(0, target.hp - dmg);
-    addLog(`⚔️ <strong>${h.name}</strong> 發動【${skill.name}】對 ${target.name} 造成 <strong style="color:#38bdf8;">${dmg}</strong> 傷害！`);
-  });
+  renderBattleScreen();
+  setTimeout(() => checkBattleAfterPlayerTurn(), 450);
+}
 
-  // Check stage clear
-  if (enemies.every(e => e.hp <= 0)) {
-    const rewardGold = Math.round((180 + state.stage * 45) * (1 + state.winStreak * 0.05));
-    const rewardGems = state.stage % 5 === 0 ? 160 : 25;
-    state.gold += rewardGold;
-    state.gems += rewardGems;
-    state.winStreak += 1;
-    state.stage += 1;
-    if (state.stage % 5 === 0) state.tickets += 1;
-    addLog(`🎉 關卡突破！獲得 ${rewardGold} 金幣、${rewardGems} 星鑽${state.stage % 5 === 0 ? '與 1 張招募券' : ''}！`, '#4ade80');
-    spawnStageEnemies();
+function playerMeditate() {
+  if (battleBusy || !enemyUnit || enemyUnit.hp <= 0) return;
+  battleBusy = true;
+  const h = getActiveHero();
+  const heal = Math.round(playerStats.maxHp * 0.18);
+  playerStats.hp = Math.min(playerStats.maxHp, playerStats.hp + heal);
+  playerStats.mp = Math.min(playerStats.maxMp, playerStats.mp + 35);
+  addLog(`✨ <strong>${h.name}</strong> 專注聚氣，回復了 <strong style="color:#4ade80;">${heal} HP</strong> 與 <strong style="color:#60a5fa;">35 MP</strong>！`, '#4ade80');
+
+  renderBattleScreen();
+  setTimeout(() => checkBattleAfterPlayerTurn(), 450);
+}
+
+function playerUseSkill(skillIdx) {
+  if (battleBusy || !enemyUnit || enemyUnit.hp <= 0) return;
+  const h = getActiveHero();
+  const sk = h.skills[skillIdx];
+  if (playerStats.mp < sk.mpCost) {
+    alert(`MP 不足！施放【${sk.name}】需要 ${sk.mpCost} MP。`);
+    return;
+  }
+  battleBusy = true;
+  playerStats.mp -= sk.mpCost;
+  const st = getCreatureStats(h.id);
+
+  if (sk.isHeal) {
+    const heal = Math.round(st.atk * (sk.power / 100));
+    playerStats.hp = Math.min(playerStats.maxHp, playerStats.hp + heal);
+    addLog(`💚 <strong>${h.name}</strong> 施放【${sk.name}】，回復了 <strong style="color:#4ade80;">${heal}</strong> 生命值！`, '#4ade80');
+  } else {
+    const dmg = Math.round(st.atk * (sk.power / 100) * (1 + state.skillBonusPct / 100));
+    enemyUnit.hp = Math.max(0, enemyUnit.hp - dmg);
+    addLog(`⚡ <strong>${h.name}</strong> 施放【${sk.name}】，對 ${enemyUnit.name} 造成 <strong style="color:#fbbf24;">${dmg}</strong> 暴擊傷害！`, '#fbbf24');
+  }
+
+  renderBattleScreen();
+  setTimeout(() => checkBattleAfterPlayerTurn(), 450);
+}
+
+function attemptCaptureWild(bonusRate = 0) {
+  if (battleBusy || !enemyUnit || enemyUnit.hp <= 0) return;
+  if (enemyUnit.isBoss) {
+    alert('👑 區域首領氣場太強，無法直接用星芽球收服！請擊敗首領獲取豐厚獎勵或前往許願池召喚！');
+    return;
+  }
+  battleBusy = true;
+  const hpRatio = enemyUnit.hp / enemyUnit.maxHp;
+  const catchChance = Math.min(0.95, Math.max(0.15, (1 - hpRatio) * 0.85 + 0.15 + bonusRate));
+
+  addLog(`🔮 丟出了星芽捕捉球！（當前收服成功率：${Math.round(catchChance * 100)}%）`, '#f472b6');
+
+  setTimeout(() => {
+    if (Math.random() < catchChance) {
+      const caught = enemyUnit.hero;
+      const isNew = !state.owned[caught.id];
+      if (isNew) {
+        state.owned[caught.id] = { level: 1, stars: 1 };
+      } else {
+        state.owned[caught.id].stars += 1;
+        state.owned[caught.id].level += 1;
+      }
+      addLog(`🎉 太棒了！成功收服了【${caught.name}】${isNew ? '（新登錄圖鑑！）' : '（星級 +1！）'}`, '#4ade80');
+      enemyUnit.hp = 0;
+      battleBusy = false;
+      updateTopUI();
+      renderHeroesGrid();
+      renderBattleScreen();
+      saveGame();
+    } else {
+      addLog(`💨 差一點！${enemyUnit.name} 掙脫了捕捉球！`, '#f87171');
+      enemyTurn();
+    }
+  }, 500);
+}
+
+function checkBattleAfterPlayerTurn() {
+  if (enemyUnit.hp <= 0) {
+    const mapObj = WORLD_MAPS.find(m => m.id === state.currentMapId) || WORLD_MAPS[0];
+    const wave = state.mapWaves[mapObj.id] || 1;
+    const goldGain = Math.round((150 + wave * 40) * mapObj.difficulty * (enemyUnit.isBoss ? 2.5 : 1) * (1 + state.goldBonusPct / 100));
+    const gemGain = enemyUnit.isBoss ? 160 : 30;
+
+    state.gold += goldGain;
+    state.gems += gemGain;
+    state.mapWaves[mapObj.id] = wave + 1;
+    if (enemyUnit.isBoss) state.tickets += 1;
+
+    // Level up active pet
+    const activeH = getActiveHero();
+    if (state.owned[activeH.id]) state.owned[activeH.id].level += 1;
+
+    addLog(`🏆 戰鬥勝利！獲得 <strong>${goldGain} 金幣</strong>、<strong>${gemGain} 星鑽</strong>${enemyUnit.isBoss ? '、<strong>1 張招募券</strong>' : ''}，${activeH.name} 升至 Lv.${state.owned[activeH.id].level}！`, '#4ade80');
+    battleBusy = false;
     updateTopUI();
-    renderBattleArena();
+    renderMapsGrid();
+    renderBattleScreen();
     saveGame();
     return;
   }
+  enemyTurn();
+}
 
-  // Enemy counter-attack
-  enemies.forEach(e => {
-    if (e.hp <= 0) return;
-    const aliveIds = state.team.filter(id => (playerHps[id] || 0) > 0);
-    if (aliveIds.length === 0) return;
-    const targetId = aliveIds[Math.floor(Math.random() * aliveIds.length)];
-    playerHps[targetId] = Math.max(0, playerHps[targetId] - e.atk);
-  });
+function enemyTurn() {
+  const h = getActiveHero();
+  const dmg = Math.max(8, Math.round(enemyUnit.atk * (0.85 + Math.random() * 0.3)));
+  playerStats.hp = Math.max(0, playerStats.hp - dmg);
+  addLog(`👾 ${enemyUnit.name} 發動反擊，對 <strong>${h.name}</strong> 造成 <strong style="color:#f87171;">${dmg}</strong> 傷害！`, '#fca5a5');
 
-  // Check team wipe
-  if (state.team.every(id => (playerHps[id] || 0) <= 0)) {
-    state.winStreak = 0;
-    addLog(`💫 隊伍體力耗盡，已自動返回營地重整並恢復全隊狀態！`, '#f87171');
-    spawnStageEnemies();
+  if (playerStats.hp <= 0) {
+    addLog(`💫 <strong>${h.name}</strong> 體力耗盡！請切換其他夥伴出戰，或使用生命靈藥 / 返回營地恢復！`, '#f43f5e');
   }
-
-  updateTopUI();
-  renderBattleArena();
+  battleBusy = false;
+  renderBattleScreen();
 }
 
-function manualAttack() { battleTick(false); }
-function castUltimateBurst() {
-  addLog(`💥 【全隊 EX 奧義共鳴】四名英雄同時釋放終極必殺技！`, '#f472b6');
-  battleTick(true);
-}
-function challengeBoss() {
-  while (state.stage % 5 !== 0) state.stage++;
-  spawnStageEnemies();
-  addLog(`🔥 已直接鎖定第 ${state.stage} 關首領戰！`, '#fbbf24');
-  renderBattleArena();
-}
-function toggleAutoBattle() {
-  autoBattle = !autoBattle;
-  document.getElementById('btn-auto-battle').textContent = autoBattle ? '▶️ 自動戰鬥：開啟' : '⏸️ 自動戰鬥：暫停';
-}
-function claimIdleReward() {
-  const g = getIdleGoldPerMin() * 3;
-  const d = getIdleGemPerMin() * 3;
-  state.gold += g;
-  state.gems += d;
-  addLog(`🎁 領取星界掛機補給：+${g} 金幣、+${d} 星鑽！`, '#fbbf24');
+function switchActiveBattleSlot(slotIdx) {
+  if (battleBusy) return;
+  state.activeSlot = slotIdx;
+  syncActivePlayerStats(true);
+  const h = getActiveHero();
+  addLog(`🔄 切換出戰夥伴：就決定是你了，<strong>${h.name}</strong>！`, '#38bdf8');
   updateTopUI();
+  renderBattleScreen();
   saveGame();
 }
 
+function renderBattleScreen() {
+  const mapObj = WORLD_MAPS.find(m => m.id === state.currentMapId) || WORLD_MAPS[0];
+  document.getElementById('battle-map-title').textContent = mapObj.name;
+  document.getElementById('battle-wave').textContent = state.mapWaves[mapObj.id] || 1;
+
+  const h = getActiveHero();
+  const own = state.owned[h.id] || { level: 1, stars: 1 };
+  const st = getCreatureStats(h.id);
+  const pHpPct = Math.max(0, Math.min(100, Math.round((playerStats.hp / playerStats.maxHp) * 100)));
+  const pMpPct = Math.max(0, Math.min(100, Math.round((playerStats.mp / playerStats.maxMp) * 100)));
+
+  document.getElementById('player-fighter-box').innerHTML = `
+    <div style="font-size:11px;color:#4ade80;font-weight:800;">我方出戰 ｜ Lv.${own.level} ★${own.stars}</div>
+    <div style="margin:6px auto;">${renderHeroSVG(h, 88)}</div>
+    <div style="font-size:13px;font-weight:900;">${h.name}</div>
+    <div style="font-size:11px;color:var(--muted);">ATK ${st.atk} ｜ HP ${playerStats.hp}/${playerStats.maxHp}</div>
+    <div class="bar-wrap"><div class="hp-fill" style="width:${pHpPct}%;"></div></div>
+    <div style="font-size:10px;color:#60a5fa;margin-top:3px;">MP ${playerStats.mp}/${playerStats.maxMp}</div>
+    <div class="bar-wrap"><div class="mp-fill" style="width:${pMpPct}%;"></div></div>
+  `;
+
+  if (!enemyUnit) encounterWildEnemy(false);
+  const eHpPct = Math.max(0, Math.min(100, Math.round((enemyUnit.hp / enemyUnit.maxHp) * 100)));
+  document.getElementById('enemy-fighter-box').innerHTML = `
+    <div style="font-size:11px;color:#f87171;font-weight:800;">${enemyUnit.isBoss ? '區域首領' : '野生像素幻獸'}</div>
+    <div style="margin:6px auto;">${renderHeroSVG(enemyUnit.hero, 88)}</div>
+    <div style="font-size:13px;font-weight:900;">${enemyUnit.name}</div>
+    <div style="font-size:11px;color:var(--muted);">ATK ${enemyUnit.atk} ｜ HP ${enemyUnit.hp}/${enemyUnit.maxHp}</div>
+    <div class="bar-wrap"><div class="hp-fill enemy-hp" style="width:${eHpPct}%;"></div></div>
+    <div style="font-size:10px;color:#fbbf24;margin-top:5px;">${enemyUnit.hp <= 0 ? '已擊敗！點擊上方尋找下一個敵人' : (eHpPct <= 40 ? '✨ 虛弱狀態！捕捉成功率大幅提升' : '狀態良好')}</div>
+  `;
+
+  // Disable actions if enemy defeated or player fainted
+  const canAct = enemyUnit.hp > 0 && playerStats.hp > 0;
+  document.getElementById('btn-normal-atk').disabled = !canAct;
+  document.getElementById('btn-heal-meditate').disabled = !canAct;
+  document.getElementById('btn-capture').disabled = !canAct;
+
+  // Render 4 Skills
+  document.getElementById('battle-skill-deck').innerHTML = h.skills.map((sk, idx) => `
+    <button class="skill-btn" onclick="playerUseSkill(${idx})" ${(!canAct || playerStats.mp < sk.mpCost) ? 'disabled' : ''}>
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:#38bdf8;">
+        <span>${sk.name}</span>
+        <span>${sk.mpCost} MP</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">${sk.isHeal ? `回復 ${sk.power}% 生命` : `造成 ${sk.power}% 屬性傷害`}</div>
+    </button>
+  `).join('');
+
+  // Render Party Switcher
+  document.getElementById('battle-party-bar').innerHTML = state.team.map((id, idx) => {
+    const member = HEROES[id - 1];
+    const isAct = idx === state.activeSlot;
+    return `
+      <div class="party-chip ${isAct ? 'active-unit' : ''}" onclick="switchActiveBattleSlot(${idx})">
+        ${renderHeroSVG(member, 28)}
+        <span>${member.name.split('·')[0]} ${isAct ? '(出戰中)' : ''}</span>
+      </div>
+    `;
+  }).join('');
+}
+
 /* ============================================================================
-   7. SIX GACHA POOLS & SUMMONING LOGIC
+   8. WORLD MAPS RENDERER
+   ============================================================================ */
+function renderMapsGrid() {
+  const grid = document.getElementById('maps-grid');
+  grid.innerHTML = WORLD_MAPS.map(m => {
+    const wave = state.mapWaves[m.id] || 1;
+    const previewCreature = HEROES.find(h => h.elem === m.elem && h.rarity === 'MYTHIC') || HEROES[0];
+    return `
+      <div class="map-card" style="background:${m.bg};border-color:${m.border};">
+        <div class="map-header">
+          <div>
+            <span style="font-size:11px;background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:999px;">推薦等級：${m.recLv}</span>
+            <div class="map-title">${m.name}</div>
+          </div>
+          ${renderHeroSVG(previewCreature, 58)}
+        </div>
+        <div class="map-desc">${m.desc}</div>
+        <div class="map-footer">
+          <span>探索進度：<strong>第 ${wave} 區</strong></span>
+          <button class="btn btn-sm btn-gold" onclick="enterMap('${m.id}')">⚔️ 進入探索戰鬥</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ============================================================================
+   9. SIX GACHA POOLS & SUMMONING
    ============================================================================ */
 function renderGachaPools() {
   const container = document.getElementById('pools-container');
@@ -1214,9 +1648,9 @@ function renderGachaPools() {
               史詩UP：${subHeroes.map(h => h.name.split('·')[0]).join('、')}
             </div>
           </div>
-          <div class="pool-cover-art" onclick="openHeroModal(${coverHero.id})" title="點擊預覽神話封面英雄">
-            ${renderHeroSVG(coverHero, 102)}
-            <span class="pool-cover-tap">🔍 預覽立繪</span>
+          <div class="pool-cover-art" onclick="openHeroModal(${coverHero.id})" title="點擊預覽神話封面幻獸">
+            ${renderHeroSVG(coverHero, 96)}
+            <span class="pool-cover-tap">🔍 預覽像素立繪</span>
           </div>
         </div>
         <div class="pool-actions">
@@ -1234,19 +1668,19 @@ function renderGachaPools() {
 function openPoolPreview(poolId) {
   const pool = GACHA_POOLS.find(p => p.id === poolId);
   const featured = pool.featuredIds.map(id => HEROES[id - 1]);
-  document.getElementById('modal-hero-title').textContent = `${pool.name} — 精選 UP 角色預覽`;
+  document.getElementById('modal-hero-title').textContent = `${pool.name} — 精選 UP 像素幻獸預覽`;
   document.getElementById('modal-hero-body').innerHTML = `
     <p style="font-size:12px;color:var(--muted);margin-top:0;">
-      本卡池大幅提升 <strong>${ELEMENTS[pool.elem].name}</strong> 屬性英雄出現機率，每 50 抽必得【神話】級英雄！
+      本卡池大幅提升 <strong>${ELEMENTS[pool.elem].name}</strong> 屬性像素幻獸出現機率，每 50 抽必得【神話】級夥伴！
     </p>
     <div style="display:flex;flex-direction:column;gap:10px;">
       ${featured.map(h => `
         <div style="display:flex;align-items:center;gap:12px;background:var(--panel-2);padding:10px;border-radius:12px;border:1px solid var(--border);cursor:pointer;" onclick="openHeroModal(${h.id})">
-          ${renderHeroSVG(h, 76)}
+          ${renderHeroSVG(h, 74)}
           <div>
             <div style="font-weight:800;font-size:14px;color:${h.rarity === 'MYTHIC' ? '#fb7185' : '#c084fc'};">${h.titleTag} ${h.name}</div>
             <div style="font-size:12px;color:var(--muted);">基礎攻擊 ${h.baseAtk} ｜ 生命 ${h.baseHp}</div>
-            <div style="font-size:11px;color:#38bdf8;margin-top:4px;">EX奧義：${h.skills[3].name}（${h.skills[3].power}%傷害）</div>
+            <div style="font-size:11px;color:#38bdf8;margin-top:4px;">終極技：${h.skills[3].name}（${h.skills[3].power}%傷害）</div>
           </div>
         </div>
       `).join('')}
@@ -1262,7 +1696,7 @@ function pullGacha(poolId, count) {
   } else if (state.gems >= gemCost) {
     state.gems -= gemCost;
   } else {
-    alert(`資源不足！需要 ${count} 張招募券 或 ${gemCost} 顆星鑽。可透過戰鬥或道具工坊獲取！`);
+    alert(`資源不足！需要 ${count} 張招募券 或 ${gemCost} 顆星鑽。可透過探索戰鬥或道具工坊獲取！`);
     return;
   }
 
@@ -1282,7 +1716,6 @@ function pullGacha(poolId, count) {
       rarity = 'RARE';
     }
 
-    // 55% chance to match pool element or featured UP
     let candidates = HEROES.filter(h => h.rarity === rarity);
     if (Math.random() < 0.55) {
       const elemCands = candidates.filter(h => h.elem === pool.elem);
@@ -1322,7 +1755,7 @@ function pullGacha(poolId, count) {
 }
 
 /* ============================================================================
-   8. 500 HEROES CODEX & TEAM MANAGEMENT
+   10. 500 PIXEL CREATURES CODEX & TEAM MANAGEMENT
    ============================================================================ */
 function renderHeroesGrid() {
   const kw = (document.getElementById('hero-search')?.value || '').trim().toLowerCase();
@@ -1345,7 +1778,7 @@ function renderHeroesGrid() {
   const start = (codexPage - 1) * PAGE_SIZE;
   const slice = filtered.slice(start, start + PAGE_SIZE);
 
-  document.getElementById('codex-showing-text').textContent = `符合條件共 ${filtered.length} 名英雄（顯示第 ${filtered.length ? start + 1 : 0} - ${start + slice.length} 名）`;
+  document.getElementById('codex-showing-text').textContent = `符合條件共 ${filtered.length} 隻幻獸（顯示第 ${filtered.length ? start + 1 : 0} - ${start + slice.length} 隻）`;
   document.getElementById('codex-page-num').textContent = `${codexPage} / ${maxPage}`;
 
   const grid = document.getElementById('heroes-grid');
@@ -1359,7 +1792,7 @@ function renderHeroesGrid() {
         <span class="elem-tag">${ELEMENTS[h.elem].icon}</span>
         <div class="hero-sprite-wrap">${renderHeroSVG(h, 80)}</div>
         <div class="hero-name">${h.name}</div>
-        <div class="hero-sub">${own ? `Lv.${own.level} ★${own.stars} ${inTeam ? '【出戰中】' : ''}` : '未解鎖（點擊預覽）'}</div>
+        <div class="hero-sub">${own ? `Lv.${own.level} ★${own.stars} ${inTeam ? '【隨行中】' : ''}` : '未收服（點擊預覽）'}</div>
       </div>
     `;
   }).join('');
@@ -1374,32 +1807,32 @@ function openHeroModal(heroId) {
   const h = HEROES[heroId - 1];
   const own = state.owned[heroId];
   const inTeam = state.team.includes(heroId);
-  const pwr = getHeroPower(heroId);
+  const st = getCreatureStats(heroId);
 
   document.getElementById('modal-hero-title').textContent = `#${String(h.id).padStart(3,'0')} ${h.name}`;
   document.getElementById('modal-hero-body').innerHTML = `
     <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px;">
-      ${renderHeroSVG(h, 110)}
+      ${renderHeroSVG(h, 108)}
       <div>
         <div style="font-size:13px;font-weight:800;color:${ELEMENTS[h.elem].color};">${ELEMENTS[h.elem].icon} ${ELEMENTS[h.elem].name} ｜ ${h.rarity}</div>
-        <div style="font-size:13px;margin:4px 0;">狀態：${own ? `<strong style="color:#4ade80;">已解鎖 (Lv.${own.level} / ★${own.stars})</strong>` : '<span style="color:#94a3b8;">尚未招募</span>'}</div>
-        <div style="font-size:12px;color:var(--muted);">攻擊：${pwr.atk} ｜ 生命：${pwr.hp} ｜ 綜合戰力：${pwr.total}</div>
+        <div style="font-size:13px;margin:4px 0;">狀態：${own ? `<strong style="color:#4ade80;">已收服 (Lv.${own.level} / ★${own.stars})</strong>` : '<span style="color:#94a3b8;">野生未收服</span>'}</div>
+        <div style="font-size:12px;color:var(--muted);">攻擊：${st.atk} ｜ 生命：${st.maxHp} ｜ 綜合戰力：${st.total}</div>
         <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
           ${own ? `
             <button class="btn btn-sm ${inTeam ? 'btn-mythic' : 'btn-primary'}" onclick="toggleTeamMember(${h.id})">
-              ${inTeam ? '➖ 移出出戰隊伍' : '➕ 加入出戰隊伍'}
+              ${inTeam ? '➖ 移出隨行隊伍' : '➕ 加入隨行隊伍'}
             </button>
-            <button class="btn btn-sm btn-gold" onclick="upgradeHero(${h.id})">⬆️ 升級 (${own.level * 150}🪙)</button>
+            <button class="btn btn-sm btn-gold" onclick="upgradeHero(${h.id})">⬆️ 餵食升級 (${own.level * 120}🪙)</button>
           ` : `<button class="btn btn-sm btn-green" onclick="switchTab('gacha');document.getElementById('hero-modal').classList.remove('open');">🌠 前往許願池召喚</button>`}
         </div>
       </div>
     </div>
-    <div style="font-size:13px;font-weight:800;margin-bottom:6px;">✨ 專屬四維技能組（共 2,000 技能庫）</div>
+    <div style="font-size:13px;font-weight:800;margin-bottom:6px;">✨ 專屬四維戰鬥技能（共 2,000 技能庫）</div>
     ${h.skills.map(sk => `
       <div class="skill-pill">
         <div style="display:flex;justify-content:space-between;font-weight:800;color:#38bdf8;">
           <span>${sk.name}</span>
-          <span>[${sk.type}]</span>
+          <span>消耗 ${sk.mpCost} MP</span>
         </div>
         <div style="color:#cbd5e1;margin-top:3px;">${sk.desc}</div>
       </div>
@@ -1411,15 +1844,17 @@ function openHeroModal(heroId) {
 function toggleTeamMember(heroId) {
   const idx = state.team.indexOf(heroId);
   if (idx >= 0) {
-    if (state.team.length <= 1) { alert('至少需要保留 1 名出戰英雄！'); return; }
+    if (state.team.length <= 1) { alert('至少需要保留 1 隻隨行幻獸！'); return; }
     state.team.splice(idx, 1);
+    if (state.activeSlot >= state.team.length) state.activeSlot = 0;
   } else {
     if (state.team.length >= 4) state.team.shift();
     state.team.push(heroId);
-    playerHps[heroId] = getHeroPower(heroId).hp;
+    state.activeSlot = state.team.length - 1;
   }
+  syncActivePlayerStats(true);
   updateTopUI();
-  renderBattleArena();
+  renderBattleScreen();
   renderHeroesGrid();
   openHeroModal(heroId);
   saveGame();
@@ -1427,31 +1862,32 @@ function toggleTeamMember(heroId) {
 
 function upgradeHero(heroId) {
   const own = state.owned[heroId];
-  const cost = own.level * 150;
+  const cost = own.level * 120;
   if (state.gold < cost) { alert('金幣不足！'); return; }
   state.gold -= cost;
   own.level += 1;
-  playerHps[heroId] = getHeroPower(heroId).hp;
+  syncActivePlayerStats(true);
   updateTopUI();
-  renderBattleArena();
+  renderBattleScreen();
   openHeroModal(heroId);
   saveGame();
 }
 
 function autoEquipBestTeam() {
   const ownedIds = Object.keys(state.owned).map(Number);
-  ownedIds.sort((a, b) => getHeroPower(b).total - getHeroPower(a).total);
+  ownedIds.sort((a, b) => getCreatureStats(b).total - getCreatureStats(a).total);
   state.team = ownedIds.slice(0, 4);
-  state.team.forEach(id => playerHps[id] = getHeroPower(id).hp);
+  state.activeSlot = 0;
+  syncActivePlayerStats(true);
   updateTopUI();
-  renderBattleArena();
+  renderBattleScreen();
   renderHeroesGrid();
   saveGame();
-  alert('✨ 已自動將戰力最高的 4 名英雄編入出戰陣容！');
+  alert('✨ 已自動將戰力最高的 4 隻像素幻獸編入隨行陣容！');
 }
 
 /* ============================================================================
-   9. TWENTY ITEMS WORKSHOP
+   11. TWENTY ITEMS WORKSHOP
    ============================================================================ */
 function renderItemsWorkshop() {
   const grid = document.getElementById('items-grid');
@@ -1491,93 +1927,101 @@ function useItem(itemId) {
 
   switch (itemId) {
     case 'item_01':
-      state.team.forEach(id => { playerHps[id] = getHeroPower(id).hp; if(state.owned[id]) state.owned[id].level += 1; });
-      addLog('🧪 使用【星芽生命靈藥】，全隊滿血並提升 1 級！', '#4ade80');
+      syncActivePlayerStats(true);
+      addLog('🧪 使用【星芽生命靈藥】，出戰幻獸 HP 與 MP 全部恢復至 100%！', '#4ade80');
       break;
     case 'item_02':
+      switchTab('battle');
+      attemptCaptureWild(0.45);
+      break;
+    case 'item_03':
       state.tickets += 1;
       addLog('🎫 獲得 1 張【星界許願招募券】！', '#38bdf8');
       break;
-    case 'item_03':
-      state.atkLv += 1;
-      addLog('⚔️ 全隊永久攻擊等級提升！', '#f87171');
-      break;
     case 'item_04':
-      state.defLv += 1;
-      addLog('🛡️ 全隊永久防禦與生命等級提升！', '#60a5fa');
+      state.atkLv += 1;
+      addLog('⚔️ 全體夥伴永久攻擊等級 +1！', '#f87171');
       break;
     case 'item_05':
+      state.defLv += 1;
+      addLog('🛡️ 全體夥伴永久生命等級 +1！', '#60a5fa');
+      break;
+    case 'item_06':
       state.gems += 320;
       addLog('💎 提煉出 320 顆星鑽！', '#38bdf8');
       break;
-    case 'item_06':
-      enemies.forEach(e => e.hp = Math.max(0, e.hp - Math.round(e.maxHp * 0.7)));
-      addLog('🔥 【炎帝狂暴秘藥】轟炸全場敵軍！', '#ef4444');
-      battleTick(false);
-      break;
     case 'item_07':
-      state.gold += getIdleGoldPerMin() * 10;
-      state.gems += getIdleGemPerMin() * 10;
-      addLog('🌿 吹響豐收號角，獲得 10 分鐘掛機收益！', '#22c55e');
+      if (enemyUnit && enemyUnit.hp > 0) {
+        enemyUnit.hp = Math.max(0, enemyUnit.hp - 450);
+        addLog('🔥 投擲【炎帝爆裂手榴彈】，對敵人造成 450 點固定傷害！', '#ef4444');
+        checkBattleAfterPlayerTurn();
+      }
       break;
-    case 'item_08':
-      state.stage += 1;
-      spawnStageEnemies();
-      addLog(`💧 時光沙漏發動，直接推進至第 ${state.stage} 關！`, '#06b6d4');
+    case 'item_08': {
+      const h = getActiveHero();
+      if (state.owned[h.id]) state.owned[h.id].level += 2;
+      syncActivePlayerStats(true);
+      addLog(`🍰 餵食彩虹經驗蛋糕，${h.name} 等級立即 +2！`, '#fbbf24');
       break;
+    }
     case 'item_09':
       state.team.forEach(id => { if (state.owned[id]) state.owned[id].stars += 2; });
-      addLog('☀️ 出戰英雄全部獲得 +2 星級覺醒！', '#facc15');
+      syncActivePlayerStats(true);
+      addLog('☀️ 隨行夥伴全部獲得 +2 星級覺醒！', '#facc15');
       break;
     case 'item_10':
       state.pity = Math.min(49, state.pity + 10);
-      addLog('🌙 許願保底計數 +10！', '#a855f7');
+      addLog('🌙 許願神話保底計數 +10！', '#a855f7');
       break;
     case 'item_11':
-      state.idleBonusPct += 15;
-      addLog('👑 永久掛機收益效率 +15%！', '#fbbf24');
+      state.goldBonusPct += 20;
+      addLog('👑 永久戰鬥金幣掉落加成 +20%！', '#fbbf24');
       break;
     case 'item_12': {
       const locked = HEROES.filter(h => !state.owned[h.id] && (h.rarity === 'RARE' || h.rarity === 'EPIC'));
       if (locked.length > 0) {
         const pick = locked[Math.floor(Math.random() * locked.length)];
         state.owned[pick.id] = { level: 1, stars: 1 };
-        addLog(`🔮 水晶球召喚出新英雄：【${pick.name}】！`, '#c084fc');
+        addLog(`🥚 神秘幻獸蛋孵化出【${pick.name}】！`, '#c084fc');
       } else { state.gems += 500; }
       break;
     }
     case 'item_13':
-      castUltimateBurst();
+      playerStats.mp = playerStats.maxMp;
+      addLog('⚡ 出戰幻獸 MP 已充能至 100%！', '#38bdf8');
       break;
     case 'item_14':
-      state.winStreak += 3;
-      addLog('🐉 連勝計數 +3！', '#fbbf24');
+      state.skillBonusPct += 6;
+      addLog('🐉 全隊技能傷害倍率永久 +6%！', '#38bdf8');
       break;
     case 'item_15': {
       const bonus = 500 + Math.floor(Math.random() * 1501);
       state.gold += bonus;
-      addLog(`🌸 櫻吹雪祝福紅包開出 ${bonus} 枚金幣！`, '#f472b6');
+      addLog(`🌸 櫻吹雪紅包開出 ${bonus} 枚金幣！`, '#f472b6');
       break;
     }
     case 'item_16':
       setBiomeTheme(ELEM_KEYS[Math.floor(Math.random() * ELEM_KEYS.length)].toLowerCase());
-      state.gems += 120;
-      addLog('🧭 星海羅盤切換天象並發現 120 顆星鑽！', '#38bdf8');
+      state.gems += 150;
+      addLog('🧭 星海羅盤切換天象並發現 150 顆星鑽！', '#38bdf8');
       break;
     case 'item_17':
-      enemies.forEach(e => e.hp = Math.max(0, Math.round(e.hp * 0.5)));
-      addLog('🏹 精靈狙擊削去敵軍 50% 生命！', '#22c55e');
+      if (enemyUnit && enemyUnit.hp > 0) {
+        enemyUnit.hp = Math.max(1, Math.round(enemyUnit.hp * 0.6));
+        addLog('🏹 精靈麻痺吹箭削去敵人 40% 生命！', '#22c55e');
+      }
       break;
     case 'item_18':
-      state.skillBonusPct += 5;
-      addLog('📜 全隊技能傷害倍率永久 +5%！', '#38bdf8');
+      state.team.forEach(id => { if (state.owned[id]) state.owned[id].level += 1; });
+      syncActivePlayerStats(true);
+      addLog('📜 閱讀古老訓練師筆記，全隊等級 +1！', '#38bdf8');
       break;
     case 'item_19': {
       const lockedMythic = HEROES.filter(h => !state.owned[h.id] && h.rarity === 'MYTHIC');
       if (lockedMythic.length > 0) {
         const pick = lockedMythic[Math.floor(Math.random() * lockedMythic.length)];
         state.owned[pick.id] = { level: 1, stars: 1 };
-        addLog(`🌌 創世星核降臨！解鎖神話英雄【${pick.name}】！`, '#f43f5e');
+        addLog(`🌌 創世星核降臨！解鎖神話幻獸【${pick.name}】！`, '#f43f5e');
       } else { state.gems += 1600; }
       break;
     }
@@ -1590,14 +2034,14 @@ function useItem(itemId) {
   }
 
   updateTopUI();
-  renderBattleArena();
+  renderBattleScreen();
   renderItemsWorkshop();
   renderHeroesGrid();
   saveGame();
 }
 
 /* ============================================================================
-   10. WEBRTC P2P SERVERLESS CO-OP
+   12. WEBRTC P2P SERVERLESS CO-OP
    ============================================================================ */
 let pc = null;
 let dc = null;
@@ -1616,9 +2060,9 @@ function setupDataChannel(channel) {
   dc = channel;
   dc.onopen = () => {
     p2pConnected = true;
-    document.getElementById('p2p-status').textContent = '🟢 雙人連線已建立（全隊戰力 +25%）';
+    document.getElementById('p2p-status').textContent = '🟢 雙人連線已建立（全屬性 +25%）';
     document.getElementById('p2p-status').style.color = '#4ade80';
-    addLog('🤝 P2P 雙人連線成功！全隊獲得 +25% 羈絆戰力加成！', '#4ade80');
+    addLog('🤝 P2P 雙人連線成功！所有幻獸獲得 +25% 羈絆加成！', '#4ade80');
     updateTopUI();
   };
   dc.onmessage = (ev) => {
@@ -1656,13 +2100,13 @@ function sendCoopCheer() {
   state.gold += 500;
   updateTopUI();
   if (dc && dc.readyState === 'open') {
-    dc.send('發動了雙人合擊應援！獲得 +500 金幣！');
+    dc.send('發送了雙人合擊應援！獲得 +500 金幣！');
   }
-  addLog('🔥 發送雙人合擊應援！獲得 +500 金幣獎勵！', '#fbbf24');
+  addLog('🔥 發送雙人應援！獲得 +500 金幣獎勵！', '#fbbf24');
 }
 
 /* ============================================================================
-   11. DYNAMIC BIOME BACKGROUNDS & UI RENDERING
+   13. DYNAMIC BIOME & UI HELPERS
    ============================================================================ */
 function setBiomeTheme(theme) {
   state.biomeTheme = theme;
@@ -1672,25 +2116,23 @@ function setBiomeTheme(theme) {
 
 function updateDynamicBiome() {
   const bg = document.getElementById('dynamic-bg');
-  const biomeNames = ['翡翠星森', '熔岩赤壁', '深海星淵', '聖光雲殿', '永夜幻境', '創世銀河'];
   const biomeGradients = {
-    forest: 'radial-gradient(circle at 25% 20%, #065f46 0%, #0b0f1a 75%)',
-    fire:   'radial-gradient(circle at 75% 20%, #7f1d1d 0%, #0b0f1a 75%)',
-    water:  'radial-gradient(circle at 30% 25%, #155e75 0%, #0b0f1a 75%)',
-    light:  'radial-gradient(circle at 50% 15%, #78350f 0%, #0b0f1a 75%)',
-    dark:   'radial-gradient(circle at 60% 20%, #4c1d95 0%, #0b0f1a 75%)',
-    genesis:'radial-gradient(circle at 50% 20%, #831843 0%, #1e1b4b 50%, #0b0f1a 85%)'
+    forest: 'radial-gradient(circle at 25% 20%, #065f46 0%, #0b101e 75%)',
+    fire:   'radial-gradient(circle at 75% 20%, #7f1d1d 0%, #0b101e 75%)',
+    water:  'radial-gradient(circle at 30% 25%, #155e75 0%, #0b101e 75%)',
+    light:  'radial-gradient(circle at 50% 15%, #78350f 0%, #0b101e 75%)',
+    dark:   'radial-gradient(circle at 60% 20%, #4c1d95 0%, #0b101e 75%)',
+    genesis:'radial-gradient(circle at 50% 20%, #831843 0%, #1e1b4b 50%, #0b101e 85%)'
   };
-  const keys = Object.keys(biomeGradients);
-  const idx = (state.stage - 1) % 6;
-  document.getElementById('stage-biome').textContent = biomeNames[idx];
-  const activeKey = state.biomeTheme === 'auto' ? keys[idx] : state.biomeTheme;
-  bg.style.background = biomeGradients[activeKey] || biomeGradients.genesis;
+  const mapObj = WORLD_MAPS.find(m => m.id === state.currentMapId) || WORLD_MAPS[0];
+  const autoKey = mapObj.elem.toLowerCase();
+  const activeKey = state.biomeTheme === 'auto' ? autoKey : state.biomeTheme;
+  bg.style.background = biomeGradients[activeKey] || biomeGradients.forest;
 }
 
 function initStarfield() {
   const bg = document.getElementById('dynamic-bg');
-  for (let i = 0; i < 42; i++) {
+  for (let i = 0; i < 40; i++) {
     const dot = document.createElement('div');
     dot.className = 'star-dot';
     const sz = 1 + Math.random() * 2.5;
@@ -1708,55 +2150,20 @@ function updateTopUI() {
   document.getElementById('res-gems').textContent = state.gems.toLocaleString();
   document.getElementById('res-tickets').textContent = state.tickets;
   document.getElementById('res-codex').textContent = Object.keys(state.owned).length;
-  document.getElementById('stage-num').textContent = state.stage;
-  document.getElementById('team-power').textContent = getTeamTotalPower().toLocaleString();
-  document.getElementById('idle-rate').textContent = getIdleGoldPerMin();
-  document.getElementById('idle-gem-rate').textContent = getIdleGemPerMin();
-  document.getElementById('win-streak').textContent = state.winStreak;
   document.getElementById('pity-count').textContent = state.pity;
-}
-
-function renderBattleArena() {
-  const pList = document.getElementById('player-team-list');
-  pList.innerHTML = state.team.map(id => {
-    const h = HEROES[id - 1];
-    const pwr = getHeroPower(id);
-    const curHp = playerHps[id] ?? pwr.hp;
-    const pct = Math.max(0, Math.min(100, Math.round((curHp / pwr.hp) * 100)));
-    return `
-      <div class="unit-box" onclick="openHeroModal(${h.id})" style="cursor:pointer;">
-        ${renderHeroSVG(h, 46)}
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.name}</div>
-          <div style="font-size:10px;color:var(--muted);">HP ${curHp}/${pwr.hp} ｜ ATK ${pwr.atk}</div>
-          <div class="hp-bar"><div class="hp-fill" style="width:${pct}%;"></div></div>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  const eList = document.getElementById('enemy-team-list');
-  eList.innerHTML = enemies.map(e => {
-    const pct = Math.max(0, Math.min(100, Math.round((e.hp / e.maxHp) * 100)));
-    return `
-      <div class="unit-box">
-        ${renderHeroSVG(e.hero, 46)}
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.name}</div>
-          <div style="font-size:10px;color:var(--muted);">HP ${e.hp}/${e.maxHp} ｜ ATK ${e.atk}</div>
-          <div class="hp-bar"><div class="hp-fill enemy-hp" style="width:${pct}%;"></div></div>
-        </div>
-      </div>
-    `;
-  }).join('');
+  const activeH = getActiveHero();
+  if (document.getElementById('map-active-pet-name')) {
+    document.getElementById('map-active-pet-name').textContent = activeH.name;
+  }
 }
 
 function switchTab(tabName) {
   document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
   document.getElementById(`tab-${tabName}`).classList.add('active');
-  const idxMap = { camp: 0, gacha: 1, heroes: 2, items: 3, coop: 4, settings: 5 };
+  const idxMap = { map: 0, battle: 1, gacha: 2, heroes: 3, items: 4, coop: 5, settings: 6 };
   document.querySelectorAll('.nav-btn')[idxMap[tabName]].classList.add('active');
+  if (tabName === 'battle') renderBattleScreen();
 }
 
 function closeModal(id, ev) {
@@ -1782,21 +2189,18 @@ function importSaveCode() {
 }
 
 /* ============================================================================
-   12. BOOTSTRAP
+   14. BOOTSTRAP
    ============================================================================ */
 initStarfield();
 loadGame();
-spawnStageEnemies();
+syncActivePlayerStats(true);
+updateDynamicBiome();
 updateTopUI();
-renderBattleArena();
+renderMapsGrid();
 renderGachaPools();
 renderHeroesGrid();
 renderItemsWorkshop();
-addLog('✨ 歡迎來到《星芽紀元》500英雄與六大許願池終極整合版！', '#38bdf8');
-
-setInterval(() => {
-  if (autoBattle) battleTick(false);
-}, 2600);
+addLog('🌱 歡迎來到《星芽紀元》500像素幻獸終極版！請先在【世界地圖探索】選擇冒險區域吧！', '#4ade80');
 </script>
 </body>
 </html>
