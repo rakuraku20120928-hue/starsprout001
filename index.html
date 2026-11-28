@@ -2250,8 +2250,11 @@
         const isEx = lv >= 5;
         const isActive = (Battle.skillMode === i) || (Battle.skillMode === 'auto' && Battle.autoSkillIndex === i);
 
-        lvTag.textContent = isEx ? 'EX' : `Lv.${lv}`;
-        lvTag.style.color = isEx ? '#fef08a' : 'var(--amber)';
+        const isLocked = lv <= 0;
+        btn.disabled = isLocked;
+        btn.style.opacity = isLocked ? '0.4' : '1';
+        lvTag.textContent = isLocked ? '未習得' : (isEx ? 'EX' : `Lv.${lv}`);
+        lvTag.style.color = isLocked ? '#94a3b8' : (isEx ? '#fef08a' : 'var(--amber)');
         if (isEx) {
           lvTag.style.background = '#e11d48';
           lvTag.style.padding = '0 4px';
@@ -2263,14 +2266,15 @@
 
         btn.classList.toggle('ex-glow', isEx);
         if (!isEx) {
-          btn.style.borderColor = isActive ? 'var(--emerald)' : '#64748b';
-          btn.style.background = isActive ? 'rgba(6,78,59,0.95)' : 'rgba(15,23,42,0.92)';
+          btn.style.borderColor = isActive && !isLocked ? 'var(--emerald)' : '#64748b';
+          btn.style.background = isActive && !isLocked ? 'rgba(6,78,59,0.95)' : 'rgba(15,23,42,0.92)';
         }
-        btn.style.transform = isActive ? 'scale(1.06)' : 'scale(1)';
+        btn.style.transform = isActive && !isLocked ? 'scale(1.06)' : 'scale(1)';
       }
     }
 
     function setSkillMode(mode) {
+      if (typeof mode === 'number' && (Battle.skillLevels[mode] || 0) <= 0) return;
       Battle.skillMode = mode;
       updateSkillButtonsUI();
     }
@@ -2290,7 +2294,9 @@
       Battle.charObj = charObj;
       Battle.running = true;
       Battle.paused = false;
-      Battle.skillLevels = [1, 1, 1, 1];
+      const startSlot = Math.floor(Math.random() * 4);
+      Battle.skillLevels = [0, 0, 0, 0];
+      Battle.skillLevels[startSlot] = 1;
       Battle.elapsed = 0;
       Battle.kills = 0;
       Battle.coinsEarned = 0;
@@ -2314,7 +2320,7 @@
       Battle.chestTimer = 6;
       Battle.shootTimer = 0;
       Battle.skillMode = 'auto';
-      Battle.autoSkillIndex = 0;
+      Battle.autoSkillIndex = startSlot;
       Battle.autoSwitchTimer = 0;
       Battle.enemies = [];
       Battle.enemyProjectiles = [];
@@ -2336,7 +2342,7 @@
         hp: baseStats.hp, maxHp: baseStats.hp,
         atk: baseStats.atk, aspd: baseStats.aspd, spd: baseStats.spd,
         extraProj: baseStats.projBonus, pickupRange: 75,
-        runLv: 1, exp: 0, nextExp: 20, invuln: 0
+        runLv: 1, exp: 0, nextExp: 40, invuln: 0
       };
 
       charObj.skills.forEach((sk, idx) => {
@@ -2449,13 +2455,13 @@
       const p = Battle.player;
       const ang = Math.random() * Math.PI * 2;
       const dist = 260;
-      const baseHp = Math.max(1, Math.round(((480 + Battle.elapsed * 9) * Battle.map.rewardMult * hpMult) / 3 * 1.5 * 6));
+      const baseHp = Math.max(1, Math.round(((480 + Battle.elapsed * 9) * Battle.map.rewardMult * hpMult) / 3 * 1.5 * 6 * 3));
       Battle.enemies.push({
         x: p.x + Math.cos(ang) * dist,
         y: p.y + Math.sin(ang) * dist,
         hp: baseHp, maxHp: baseHp,
-        atk: Math.max(1, Math.round(((18 + Battle.elapsed * 0.14) * Battle.map.rewardMult) / 3 * 1.5 * 6)),
-        spd: tier === 'final' ? 68 : 78,
+        atk: Math.max(1, Math.round(((18 + Battle.elapsed * 0.14) * Battle.map.rewardMult) / 3 * 1.5 * 6 * 3)),
+        spd: (tier === 'final' ? 68 : 78) * 3,
         r: tier === 'final' ? 38 : 30,
         isBoss: true, bossTier: tier, bossKey, bossName: customName,
         shootCd: 2.2
@@ -2468,26 +2474,33 @@
       SoundFX.play('levelup');
       Battle.paused = true;
 
-      // 構建包含「4招式升級 (Lv.1->Lv.5 EX)」與基礎強化的選項池
+      // 構建包含「4招式習得/升級 (Lv.0->Lv.5 EX)」與基礎強化的選項池
       const choices = [];
       Battle.charObj.skills.forEach((sk, idx) => {
-        const curLv = Battle.skillLevels[idx] || 1;
+        const curLv = Battle.skillLevels[idx] || 0;
         if (curLv < 5) {
           const nextLv = curLv + 1;
+          const isUnlock = curLv === 0;
           const willBeEx = nextLv === 5;
           choices.push({
             isSkill: true,
             isExUpgrade: willBeEx,
-            title: willBeEx
-              ? `🌟 覺醒：【${sk.name} EX】！`
-              : `${sk.icon} ${sk.name} (Lv.${curLv} → Lv.${nextLv})`,
-            desc: willBeEx
-              ? `滿級終極進化！冷卻再 -10%、傷害與範圍暴增＋華麗金色星爆特效！`
-              : `招式冷卻 -10% ｜ 技能傷害 +10% ｜ 攻擊範圍 +8%`,
+            title: isUnlock
+              ? `✨ 習得新招式：【${sk.name}】 (Lv.1)`
+              : (willBeEx
+                ? `🌟 覺醒：【${sk.name} EX】！`
+                : `${sk.icon} ${sk.name} (Lv.${curLv} → Lv.${nextLv})`),
+            desc: isUnlock
+              ? `解鎖全新專屬攻擊招式！${sk.desc}`
+              : (willBeEx
+                ? `滿級終極進化！冷卻再 -10%、傷害與範圍暴增＋華麗金色星爆特效！`
+                : `招式冷卻 -10% ｜ 技能傷害 +10% ｜ 攻擊範圍 +8%`),
             apply: () => {
               Battle.skillLevels[idx] = nextLv;
               updateSkillButtonsUI();
-              if (willBeEx) {
+              if (isUnlock) {
+                showToast(`✨ 習得新招式：${sk.name}！`);
+              } else if (willBeEx) {
                 SoundFX.play('ex_awaken');
                 spawnShockwave(Battle.player.x, Battle.player.y, 180, '#fbbf24');
                 spawnParticles(Battle.player.x, Battle.player.y, '#fde047', 35);
@@ -2511,10 +2524,18 @@
         { title: '🧲 星辰磁場', desc: '經驗與金幣拾取範圍 +50%', apply: () => { Battle.player.pickupRange = Math.round(Battle.player.pickupRange * 1.5); } }
       ];
 
-      // 優先放入最多 2 張未滿級招式升級卡 + 隨機基礎強化卡湊滿 3 選 1
-      const shuffledSkills = [...choices].sort(() => Math.random() - 0.5).slice(0, 2);
-      const shuffledStats = [...statPool].sort(() => Math.random() - 0.5).slice(0, 3 - shuffledSkills.length);
-      const finalChoices = [...shuffledSkills, ...shuffledStats];
+      // 依類別權重抽取 3 張不重複選項：調低「攻擊招式」出現機率(25%)、提高「數值提升」出現機率(75%)
+      const availSkills = [...choices].sort(() => Math.random() - 0.5);
+      const availStats = [...statPool].sort(() => Math.random() - 0.5);
+      const finalChoices = [];
+      for (let i = 0; i < 3; i++) {
+        const pickSkill = availSkills.length > 0 && (availStats.length === 0 || Math.random() < 0.25);
+        if (pickSkill) {
+          finalChoices.push(availSkills.pop());
+        } else if (availStats.length > 0) {
+          finalChoices.push(availStats.pop());
+        }
+      }
 
       const container = document.getElementById('levelup-choices');
       container.innerHTML = finalChoices.map((ch, idx) => `
@@ -2622,7 +2643,11 @@
         Battle.autoSwitchTimer += dt;
         if (Battle.autoSwitchTimer >= 2.2) {
           Battle.autoSwitchTimer = 0;
-          Battle.autoSkillIndex = (Battle.autoSkillIndex + 1) % 4;
+          const unlocked = [0, 1, 2, 3].filter(i => (Battle.skillLevels[i] || 0) > 0);
+          if (unlocked.length > 0) {
+            const curPos = unlocked.indexOf(Battle.autoSkillIndex);
+            Battle.autoSkillIndex = unlocked[(curPos + 1) % unlocked.length];
+          }
           updateSkillButtonsUI();
         }
       }
@@ -2792,7 +2817,7 @@
 
       // 守護星環持續傷害 (Lv.5 EX 升級為 5 顆巨型神聖星球)
       const orbitIdx = Battle.charObj.skills.findIndex(s => s.style === 'orbit');
-      if (orbitIdx !== -1) {
+      if (orbitIdx !== -1 && (Battle.skillLevels[orbitIdx] || 0) > 0) {
         const { isEx: orbitEx, dmgFactor: orbitDmgF, rangeFactor: orbitRangeF } = getSkillCombatStats(orbitIdx);
         const orbCount = orbitEx ? 5 : 2;
         const orbR = (orbitEx ? 72 : 52) * Math.min(1.35, orbitRangeF);
@@ -2843,14 +2868,14 @@
           if (Battle.enemies.length >= maxEnemies) break;
           const ang = Math.random() * Math.PI * 2;
           const bhMult = Battle.zone === 'blackhole' ? 2 : 1;
-          const eHp = Math.max(1, Math.round(((28 * hpScale) / 3 * 1.5) * bhMult * 6));
-          const eAtk = Math.max(1, Math.round(((9 * Battle.map.rewardMult) / 3 * 1.5) * bhMult * 6));
+          const eHp = Math.max(1, Math.round(((28 * hpScale) / 3 * 1.5) * bhMult * 6 * 3));
+          const eAtk = Math.max(1, Math.round(((9 * Battle.map.rewardMult) / 3 * 1.5) * bhMult * 6 * 3));
           Battle.enemies.push({
             x: (Battle.zone === 'main' ? p.x : 0) + Math.cos(ang) * dist,
             y: (Battle.zone === 'main' ? p.y : 0) + Math.sin(ang) * dist,
             hp: eHp, maxHp: eHp,
             atk: eAtk,
-            spd: (62 + Math.min(45, Battle.elapsed * 0.05)) * (Battle.zone === 'blackhole' ? 1.15 : 1),
+            spd: (62 + Math.min(45, Battle.elapsed * 0.05)) * (Battle.zone === 'blackhole' ? 1.15 : 1) * 3,
             r: 14, isBoss: false, inBlackHole: Battle.zone === 'blackhole'
           });
         }
@@ -3209,7 +3234,7 @@
 
       // 守護星環光球
       const orbitIdx = Battle.charObj.skills.findIndex(s => s.style === 'orbit');
-      if (orbitIdx !== -1) {
+      if (orbitIdx !== -1 && (Battle.skillLevels[orbitIdx] || 0) > 0) {
         const { isEx: orbitEx, rangeFactor: orbitRangeF } = getSkillCombatStats(orbitIdx);
         const orbCount = orbitEx ? 5 : 2;
         const orbR = (orbitEx ? 72 : 52) * Math.min(1.35, orbitRangeF);
