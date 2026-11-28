@@ -1423,8 +1423,30 @@
 
     function loadAccountsDB() {
       try {
-        const rawDB = localStorage.getItem(ACCOUNTS_DB_KEY);
-        if (rawDB) accountsDB = JSON.parse(rawDB) || {};
+        const legacyKeys = ['star_sprout_accounts_db_v1', 'star_sprout_accounts_db_v2', ACCOUNTS_DB_KEY];
+        for (const k of legacyKeys) {
+          const rawLegacy = localStorage.getItem(k);
+          if (rawLegacy) {
+            const parsedLegacy = JSON.parse(rawLegacy) || {};
+            Object.keys(parsedLegacy).forEach(accName => {
+              if (!accountsDB[accName]) {
+                accountsDB[accName] = parsedLegacy[accName];
+              } else if (parsedLegacy[accName] && parsedLegacy[accName].saveData) {
+                const curData = accountsDB[accName].saveData || {};
+                const oldData = parsedLegacy[accName].saveData || {};
+                const mergedOwned = Object.assign({}, oldData.owned || {}, curData.owned || {});
+                Object.keys(mergedOwned).forEach(cid => {
+                  mergedOwned[cid] = Math.max(oldData.owned?.[cid] || 1, curData.owned?.[cid] || 1);
+                });
+                accountsDB[accName].saveData = migrateAndMergeSaveState(accName, Object.assign({}, oldData, curData, {
+                  coins: Math.max(oldData.coins || 0, curData.coins || 0),
+                  tickets: Math.max(oldData.tickets || 0, curData.tickets || 0),
+                  owned: mergedOwned
+                }));
+              }
+            });
+          }
+        }
         // 自動將舊版存檔資料結構無損升級並補齊預設欄位
         Object.keys(accountsDB).forEach(accName => {
           if (accountsDB[accName] && accountsDB[accName].saveData) {
@@ -2251,10 +2273,15 @@
         const isActive = (Battle.skillMode === i) || (Battle.skillMode === 'auto' && Battle.autoSkillIndex === i);
 
         const isLocked = lv <= 0;
+        const iconEl = document.getElementById(`skill-icon-${i}`);
+        const labelEl = document.getElementById(`skill-label-${i}`);
         btn.disabled = isLocked;
-        btn.style.opacity = isLocked ? '0.4' : '1';
-        lvTag.textContent = isLocked ? '未習得' : (isEx ? 'EX' : `Lv.${lv}`);
-        lvTag.style.color = isLocked ? '#94a3b8' : (isEx ? '#fef08a' : 'var(--amber)');
+        btn.style.opacity = '1';
+        btn.style.filter = isLocked ? 'brightness(0.28) grayscale(1)' : 'none';
+        lvTag.textContent = isLocked ? '未解鎖' : (isEx ? 'EX' : `Lv.${lv}`);
+        lvTag.style.color = isLocked ? '#475569' : (isEx ? '#fef08a' : 'var(--amber)');
+        if (iconEl) iconEl.style.filter = isLocked ? 'brightness(0)' : 'none';
+        if (labelEl) labelEl.style.color = isLocked ? '#334155' : '#ffffff';
         if (isEx) {
           lvTag.style.background = '#e11d48';
           lvTag.style.padding = '0 4px';
@@ -2264,10 +2291,13 @@
           lvTag.style.padding = '0';
         }
 
-        btn.classList.toggle('ex-glow', isEx);
-        if (!isEx) {
-          btn.style.borderColor = isActive && !isLocked ? 'var(--emerald)' : '#64748b';
-          btn.style.background = isActive && !isLocked ? 'rgba(6,78,59,0.95)' : 'rgba(15,23,42,0.92)';
+        btn.classList.toggle('ex-glow', isEx && !isLocked);
+        if (isLocked) {
+          btn.style.borderColor = '#1e293b';
+          btn.style.background = '#020408';
+        } else if (!isEx) {
+          btn.style.borderColor = isActive ? 'var(--emerald)' : '#64748b';
+          btn.style.background = isActive ? 'rgba(6,78,59,0.95)' : 'rgba(15,23,42,0.92)';
         }
         btn.style.transform = isActive && !isLocked ? 'scale(1.06)' : 'scale(1)';
       }
@@ -2461,7 +2491,7 @@
         y: p.y + Math.sin(ang) * dist,
         hp: baseHp, maxHp: baseHp,
         atk: Math.max(1, Math.round(((18 + Battle.elapsed * 0.14) * Battle.map.rewardMult) / 3 * 1.5 * 6 * 3)),
-        spd: (tier === 'final' ? 68 : 78) * 3,
+        spd: ((tier === 'final' ? 68 : 78) * 3) / 3,
         r: tier === 'final' ? 38 : 30,
         isBoss: true, bossTier: tier, bossKey, bossName: customName,
         shootCd: 2.2
@@ -2875,8 +2905,10 @@
             y: (Battle.zone === 'main' ? p.y : 0) + Math.sin(ang) * dist,
             hp: eHp, maxHp: eHp,
             atk: eAtk,
-            spd: (62 + Math.min(45, Battle.elapsed * 0.05)) * (Battle.zone === 'blackhole' ? 1.15 : 1) * 3,
-            r: 14, isBoss: false, inBlackHole: Battle.zone === 'blackhole'
+            spd: ((62 + Math.min(45, Battle.elapsed * 0.05)) * (Battle.zone === 'blackhole' ? 1.15 : 1) * 3) / 3,
+            r: 14, isBoss: false, inBlackHole: Battle.zone === 'blackhole',
+            enemyType: Math.floor(Math.random() * 5),
+            animSeed: Math.random() * 6.28
           });
         }
       }
@@ -3119,36 +3151,96 @@
 
       for (let c = startCol; c <= endCol; c++) {
         for (let r = startRow; r <= endRow; r++) {
+          const tx = c * tileSize, ty = r * tileSize;
           if ((c + r) % 2 === 0) {
             ctx.fillStyle = Battle.zone === 'abyss' ? '#240b29' : Battle.zone === 'portal' ? '#1f184f' : Battle.zone === 'blackhole' ? '#130a2a' : Battle.map.tileAlt;
-            ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
+            ctx.fillRect(tx, ty, tileSize, tileSize);
           }
-          const hash = Math.abs((c * 928371) ^ (r * 364921)) % 17;
-          if (hash === 0) {
+          ctx.fillStyle = 'rgba(255,255,255,0.03)';
+          ctx.fillRect(tx, ty, tileSize, 2);
+          ctx.fillStyle = 'rgba(0,0,0,0.08)';
+          ctx.fillRect(tx, ty + tileSize - 2, tileSize, 2);
+
+          const hash = Math.abs((c * 928371) ^ (r * 364921)) % 19;
+          if (Battle.zone !== 'main') {
+            if (hash === 0 || hash === 5) {
+              ctx.fillStyle = Battle.zone === 'blackhole' ? 'rgba(168,85,247,0.35)' : 'rgba(251,191,36,0.28)';
+              ctx.fillRect(tx + 28, ty + 28, 8, 8);
+              ctx.fillStyle = 'rgba(255,255,255,0.35)';
+              ctx.fillRect(tx + 30, ty + 30, 4, 4);
+            } else if (hash === 2) {
+              ctx.strokeStyle = 'rgba(56,189,248,0.18)';
+              ctx.lineWidth = 1.5;
+              ctx.strokeRect(tx + 14, ty + 14, 36, 36);
+            }
+          } else if (hash === 0 || hash === 7) {
             ctx.fillStyle = Battle.map.deco;
-            ctx.fillRect(c * tileSize + 24, r * tileSize + 28, 6, 4);
-          } else if (hash === 1) {
+            ctx.fillRect(tx + 18, ty + 30, 6, 4);
+            ctx.fillRect(tx + 24, ty + 26, 4, 8);
+            ctx.fillRect(tx + 28, ty + 30, 5, 4);
+          } else if (hash === 1 || hash === 9) {
+            ctx.fillStyle = Battle.map.deco;
+            ctx.fillRect(tx + 36, ty + 22, 4, 4);
             ctx.fillStyle = Battle.map.flower;
-            ctx.fillRect(c * tileSize + 36, r * tileSize + 18, 4, 4);
+            ctx.fillRect(tx + 34, ty + 18, 8, 4);
+            ctx.fillRect(tx + 36, ty + 16, 4, 8);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(tx + 37, ty + 19, 2, 2);
+          } else if (hash === 3) {
+            ctx.fillStyle = 'rgba(0,0,0,0.22)';
+            ctx.fillRect(tx + 14, ty + 42, 12, 6);
+            ctx.fillStyle = 'rgba(255,255,255,0.12)';
+            ctx.fillRect(tx + 15, ty + 42, 10, 2);
+          } else if (hash === 11) {
+            ctx.fillStyle = Battle.map.flower;
+            ctx.fillRect(tx + 44, ty + 44, 4, 4);
+            ctx.fillStyle = Battle.map.deco;
+            ctx.fillRect(tx + 20, ty + 14, 4, 4);
           }
         }
       }
 
       if (Battle.zone !== 'main' && Battle.arenaRadius > 0) {
-        ctx.strokeStyle = Battle.zone === 'abyss' ? '#f43f5e' : '#c084fc';
-        ctx.lineWidth = 6;
+        const ringCol = Battle.zone === 'abyss' ? '#f43f5e' : Battle.zone === 'blackhole' ? '#a855f7' : '#c084fc';
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = 14;
+        ctx.beginPath(); ctx.arc(0, 0, Battle.arenaRadius, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = ringCol;
+        ctx.lineWidth = 5;
         ctx.beginPath(); ctx.arc(0, 0, Battle.arenaRadius, 0, Math.PI * 2); ctx.stroke();
       } else {
         const cx = Math.floor(p.x / 480), cy = Math.floor(p.y / 480);
         for (let dx = -1; dx <= 1; dx++) {
           for (let dy = -1; dy <= 1; dy++) {
             for (const obs of getChunkObstacles(cx + dx, cy + dy)) {
-              ctx.fillStyle = 'rgba(0,0,0,0.3)';
-              ctx.beginPath(); ctx.ellipse(obs.x, obs.y + 16, 20, 8, 0, 0, Math.PI * 2); ctx.fill();
-              ctx.fillStyle = Battle.map.obsCol;
-              ctx.fillRect(obs.x - 14, obs.y - 12, 28, 28);
-              ctx.fillStyle = Battle.map.obsTop;
-              ctx.fillRect(obs.x - 18, obs.y - 22, 36, 16);
+              ctx.fillStyle = 'rgba(0,0,0,0.34)';
+              ctx.beginPath(); ctx.ellipse(obs.x, obs.y + 17, 22, 8, 0, 0, Math.PI * 2); ctx.fill();
+              const oType = Battle.map.obstacleType;
+              if (oType === 'tree') {
+                ctx.fillStyle = '#78350f'; ctx.fillRect(obs.x - 6, obs.y + 2, 12, 14);
+                ctx.fillStyle = Battle.map.obsCol; ctx.fillRect(obs.x - 18, obs.y - 16, 36, 20);
+                ctx.fillStyle = Battle.map.obsTop; ctx.fillRect(obs.x - 14, obs.y - 24, 28, 12);
+                ctx.fillStyle = '#fef08a'; ctx.fillRect(obs.x - 10, obs.y - 12, 3, 3); ctx.fillRect(obs.x + 8, obs.y - 8, 3, 3);
+              } else if (oType === 'shroom') {
+                ctx.fillStyle = '#fce7f3'; ctx.fillRect(obs.x - 7, obs.y - 2, 14, 18);
+                ctx.fillStyle = Battle.map.obsCol; ctx.fillRect(obs.x - 19, obs.y - 16, 38, 15);
+                ctx.fillStyle = Battle.map.obsTop; ctx.fillRect(obs.x - 14, obs.y - 21, 28, 6);
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(obs.x - 11, obs.y - 13, 5, 5); ctx.fillRect(obs.x + 5, obs.y - 14, 6, 6);
+              } else if (oType === 'lava') {
+                ctx.fillStyle = '#291515'; ctx.fillRect(obs.x - 16, obs.y - 18, 32, 34);
+                ctx.fillStyle = Battle.map.obsTop; ctx.fillRect(obs.x - 10, obs.y - 12, 6, 18); ctx.fillRect(obs.x + 4, obs.y - 6, 6, 14);
+                ctx.fillStyle = '#fef08a'; ctx.fillRect(obs.x - 8, obs.y - 10, 2, 12);
+              } else if (oType === 'ice') {
+                ctx.fillStyle = Battle.map.obsCol; ctx.fillRect(obs.x - 15, obs.y - 16, 30, 32);
+                ctx.fillStyle = Battle.map.obsTop; ctx.fillRect(obs.x - 10, obs.y - 24, 20, 12);
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(obs.x - 11, obs.y - 18, 4, 18);
+              } else {
+                ctx.fillStyle = Battle.map.obsCol;
+                ctx.fillRect(obs.x - 7, obs.y - 22, 14, 38);
+                ctx.fillRect(obs.x - 17, obs.y - 12, 10, 6); ctx.fillRect(obs.x - 17, obs.y - 18, 6, 10);
+                ctx.fillRect(obs.x + 7, obs.y - 8, 10, 6); ctx.fillRect(obs.x + 11, obs.y - 15, 6, 11);
+                ctx.fillStyle = '#f43f5e'; ctx.fillRect(obs.x - 3, obs.y - 26, 6, 4);
+              }
             }
           }
         }
@@ -3262,10 +3354,71 @@
           ctx.beginPath(); ctx.arc(e.x, e.y + 8, drawSize * 0.52 + Math.sin(Battle.elapsed * 6) * 3, 0, Math.PI * 2); ctx.stroke();
           ctx.drawImage(bossSpr, e.x - drawSize / 2, e.y - drawSize / 2, drawSize, drawSize);
         } else {
-          ctx.fillStyle = Battle.map.enemyCol;
-          ctx.fillRect(e.x - 12, e.y - 12, 24, 24);
-          ctx.fillStyle = '#fff';
-          ctx.fillRect(e.x - 6, e.y - 4, 4, 4); ctx.fillRect(e.x + 2, e.y - 4, 4, 4);
+          const et = e.enemyType !== undefined ? e.enemyType : 0;
+          const bob = Math.sin(Battle.elapsed * 8 + (e.animSeed || 0)) * 2;
+          const baseCol = e.inBlackHole ? '#9333ea' : Battle.map.enemyCol;
+          ctx.fillStyle = 'rgba(0,0,0,0.28)';
+          ctx.beginPath(); ctx.ellipse(e.x, e.y + 13, 11, 4, 0, 0, Math.PI * 2); ctx.fill();
+
+          if (et === 0) {
+            // 造型 0：果凍史萊姆
+            ctx.fillStyle = baseCol;
+            ctx.fillRect(e.x - 12, e.y - 6 + bob, 24, 18);
+            ctx.fillRect(e.x - 9, e.y - 11 + bob, 18, 6);
+            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            ctx.fillRect(e.x - 8, e.y - 8 + bob, 6, 3);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(e.x - 6, e.y - 2 + bob, 4, 4); ctx.fillRect(e.x + 2, e.y - 2 + bob, 4, 4);
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(e.x - 5, e.y - 1 + bob, 2, 2); ctx.fillRect(e.x + 3, e.y - 1 + bob, 2, 2);
+          } else if (et === 1) {
+            // 造型 1：振翅獨眼小蝠
+            const flap = Math.sin(Battle.elapsed * 18 + (e.animSeed || 0)) * 4;
+            ctx.fillStyle = '#312e81';
+            ctx.fillRect(e.x - 20, e.y - 6 + flap, 9, 8);
+            ctx.fillRect(e.x + 11, e.y - 6 + flap, 9, 8);
+            ctx.fillStyle = baseCol;
+            ctx.fillRect(e.x - 10, e.y - 10, 20, 20);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(e.x - 5, e.y - 5, 10, 8);
+            ctx.fillStyle = '#e11d48';
+            ctx.fillRect(e.x - 2, e.y - 3, 4, 5);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(e.x - 5, e.y + 6, 2, 3); ctx.fillRect(e.x + 3, e.y + 6, 2, 3);
+          } else if (et === 2) {
+            // 造型 2：尖刺魔球怪
+            ctx.fillStyle = '#fde047';
+            ctx.fillRect(e.x - 2, e.y - 16, 4, 5); ctx.fillRect(e.x - 2, e.y + 11, 4, 5);
+            ctx.fillRect(e.x - 16, e.y - 2, 5, 4); ctx.fillRect(e.x + 11, e.y - 2, 5, 4);
+            ctx.fillStyle = baseCol;
+            ctx.fillRect(e.x - 11, e.y - 11, 22, 22);
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(e.x - 7, e.y - 3, 5, 3); ctx.fillRect(e.x + 2, e.y - 3, 5, 3);
+            ctx.fillStyle = '#f43f5e';
+            ctx.fillRect(e.x - 5, e.y + 4, 10, 3);
+          } else if (et === 3) {
+            // 造型 3：幽靈小鬼
+            ctx.fillStyle = '#fb7185';
+            ctx.fillRect(e.x - 8, e.y - 15 + bob, 3, 4); ctx.fillRect(e.x + 5, e.y - 15 + bob, 3, 4);
+            ctx.fillStyle = baseCol;
+            ctx.fillRect(e.x - 11, e.y - 11 + bob, 22, 19);
+            ctx.fillRect(e.x - 11, e.y + 8 + bob, 5, 4);
+            ctx.fillRect(e.x - 2, e.y + 8 + bob, 4, 5);
+            ctx.fillRect(e.x + 6, e.y + 8 + bob, 5, 4);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(e.x - 6, e.y - 4 + bob, 4, 5); ctx.fillRect(e.x + 2, e.y - 4 + bob, 4, 5);
+          } else {
+            // 造型 4：重裝甲蟲怪
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(e.x - 8, e.y - 15, 4, 5); ctx.fillRect(e.x + 4, e.y - 15, 4, 5);
+            ctx.fillStyle = baseCol;
+            ctx.fillRect(e.x - 13, e.y - 10, 26, 22);
+            ctx.fillStyle = 'rgba(15,23,42,0.45)';
+            ctx.fillRect(e.x - 1, e.y - 10, 2, 22);
+            ctx.fillRect(e.x - 13, e.y + 1, 26, 2);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(e.x - 7, e.y - 6, 4, 3); ctx.fillRect(e.x + 3, e.y - 6, 4, 3);
+          }
         }
       }
 
